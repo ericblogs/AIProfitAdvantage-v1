@@ -1,158 +1,458 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ===========================
+   AI Profit Advantage v1.0
+   Global Styles
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.6;
-    color: #222;
-    background: #ffffff;
+html{
+    scroll-behavior:smooth;
 }
 
-header {
-    background: #0b1220;
-    color: #fff;
-    padding: 20px;
-    text-align: center;
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    line-height:1.7;
+    background:#f8fafc;
+    color:#1f2937;
 }
 
-#hero {
-    max-width: 1200px;
-    margin: 60px auto;
-    padding: 20px;
-    text-align: center;
+img{
+    max-width:100%;
+    display:block;
 }
 
-#hero h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+a{
+    text-decoration:none;
 }
 
-#hero p {
-    max-width: 700px;
-    margin: 0 auto 30px;
-    font-size: 1.1rem;
+ul{
+    list-style:none;
 }
 
-#hero a {
-    display: inline-block;
-    padding: 14px 28px;
-    background: #0b57d0;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
+section{
+    padding:80px 8%;
 }
 
-footer {
-    text-align: center;
-    padding: 30px;
-    background: #f5f5f5;
-}
-nav {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+h1,
+h2,
+h3{
+    line-height:1.2;
+    margin-bottom:20px;
 }
 
-nav h1 {
-    font-size: 1.8rem;
+p{
+    margin-bottom:18px;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 25px;
+/* ===========================
+   Navigation
+=========================== */
+
+header{
+    background:#07152d;
+    position:sticky;
+    top:0;
+    z-index:1000;
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
 }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
+.navbar{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:20px 30px;
+
 }
 
-nav a:hover {
-    color: #4da3ff;
-}
-.hero-buttons {
-    margin-top: 35px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
+.logo h1{
+
+    color:#ffffff;
+
+    font-size:1.7rem;
+
+    font-weight:700;
+
 }
 
-.btn-primary,
-.btn-secondary {
-    display: inline-block;
-    padding: 14px 30px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+.nav-links{
+
+    display:flex;
+
+    gap:30px;
+
 }
 
-.btn-primary {
-    background: #0b57d0;
-    color: #ffffff;
+.nav-links a{
+
+    color:white;
+
+    font-weight:600;
+
+    transition:.3s;
+
 }
 
-.btn-primary:hover {
-    background: #0847ad;
+.nav-links a:hover{
+
+    color:#38bdf8;
+
 }
 
-.btn-secondary {
-    border: 2px solid #0b57d0;
-    color: #0b57d0;
-    background: transparent;
+/* ===========================
+   Buttons
+=========================== */
+
+.btn-primary{
+
+    display:inline-block;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:15px 32px;
+
+    border-radius:8px;
+
+    font-weight:700;
+
+    transition:.3s;
+
 }
 
-.btn-secondary:hover {
-    background: #0b57d0;
-    color: #ffffff;
-}
-#features {
-    max-width: 1200px;
-    margin: 80px auto;
-    padding: 20px;
-    text-align: center;
+.btn-primary:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
 }
 
-#features h2 {
-    font-size: 2.2rem;
-    margin-bottom: 50px;
-    color: #0b1220;
+.btn-secondary{
+
+    display:inline-block;
+
+    background:white;
+
+    color:#2563eb;
+
+    border:2px solid #2563eb;
+
+    padding:15px 32px;
+
+    border-radius:8px;
+
+    font-weight:700;
+
+    margin-left:15px;
+
+    transition:.3s;
+
 }
 
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
+.btn-secondary:hover{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+/* ===========================
+   Hero Section
+=========================== */
+
+.hero{
+    background:linear-gradient(135deg,#07152d,#0b57d0);
+    color:#ffffff;
+    text-align:center;
+    padding:120px 8%;
 }
 
-.feature-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.hero-content{
+    max-width:900px;
+    margin:0 auto;
 }
 
-.feature-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+.hero h2{
+    font-size:3rem;
+    margin-bottom:25px;
 }
 
-.feature-card h3 {
-    margin-bottom: 15px;
-    color: #0b57d0;
+.hero p{
+    font-size:1.15rem;
+    max-width:760px;
+    margin:0 auto 35px;
+    color:#e5e7eb;
 }
 
-.feature-card p {
-    color: #555;
-    line-height: 1.7;
+.hero-buttons{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* ===========================
+   Features Section
+=========================== */
+
+.features{
+    background:#ffffff;
+    text-align:center;
+}
+
+.features h2{
+    font-size:2.2rem;
+}
+
+.features-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:30px;
+    margin-top:50px;
+}
+
+.feature-card{
+    background:#ffffff;
+    padding:35px 30px;
+    border-radius:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.feature-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 16px 36px rgba(0,0,0,.12);
+}
+
+.feature-card h3{
+    color:#0b57d0;
+    margin-bottom:15px;
+}
+/* ===========================
+   Courses Section
+=========================== */
+
+.courses{
+    background:#f8fafc;
+    text-align:center;
+}
+
+.courses h2{
+    font-size:2.2rem;
+}
+
+.courses-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:30px;
+    margin-top:50px;
+}
+
+.course-card{
+    background:#ffffff;
+    padding:35px 30px;
+    border-radius:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.course-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 16px 36px rgba(0,0,0,.12);
+}
+
+.course-card h3{
+    color:#0b57d0;
+}
+
+/* ===========================
+   Community Section
+=========================== */
+
+.community{
+    background:#0b57d0;
+    color:#ffffff;
+    text-align:center;
+}
+
+.community h2{
+    font-size:2.3rem;
+}
+
+.community p{
+    max-width:750px;
+    margin:0 auto 30px;
+    color:#e5e7eb;
+}
+
+/* ===========================
+   Testimonials
+=========================== */
+
+.testimonials{
+    background:#ffffff;
+    text-align:center;
+}
+
+.testimonials h2{
+    font-size:2.2rem;
+}
+
+.testimonial-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:30px;
+    margin-top:50px;
+}
+
+.testimonial-card{
+    background:#f8fafc;
+    padding:30px;
+    border-radius:12px;
+    border-left:5px solid #2563eb;
+    box-shadow:0 6px 18px rgba(0,0,0,.06);
+}
+
+.testimonial-card h4{
+    margin-top:20px;
+    color:#2563eb;
+}
+/* ===========================
+   Pricing
+=========================== */
+
+.pricing{
+    background:#f8fafc;
+    text-align:center;
+}
+
+.pricing-card{
+    max-width:520px;
+    margin:50px auto 0;
+    background:#ffffff;
+    padding:40px;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.pricing-card ul{
+    margin:30px 0;
+    padding:0;
+}
+
+.pricing-card li{
+    padding:10px 0;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.price{
+    font-size:1.4rem;
+    color:#2563eb;
+    font-weight:bold;
+}
+
+/* ===========================
+   FAQ
+=========================== */
+
+.faq{
+    background:#ffffff;
+}
+
+.faq h2{
+    text-align:center;
+}
+
+.faq-item{
+    max-width:850px;
+    margin:30px auto;
+    background:#f8fafc;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.faq-item h3{
+    color:#0b57d0;
+}
+
+/* ===========================
+   CTA
+=========================== */
+
+.cta{
+    background:linear-gradient(135deg,#07152d,#0b57d0);
+    color:#ffffff;
+    text-align:center;
+}
+
+.cta p{
+    max-width:700px;
+    margin:0 auto 35px;
+}
+
+/* ===========================
+   Footer
+=========================== */
+
+footer{
+    background:#07152d;
+    color:#ffffff;
+    text-align:center;
+    padding:50px 20px;
+}
+
+.footer-content{
+    max-width:900px;
+    margin:auto;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:768px){
+
+    .navbar{
+        flex-direction:column;
+        gap:20px;
+    }
+
+    .nav-links{
+        flex-direction:column;
+        align-items:center;
+        gap:15px;
+    }
+
+    .hero h2{
+        font-size:2.2rem;
+    }
+
+    .hero-buttons{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .btn-secondary{
+        margin-left:0;
+        margin-top:15px;
+    }
+
+    section{
+        padding:60px 6%;
+    }
+
 }
