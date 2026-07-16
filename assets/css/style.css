@@ -73,13 +73,14 @@ header{
 .logo{
     display:flex;
     align-items:center;
-    gap:12px;
-    color:#fff;
+    flex-shrink:0;
 }
 
-.logo-icon{
-    width:46px;
-    height:46px;
+.logo img{
+    height:62px;
+    width:auto;
+    display:block;
+}
 
     background:#2563eb;
 
