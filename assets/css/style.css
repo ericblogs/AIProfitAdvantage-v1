@@ -49,7 +49,7 @@ p{
 }
 
 /* ===========================
-   Navigation
+   Version 2 Navigation
 =========================== */
 
 header{
@@ -57,14 +57,13 @@ header{
     top:0;
     z-index:1000;
     background:#07152d;
-    box-shadow:0 4px 20px rgba(0,0,0,.15);
+    box-shadow:0 6px 20px rgba(0,0,0,.12);
 }
 
 .navbar{
     max-width:1200px;
     margin:0 auto;
-    padding:18px 40px;
-
+    padding:18px 30px;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -77,49 +76,53 @@ header{
 }
 
 .logo img{
-    height:62px;
-    width:auto;
     display:block;
-}
-
-    background:#2563eb;
-
-    border-radius:10px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-weight:700;
-    color:#fff;
-}
-
-.logo-text{
-    font-size:1.6rem;
-    font-weight:700;
-    color:#fff;
+    height:58px;
+    width:auto;
 }
 
 .nav-links{
     display:flex;
     align-items:center;
-    gap:28px;
-    list-style:none;
+    gap:30px;
 }
 
 .nav-links li{
-    margin:0;
+    list-style:none;
 }
 
 .nav-links a{
     color:#ffffff;
     font-weight:600;
-    font-size:1rem;
+    font-size:15px;
+    text-decoration:none;
     transition:.3s;
 }
 
 .nav-links a:hover{
     color:#38bdf8;
+}
+
+/* Mobile */
+
+@media (max-width:900px){
+
+    .navbar{
+        flex-direction:column;
+        gap:20px;
+        padding:20px;
+    }
+
+    .logo img{
+        height:52px;
+    }
+
+    .nav-links{
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:16px;
+    }
+
 }
 
 /* ===========================
