@@ -53,20 +53,23 @@ p{
 =========================== */
 
 header{
+    background:#07152d;
     position:sticky;
     top:0;
-    z-index:1000;
-    background:#07152d;
-    box-shadow:0 6px 20px rgba(0,0,0,.12);
+    z-index:999;
+
 }
 
 .navbar{
     max-width:1200px;
     margin:0 auto;
-    padding:18px 30px;
+    padding:16px 40px;
+
     display:flex;
     justify-content:space-between;
     align-items:center;
+
+    background:#07152d;
 }
 
 .logo{
@@ -84,23 +87,25 @@ header{
 .nav-links{
     display:flex;
     align-items:center;
-    gap:30px;
-}
+    gap:42px;
 
-.nav-links li{
     list-style:none;
+    margin:0;
+    padding:0;
 }
 
 .nav-links a{
     color:#ffffff;
-    font-weight:600;
-    font-size:15px;
     text-decoration:none;
+
+    font-size:17px;
+    font-weight:600;
+
     transition:.3s;
 }
 
 .nav-links a:hover{
-    color:#38bdf8;
+    color:#f4c542;
 }
 
 /* Mobile */
@@ -114,8 +119,10 @@ header{
     }
 
     .logo img{
-        height:52px;
-    }
+    height:74px;
+    width:auto;
+    display:block;
+}
 
     .nav-links{
         flex-wrap:wrap;
