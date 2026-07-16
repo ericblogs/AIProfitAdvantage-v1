@@ -69,14 +69,18 @@ header{
     align-items:center;
     padding:18px 30px;
 }
+}
 
 .logo{
     display:flex;
     align-items:center;
     gap:12px;
-    color:#fff;
+    color:#ffffff;
     font-weight:700;
     font-size:1.35rem;
+    white-space:nowrap;
+}
+}
 }
 
 .logo-icon{
@@ -94,14 +98,20 @@ header{
 }
 
 .logo-text{
-    color:#fff;
+    color:#ffffff;
+    font-size:1.4rem;
+    font-weight:700;
     letter-spacing:.3px;
+}
 }
 
 .nav-links{
     display:flex;
     align-items:center;
-    gap:28px;
+    justify-content:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+}
 }
 
 .nav-links a{
