@@ -499,3 +499,58 @@ footer{
     color:#4b5563;
     font-weight:600;
 }
+/* ===========================
+   Founder Section
+=========================== */
+
+.founder{
+    background:#f8fafc;
+    padding:80px 8%;
+}
+
+.founder-content{
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:50px;
+    align-items:center;
+}
+
+.founder-image img{
+    width:100%;
+    border-radius:16px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+    object-fit:cover;
+}
+
+.founder-text h2{
+    color:#2563eb;
+    margin-bottom:10px;
+}
+
+.founder-text h3{
+    font-size:2rem;
+    margin-bottom:20px;
+    color:#111827;
+}
+
+.founder-text p{
+    color:#4b5563;
+    margin-bottom:18px;
+    line-height:1.8;
+}
+
+@media (max-width:768px){
+
+    .founder-content{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .founder-image{
+        max-width:280px;
+        margin:auto;
+    }
+
+}
