@@ -118,13 +118,11 @@ header{
         gap:20px;
         padding:120px 20px;
     }
-
     .logo img{
     height:74px;
     width:auto;
     display:block;
 }
-
     .nav-links{
         flex-wrap:wrap;
         justify-content:center;
