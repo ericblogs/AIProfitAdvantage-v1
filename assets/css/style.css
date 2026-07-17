@@ -1,0 +1,10 @@
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:Arial,Helvetica,sans-serif;line-height:1.7;background:#f8fafc;color:#1f2937}
+img{max-width:100%;display:block}
+a{text-decoration:none}
+ul{list-style:none}
+main{padding-top:96px}
+section{padding:80px 8%}
+header{position:fixed;top:0;left:0;width:100%;background:#07152d;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.navbar{max-width:1200px;height:96px;margin:auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center}.logo img{height:68px}.nav-links{display:flex;gap:32px}.nav-links a{color:#fff;font-weight:700;font-size:16px}.nav-links a:hover{color:#d4af37}.btn-primary,.btn-secondary{display:inline-block;padding:15px 32px;border-radius:8px;font-weight:700}.btn-primary{background:#2563eb;color:#fff}.btn-secondary{background:#fff;color:#2563eb;border:2px solid #2563eb}.hero{min-height:100vh;padding:120px 20px 80px;background:linear-gradient(135deg,#0b1f45,#1f5fd8);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center}.hero-content{max-width:900px}.hero-buttons{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}.features-grid,.courses-grid,.testimonial-grid,.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:30px}.feature-card,.course-card,.testimonial-card,.stat-card,.pricing-card,.faq-item{background:#fff;border-radius:12px;padding:30px;box-shadow:0 8px 24px rgba(0,0,0,.08)}.founder-content{display:grid;grid-template-columns:300px 1fr;gap:50px}.community,.cta{background:#0b57d0;color:#fff;text-align:center}footer{background:#07152d;color:#fff;text-align:center;padding:50px 20px}@media(max-width:768px){main{padding-top:150px}.navbar{height:auto;padding:20px;flex-direction:column;gap:20px}.logo img{height:52px}.nav-links{flex-wrap:wrap;justify-content:center;gap:16px}.founder-content{grid-template-columns:1fr}}
