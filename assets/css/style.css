@@ -18,6 +18,9 @@ body{
     line-height:1.7;
     background:#f8fafc;
     color:#1f2937;
+   main{
+    margin-top:140px;
+}
 }
 
 img{
@@ -53,18 +56,13 @@ p{
 =========================== */
 
 header{
-    background:#07152d;
-    position:sticky;
-    top:0;
-    z-index:999;
-
+    height:140px;
 }
 
 .navbar{
-    position:fixed;
+    position:sticky;
     top:0;
-    left:0;
-    width:100%;
+}
 
     background:#07152d;
 
@@ -215,8 +213,14 @@ header{
     color:#fff;
     text-align:center;
 
-    /* THIS IS THE IMPORTANT PART */
-    padding:220px 20px 120px;
+    min-height:100vh;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:140px 20px 120px;
+}
 
     min-height:100vh;
 
