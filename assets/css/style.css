@@ -52,97 +52,94 @@ p{
 }
 
 /* ===========================
-   Version 2 Navigation
+   Enterprise Navigation
 =========================== */
 
 header{
-    height:140px;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    background:#07152d;
+    z-index:1000;
+    box-shadow:0 4px 18px rgba(0,0,0,.15);
 }
 
 .navbar{
-    position:sticky;
-    top:0;
-}
-
-    background:#07152d;
-
-    z-index:1000;
+    max-width:1200px;
+    margin:0 auto;
+    height:90px;
 
     display:flex;
-    flex-direction:column;
-
     align-items:center;
+    justify-content:space-between;
 
-    padding:20px 0;
+    padding:0 40px;
 }
+
 .logo{
     display:flex;
     align-items:center;
-    flex-shrink:0;
 }
 
 .logo img{
-    height:68px;      /* Desktop */
+    height:68px;
     width:auto;
     display:block;
 }
 
-
 .nav-links{
     display:flex;
-    gap:40px;
+    align-items:center;
+    gap:32px;
+}
+
+.nav-links li{
     list-style:none;
-    padding:0;
-    margin:0;
 }
 
 .nav-links a{
     color:#ffffff;
-    font-size:20px;
-    font-weight:700;
+    font-size:16px;
+    font-weight:600;
     text-decoration:none;
-    transition:.3s;
+    transition:color .3s ease;
 }
 
 .nav-links a:hover{
     color:#d4af37;
 }
 
-/* Mobile */
-
-@media (max-width:900px){
-
-    .navbar{
-        flex-direction:column;
-        gap:20px;
-        padding:20px;
-    }
-
-    .logo img{
-        height:60px;
-        width:auto;
-        display:block;
-    }
-
-    .nav-links{
-        flex-wrap:wrap;
-        justify-content:center;
-        gap:16px;
-    }
-
+/* Prevent the fixed header from covering the page */
+main{
+    padding-top:90px;
 }
 
-@media (max-width:600px){
+/* ===========================
+   Responsive Navigation
+=========================== */
+
+@media (max-width:768px){
+
+    .navbar{
+        height:auto;
+        padding:20px;
+        flex-direction:column;
+        gap:20px;
+    }
 
     .logo img{
         height:52px;
     }
 
-}
     .nav-links{
         flex-wrap:wrap;
         justify-content:center;
-        gap:16px;
+        gap:18px;
+    }
+
+    main{
+        padding-top:140px;
     }
 
 /* ===========================
