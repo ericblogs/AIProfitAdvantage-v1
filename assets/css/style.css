@@ -52,68 +52,75 @@ p{
 }
 
 /* ===========================
-   Enterprise Navigation
+   Navigation
 =========================== */
 
 header{
-    position:fixed;
+    position:sticky;
     top:0;
-    left:0;
-    width:100%;
-    background:#07152d;
     z-index:1000;
-    box-shadow:0 4px 18px rgba(0,0,0,.15);
 }
 
 .navbar{
+    background:#07152d;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
     max-width:1200px;
     margin:0 auto;
-    height:90px;
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    padding:0 40px;
-}
-
-.logo{
-    display:flex;
-    align-items:center;
+    padding:18px 30px;
 }
 
 .logo img{
-    height:68px;
-    width:auto;
+    height:60px;
     display:block;
 }
 
 .nav-links{
     display:flex;
-    align-items:center;
-    gap:32px;
-}
-
-.nav-links li{
     list-style:none;
+    gap:35px;
+
+    margin:0;
+    padding:0;
 }
 
 .nav-links a{
-    color:#ffffff;
-    font-size:16px;
-    font-weight:600;
+    color:#fff;
     text-decoration:none;
-    transition:color .3s ease;
+    font-weight:700;
+    font-size:18px;
+    transition:.3s;
 }
 
 .nav-links a:hover{
     color:#d4af37;
 }
 
-/* Prevent the fixed header from covering the page */
-main{
-    padding-top:90px;
-}
+/* Mobile */
+
+@media (max-width:900px){
+
+    .navbar{
+
+        flex-direction:column;
+
+        gap:25px;
+
+        padding:20px;
+    }
+
+    .nav-links{
+
+        flex-wrap:wrap;
+
+        justify-content:center;
+
+        gap:18px;
+    }
 
 /* ===========================
    Responsive Navigation
