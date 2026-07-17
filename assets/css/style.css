@@ -84,10 +84,11 @@ header{
 }
 
 .logo img{
-    height:90px;
+    height:68px;      /* Desktop */
     width:auto;
     display:block;
 }
+
 
 .nav-links{
     display:flex;
@@ -119,7 +120,8 @@ header{
         padding:120px 20px;
     }
     .logo img{
-    height:74px;
+    height:52px;
+}
     width:auto;
     display:block;
 }
