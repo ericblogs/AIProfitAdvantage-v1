@@ -117,13 +117,29 @@ header{
     .navbar{
         flex-direction:column;
         gap:20px;
-        padding:120px 20px;
+        padding:20px;
     }
+
     .logo img{
-    height:52px;
+        height:60px;
+        width:auto;
+        display:block;
+    }
+
+    .nav-links{
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:16px;
+    }
+
 }
-    width:auto;
-    display:block;
+
+@media (max-width:600px){
+
+    .logo img{
+        height:52px;
+    }
+
 }
     .nav-links{
         flex-wrap:wrap;
