@@ -481,3 +481,58 @@ scroll-behavior:auto}
 transition-duration:.01ms!important;
 animation-duration:.01ms!important}
 }
+/* =========================================
+   Contact Page Form
+========================================= */
+
+.contact-form{
+    margin-top:40px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:24px;
+    margin-bottom:24px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.form-group label{
+    font-weight:600;
+    color:var(--ink);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:14px 16px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fff;
+    color:var(--ink);
+    font:inherit;
+    transition:.25s ease;
+}
+
+.form-group textarea{
+    resize:vertical;
+    min-height:180px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    outline:none;
+    border-color:var(--blue);
+    box-shadow:0 0 0 4px rgba(0,119,255,.15);
+}
+
+.contact-form button{
+    margin-top:20px;
+}
