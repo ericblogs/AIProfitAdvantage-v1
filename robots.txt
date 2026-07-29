@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aiprofitadvantage.online/sitemap.xml
+Sitemap: https://www.aiprofitadvantage.online/sitemap.xml
