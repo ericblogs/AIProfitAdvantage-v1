@@ -465,35 +465,31 @@
 
         </div>
 
-        <div class="form-group">
-          <label for="budget">Budget</label>
+       <div class="form-group">
+  <label for="budget">Estimated Budget</label>
 
-          <select
-            id="budget"
-            name="Budget">
+  <select id="budget" name="Budget">
 
-            <option value="">Select Budget</option>
+    <option value="">Select Estimated Budget</option>
 
-            <option>
-              Under ₦100,000
-            </option>
+    <optgroup label="🇳🇬 Nigerian Naira (₦)">
+      <option value="Under ₦100,000">Under ₦100,000</option>
+      <option value="₦100,000 – ₦500,000">₦100,000 – ₦500,000</option>
+      <option value="₦500,000 – ₦1,000,000">₦500,000 – ₦1,000,000</option>
+      <option value="₦1,000,000 – ₦5,000,000">₦1,000,000 – ₦5,000,000</option>
+      <option value="Above ₦5,000,000">Above ₦5,000,000</option>
+    </optgroup>
 
-            <option>
-              ₦100,000 – ₦500,000
-            </option>
+    <optgroup label="🌍 US Dollars (USD)">
+      <option value="Under $100">Under $100</option>
+      <option value="$100 – $500">$100 – $500</option>
+      <option value="$500 – $1,000">$500 – $1,000</option>
+      <option value="$1,000 – $5,000">$1,000 – $5,000</option>
+      <option value="Above $5,000">Above $5,000</option>
+    </optgroup>
 
-            <option>
-              ₦500,000 – ₦1,000,000
-            </option>
-
-            <option>
-              Above ₦1,000,000
-            </option>
-
-          </select>
-
-        </div>
-
+  </select>
+</div>
         <div class="form-group">
           <label for="subject">Subject *</label>
 
