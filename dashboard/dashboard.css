@@ -396,3 +396,159 @@ body{
     color:#374151 !important;
     cursor:not-allowed;
 }
+/* ==========================================
+   COURSE PLAYER
+========================================== */
+
+.player-layout{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:32px;
+    margin-top:40px;
+}
+
+.video-player{
+    background:#ffffff;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+
+.video-placeholder{
+    width:100%;
+    height:420px;
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
+    border-radius:16px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+    font-size:5rem;
+    margin-bottom:24px;
+}
+
+.video-player h2{
+    color:#0f172a;
+    margin-bottom:16px;
+}
+
+.video-player p{
+    color:#64748b;
+    line-height:1.7;
+    margin-bottom:28px;
+}
+
+.lesson-controls{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.course-outline{
+    background:#ffffff;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    height:fit-content;
+}
+
+.course-outline h3{
+    margin-bottom:20px;
+    color:#0f172a;
+}
+
+.course-outline ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.course-outline li{
+    padding:14px 12px;
+    border-radius:10px;
+    margin-bottom:10px;
+    color:#475569;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.course-outline li:hover{
+    background:#eef4ff;
+}
+
+.course-outline li.active{
+    background:#2563eb;
+    color:#ffffff;
+    font-weight:600;
+}
+
+@media(max-width:900px){
+
+.player-layout{
+    grid-template-columns:1fr;
+}
+
+.video-placeholder{
+    height:240px;
+}
+
+.lesson-controls{
+    flex-direction:column;
+}
+
+/* ==========================================
+   COURSE PROGRESS
+========================================== */
+
+.course-progress-card{
+    margin:28px 0;
+}
+
+.course-progress-card h3{
+    margin-bottom:14px;
+    color:#0f172a;
+}
+
+.lesson-meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-bottom:28px;
+    color:#64748b;
+    font-size:.9rem;
+}
+
+.lesson-meta span{
+    background:#f1f5f9;
+    padding:8px 14px;
+    border-radius:30px;
+}/* ==========================================
+   COURSE RESOURCES
+========================================== */
+
+.resource-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:18px;
+}
+
+.resource-list a{
+    text-decoration:none;
+    color:#2563eb;
+    background:#f8fafc;
+    padding:12px 16px;
+    border-radius:10px;
+    transition:.25s;
+    font-weight:500;
+}
+
+.resource-list a:hover{
+    background:#e0ecff;
+}
+
+.course-outline hr{
+    margin:28px 0;
+    border:none;
+    border-top:1px solid #e5e7eb;
+}
