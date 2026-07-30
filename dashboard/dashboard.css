@@ -325,29 +325,41 @@ body{
 
 .course-badge{
     display:inline-block;
-    padding:6px 12px;
+    padding:6px 14px;
     border-radius:30px;
+    color:#fff;
     font-size:.75rem;
     font-weight:700;
     margin-bottom:18px;
-    color:#fff;
 }
 
 .beginner{
     background:#16a34a;
-}
+}<img
+src="../assets/images/course-ai-foundations.jpg"
+class="course-image"
+alt="AI Foundations">
 
 .intermediate{
     background:#2563eb;
-}
+}<img
+src="../assets/images/course-ai-foundations.jpg"
+class="course-image"
+alt="AI Foundations">
 
 .advanced{
     background:#7c3aed;
-}
+}<img
+src="../assets/images/course-ai-foundations.jpg"
+class="course-image"
+alt="AI Foundations">
 
 .upcoming{
     background:#f59e0b;
-}
+}<img
+src="../assets/images/course-ai-foundations.jpg"
+class="course-image"
+alt="AI Foundations">
 
 .course-meta{
     display:flex;
@@ -355,7 +367,11 @@ body{
     margin:18px 0;
     color:#64748b;
     font-size:.9rem;
-}
+} <div class="course-progress">
+    <div class="progress-bar">
+        <div class="progress-fill" style="width:65%;"></div>
+    </div>
+</div>
 
 .course-progress{
     margin:20px 0;
