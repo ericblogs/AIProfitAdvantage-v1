@@ -361,11 +361,7 @@ body{
     margin:18px 0;
     color:#64748b;
     font-size:.9rem;
-} <div class="course-progress">
-    <div class="progress-bar">
-        <div class="progress-fill" style="width:65%;"></div>
-    </div>
-</div>
+} 
 
 .course-progress{
     margin:20px 0;
