@@ -237,6 +237,14 @@ body{
 
 .dashboard-search{
     width:100%;
+}.dashboard-search{
+    width:100%;
+}.wave{
+    display:inline;
+    font-size:0.9em;
+    vertical-align:middle;
 }
 
-}
+
+
+
