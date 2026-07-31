@@ -548,3 +548,145 @@ body{
     border:none;
     border-top:1px solid #e5e7eb;
 }
+/* ==========================================
+   LESSON OBJECTIVES
+========================================== */
+
+.lesson-objectives{
+    margin:32px 0;
+    background:#f8fafc;
+    border-left:5px solid #2563eb;
+    padding:22px;
+    border-radius:12px;
+}
+
+.lesson-objectives h3{
+    margin-top:0;
+    color:#0f172a;
+}
+
+.lesson-objectives ul{
+    margin:18px 0 0;
+    padding-left:20px;
+}
+
+.lesson-objectives li{
+    margin-bottom:12px;
+    color:#475569;
+}/* ==========================================
+   LESSON CONTENT
+========================================== */
+
+.lesson-content{
+    margin-top:40px;
+}
+
+.lesson-content h3{
+    color:#0f172a;
+    margin:30px 0 16px;
+}
+
+.lesson-content p{
+    color:#475569;
+    line-height:1.9;
+    margin-bottom:20px;
+    font-size:1.02rem;
+}/* ==========================================
+   LESSON TAKEAWAYS
+========================================== */
+
+.lesson-takeaways{
+    margin-top:40px;
+    background:#eef6ff;
+    border-left:5px solid #2563eb;
+    border-radius:14px;
+    padding:24px;
+}
+
+.lesson-takeaways h3{
+    margin-top:0;
+    color:#0f172a;
+}
+
+.lesson-takeaways ul{
+    margin-top:18px;
+    padding-left:22px;
+}
+
+.lesson-takeaways li{
+    margin-bottom:14px;
+    line-height:1.8;
+    color:#334155;
+}/* ==========================================
+   AI PROMPT PRACTICE
+========================================== */
+
+.prompt-practice{
+    margin-top:40px;
+}
+
+.prompt-practice h3{
+    color:#0f172a;
+    margin-bottom:18px;
+}
+
+.prompt-box{
+    background:#0f172a;
+    color:#ffffff;
+    padding:24px;
+    border-radius:14px;
+    margin:20px 0;
+    line-height:1.8;
+}
+
+.prompt-box strong{
+    color:#facc15;
+    display:block;
+    margin-bottom:12px;
+}/* ==========================================
+   LESSON SUMMARY
+========================================== */
+
+.lesson-summary{
+    margin-top:40px;
+    background:#f8fafc;
+    border-radius:14px;
+    padding:28px;
+    border-left:5px solid #16a34a;
+}
+
+.lesson-summary h3{
+    margin-top:0;
+    color:#0f172a;
+}
+
+.lesson-summary p{
+    line-height:1.9;
+    color:#475569;
+}/* ==========================================
+   LESSON QUIZ
+========================================== */
+
+.lesson-quiz{
+    margin-top:40px;
+    background:#ffffff;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+
+.lesson-quiz h3{
+    margin-top:0;
+    color:#0f172a;
+}
+
+.lesson-quiz label{
+    display:block;
+    margin-bottom:12px;
+    color:#475569;
+    cursor:pointer;
+}
+
+.lesson-quiz input{
+    margin-right:10px;
+}
