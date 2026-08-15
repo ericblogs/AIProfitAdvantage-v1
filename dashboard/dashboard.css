@@ -724,16 +724,19 @@ body{
     display:block;
     padding:14px 18px;
     background:#f8fafc;
-    border:1px solid #e5e7eb;
-    border-radius:10px;
     color:#2563eb;
+    border:1px solid #dbeafe;
+    border-radius:10px;
     text-decoration:none;
     font-weight:600;
     transition:.25s ease;
+    cursor:pointer;
 }
 
 .resource-item:hover{
-    background:#eef4ff;
-    border-color:#2563eb;
+    background:#e0ecff;
+    color:#1d4ed8;
+    border-color:#93c5fd;
     transform:translateX(4px);
+    box-shadow:0 4px 12px rgba(37,99,235,.12);
 }
