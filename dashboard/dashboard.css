@@ -690,3 +690,50 @@ body{
 .lesson-quiz input{
     margin-right:10px;
 }
+/* ==========================================
+   LESSON RESOURCES
+========================================== */
+
+.lesson-resources{
+    margin-top:40px;
+    background:#ffffff;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+
+.lesson-resources h3{
+    margin-top:0;
+    margin-bottom:12px;
+    color:#0f172a;
+}
+
+.lesson-resources p{
+    color:#64748b;
+    line-height:1.7;
+    margin-bottom:24px;
+}
+
+.resource-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.resource-item{
+    display:block;
+    padding:14px 18px;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    color:#2563eb;
+    text-decoration:none;
+    font-weight:600;
+    transition:.25s ease;
+}
+
+.resource-item:hover{
+    background:#eef4ff;
+    border-color:#2563eb;
+    transform:translateX(4px);
+}
