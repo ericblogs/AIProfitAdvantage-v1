@@ -720,23 +720,24 @@ body{
     gap:12px;
 }
 
-.resource-item{
+.lesson-resources .resource-item{
     display:block;
-    padding:14px 18px;
-    background:#f8fafc;
-    color:#2563eb;
-    border:1px solid #dbeafe;
+    width:100%;
+    padding:16px 20px;
+    background:#eef6ff;
+    color:#2563eb !important;
+    border:2px solid #2563eb;
     border-radius:10px;
-    text-decoration:none;
-    font-weight:600;
-    transition:.25s ease;
+    text-decoration:none !important;
+    font-weight:700;
     cursor:pointer;
+    transition:all .25s ease;
 }
 
-.resource-item:hover{
-    background:#e0ecff;
-    color:#1d4ed8;
-    border-color:#93c5fd;
-    transform:translateX(4px);
-    box-shadow:0 4px 12px rgba(37,99,235,.12);
+.lesson-resources .resource-item:hover{
+    background:#2563eb;
+    color:#ffffff !important;
+    border-color:#2563eb;
+    transform:translateY(-2px);
+    box-shadow:0 6px 16px rgba(37,99,235,.18);
 }
