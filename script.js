@@ -20,8 +20,31 @@ function initializeApplication() {
   setCurrentYear();
 }
 
+function initializePublicNavigationLinks() {
+  const links = document.querySelectorAll('.primary-nav a');
+  const destinations = {
+    Resources: 'pages/resources.html',
+    Community: 'pages/community.html',
+    Store: 'pages/store.html',
+    Blog: 'pages/blog.html',
+    Login: 'auth/login.html'
+  };
+
+  links.forEach((link) => {
+    const label = link.textContent.trim();
+    const destination = destinations[label];
+    if (destination && !link.closest('.dashboard-layout')) {
+      link.setAttribute('href', destination);
+    }
+  });
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApplication, { once: true });
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeApplication();
+    initializePublicNavigationLinks();
+  }, { once: true });
 } else {
   initializeApplication();
+  initializePublicNavigationLinks();
 }
