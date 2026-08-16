@@ -23,11 +23,11 @@ function initializeApplication() {
 function initializePublicNavigationLinks() {
   const links = document.querySelectorAll('.primary-nav a');
   const destinations = {
-    Resources: 'pages/resources.html',
-    Community: 'pages/community.html',
-    Store: 'pages/store.html',
-    Blog: 'pages/blog.html',
-    Login: 'auth/login.html'
+    Resources: '/pages/resources.html',
+    Community: '/pages/community.html',
+    Store: '/pages/store.html',
+    Blog: '/pages/blog.html',
+    Login: '/auth/login.html'
   };
 
   links.forEach((link) => {
