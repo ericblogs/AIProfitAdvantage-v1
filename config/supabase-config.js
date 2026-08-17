@@ -4,9 +4,8 @@
  * IMPORTANT:
  * - SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY are safe for browser use.
  * - NEVER place a Supabase secret/service-role key in this file.
- * - Replace the placeholders with the values from your Supabase project.
  */
 export const SUPABASE_CONFIG = Object.freeze({
-  url: 'https://YOUR-PROJECT-REF.supabase.co',
-  publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY'
+  url: 'https://luvktpjwycizqennsmom.supabase.co',
+  publishableKey: 'sb_publishable_yfQ17Uydmefi7Gb2FH1-0A_tBEMa_9O'
 });
