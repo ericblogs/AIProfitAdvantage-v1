@@ -30,6 +30,20 @@ function setStatus(message, type = 'info') {
   status.style.border = `1px solid ${type === 'success' ? '#a7f3d0' : type === 'error' ? '#fecaca' : '#bfdbfe'}`;
 }
 
+function setBackendNotice() {
+  const form = document.querySelector('form.contact-form');
+  if (!form || document.getElementById('auth-backend-notice')) return;
+
+  const notice = document.createElement('div');
+  notice.id = 'auth-backend-notice';
+  notice.setAttribute('role', 'note');
+  notice.style.cssText = 'margin:0 0 18px;padding:12px 14px;border-radius:10px;background:#f8fafc;color:#475569;border:1px solid #e2e8f0;font-size:.92rem;line-height:1.5;';
+  notice.textContent = isConfigured
+    ? '🔐 APEP authentication is connected to Supabase for secure sign-in, registration, and password recovery. If the service is unavailable, this page will report the problem instead of pretending the action succeeded.'
+    : 'ℹ️ APEP authentication is currently not connected. This page will not pretend to create or sign in an account until the authentication backend is configured.';
+  form.prepend(notice);
+}
+
 function requireConfiguration() {
   if (isConfigured) return true;
   setStatus('Authentication is not connected yet. Add the APEP Supabase project URL and publishable key in config/supabase-config.js.', 'error');
@@ -62,6 +76,7 @@ async function initLogin() {
   if (pageName() !== 'login.html') return;
   const form = document.querySelector('form.contact-form');
   if (!form) return;
+  setBackendNotice();
 
   if (supabase) {
     const { data } = await supabase.auth.getSession();
@@ -98,6 +113,7 @@ async function initRegister() {
   if (pageName() !== 'register.html') return;
   const form = document.querySelector('form.contact-form');
   if (!form) return;
+  setBackendNotice();
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -155,6 +171,7 @@ async function initForgotPassword() {
   if (pageName() !== 'forgot-password.html') return;
   const form = document.querySelector('form.contact-form');
   if (!form) return;
+  setBackendNotice();
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -178,6 +195,7 @@ async function initResetPassword() {
   if (pageName() !== 'reset-password.html') return;
   const form = document.querySelector('form.contact-form');
   if (!form || !requireConfiguration()) return;
+  setBackendNotice();
   const { data } = await supabase.auth.getSession();
   if (!data.session) {
     setStatus('Your password-reset link is missing or has expired. Please request a new one.', 'error');
