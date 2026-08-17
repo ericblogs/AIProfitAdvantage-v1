@@ -62,7 +62,6 @@ function initializePublicNavigationLinks() {
     else navigation.appendChild(register);
   }
 
-  // Keep the current public navigation item visibly highlighted.
   const currentPath = window.location.pathname.replace(/\/$/, '') || '/index.html';
   const currentHash = window.location.hash;
 
@@ -74,16 +73,13 @@ function initializePublicNavigationLinks() {
     const destinationUrl = new URL(destination, window.location.origin);
     let isActive = destinationUrl.pathname === currentPath;
 
-    // Section links on the homepage should highlight when that section is active.
     if (destinationUrl.pathname === currentPath && destinationUrl.hash) {
       isActive = destinationUrl.hash === currentHash;
     }
 
-    // Register/Login should also receive the active state on their own pages.
     link.classList.toggle('active', isActive);
   });
 
-  // Home remains active on the root homepage when no section anchor is selected.
   const homeLink = Array.from(navigation.querySelectorAll('a')).find(
     (link) => link.textContent.trim() === 'Home'
   );
@@ -95,7 +91,6 @@ function initializePublicNavigationLinks() {
     );
   }
 
-  // Add the visual active state once, without requiring changes to every page.
   if (!document.getElementById('public-nav-active-style')) {
     const style = document.createElement('style');
     style.id = 'public-nav-active-style';
@@ -129,12 +124,50 @@ function initializePublicNavigationLinks() {
   }
 }
 
+function initializePublicFooter() {
+  const footer = document.querySelector('.site-footer');
+  if (!footer || document.querySelector('.dashboard-layout')) return;
+
+  const currentYear = new Date().getFullYear();
+  const isRoot = window.location.pathname === '/' || window.location.pathname === '/index.html';
+  const base = isRoot ? '' : '../';
+
+  footer.innerHTML = `
+    <div class="container footer-top">
+      <a class="brand brand-footer" href="${base}index.html" aria-label="AI Profit Advantage home">
+        <span class="brand-mark" aria-hidden="true">AI</span>
+        <span class="brand-wordmark" aria-hidden="true">AI Profit Advantage</span>
+      </a>
+      <p>AI Profit Advantage Enterprise Platform (APEP) provides practical AI education, consulting, automation and digital growth guidance for learners, professionals, entrepreneurs and organizations.</p>
+      <nav aria-label="Footer navigation">
+        <a href="${base}index.html#courses">Courses</a>
+        <a href="${base}pages/about.html">About</a>
+        <a href="${base}pages/resources.html">Resources</a>
+        <a href="${base}pages/community.html">Community</a>
+        <a href="${base}pages/store.html">Store</a>
+        <a href="${base}pages/blog.html">Blog</a>
+        <a href="${base}pages/contact.html">Contact</a>
+        <a href="${base}pages/privacy-policy.html">Privacy Policy</a>
+        <a href="${base}pages/terms.html">Terms of Use</a>
+        <a href="${base}pages/cookie-policy.html">Cookie Policy</a>
+        <a href="${base}pages/disclaimer.html">Disclaimer</a>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="current-year">${currentYear}</span> AI Profit Advantage Enterprise Platform (APEP). All rights reserved.</p>
+      <a href="${isRoot ? '#top' : base + 'index.html#top'}">Back to top ↑</a>
+    </div>
+  `;
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initializeApplication();
     initializePublicNavigationLinks();
+    initializePublicFooter();
   }, { once: true });
 } else {
   initializeApplication();
   initializePublicNavigationLinks();
+  initializePublicFooter();
 }
