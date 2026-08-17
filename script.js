@@ -22,22 +22,71 @@ function initializeApplication() {
 }
 
 function initializePublicNavigationLinks() {
-  const links = document.querySelectorAll('.primary-nav a');
+  const navigation = document.querySelector('.primary-nav');
+  if (!navigation || navigation.closest('.dashboard-layout')) return;
+
   const destinations = {
-    Resources: 'pages/resources.html',
-    Community: 'pages/community.html',
-    Store: 'pages/store.html',
-    Blog: 'pages/blog.html',
-    Login: 'auth/login.html'
+    Home: '/index.html',
+    About: '/pages/about.html',
+    Courses: '/index.html#courses',
+    Services: '/pages/services.html',
+    Resources: '/pages/resources.html',
+    Community: '/pages/community.html',
+    Store: '/pages/store.html',
+    Blog: '/pages/blog.html',
+    Contact: '/pages/contact.html',
+    Login: '/auth/login.html',
+    Register: '/auth/register.html',
+    'Get Started': '/index.html#pricing'
   };
+
+  const links = navigation.querySelectorAll('a');
 
   links.forEach((link) => {
     const label = link.textContent.trim();
     const destination = destinations[label];
-    if (destination && !link.closest('.dashboard-layout')) {
-      link.setAttribute('href', destination);
-    }
+    if (destination) link.setAttribute('href', destination);
   });
+
+  if (!navigation.querySelector('a[href="/auth/register.html"]')) {
+    const getStarted = Array.from(links).find(
+      (link) => link.textContent.trim() === 'Get Started'
+    );
+
+    const register = document.createElement('a');
+    register.className = 'nav-cta';
+    register.href = '/auth/register.html';
+    register.textContent = 'Register';
+
+    if (getStarted) navigation.insertBefore(register, getStarted);
+    else navigation.appendChild(register);
+  }
+
+  const currentPath = window.location.pathname.replace(/\/$/, '') || '/index.html';
+
+  navigation.querySelectorAll('a').forEach((link) => {
+    const label = link.textContent.trim();
+    const destination = destinations[label];
+    if (!destination) return;
+
+    const destinationUrl = new URL(destination, window.location.origin);
+    const isActive = destinationUrl.pathname === currentPath &&
+      !destinationUrl.hash &&
+      !['Home', 'Courses', 'Get Started', 'Register'].includes(label);
+
+    link.classList.toggle('active', isActive);
+  });
+
+  const homeLink = Array.from(navigation.querySelectorAll('a')).find(
+    (link) => link.textContent.trim() === 'Home'
+  );
+
+  if (homeLink) {
+    homeLink.classList.toggle(
+      'active',
+      currentPath === '/index.html' || currentPath === '/'
+    );
+  }
 }
 
 if (document.readyState === 'loading') {
