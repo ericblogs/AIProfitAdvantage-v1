@@ -49,7 +49,8 @@ function validatePassword(password) {
 }
 
 async function protectDashboard() {
-  if (!document.body.dataset.requiresAuth || !supabase) return;
+  const isDashboardPage = window.location.pathname.includes('/dashboard/');
+  if (!isDashboardPage || !supabase) return;
   const { data } = await supabase.auth.getSession();
   if (!data.session) {
     const next = encodeURIComponent(window.location.href);
