@@ -6,6 +6,7 @@ import { validateConfig, publishValidationState } from './config/config-validato
 import { initializeNavigation, setCurrentYear } from './js/components.js';
 import { initializeBusinessFoundation } from './js/modules/business-foundation.js';
 import { initializeReleaseMetadata } from './js/modules/release-metadata.js';
+import './js/supabase-auth.js';
 
 function initializeApplication() {
   const valid = validateConfig({ APP_CONFIG, BUSINESS_CONFIG, RELEASE_CONFIG, INTEGRATIONS_CONFIG });
