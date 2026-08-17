@@ -45,7 +45,7 @@ function setBackendNotice() {
 }
 
 function requireConfiguration() {
-  if (isConfigured) return true;
+  if (isConfigured && supabase) return true;
   setStatus('Authentication is not connected yet. Add the APEP Supabase project URL and publishable key in config/supabase-config.js.', 'error');
   return false;
 }
@@ -101,7 +101,7 @@ async function initLogin() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     submit.disabled = false;
     if (error) {
-      setStatus('We could not sign you in. Please check your email and password and try again.', 'error');
+      setStatus(error.message || 'We could not sign you in. Please check your email and password and try again.', 'error');
       return;
     }
     const next = params.get('next');
@@ -120,9 +120,14 @@ async function initRegister() {
     if (!requireConfiguration()) return;
 
     const get = (id) => form.querySelector(`#${id}`)?.value.trim() || '';
+    const email = get('email');
     const password = form.querySelector('#password')?.value || '';
     const confirm = form.querySelector('#confirm')?.value || '';
 
+    if (!email) {
+      setStatus('Please enter your email address.', 'error');
+      return;
+    }
     if (!validatePassword(password)) {
       setStatus('Your password must contain at least 8 characters.', 'error');
       return;
@@ -137,33 +142,55 @@ async function initRegister() {
     setStatus('Creating your APEP account…');
     const accountType = form.querySelector('input[name="account"]:checked')?.value || 'Student';
 
-    const { data, error } = await supabase.auth.signUp({
-      email: get('email'),
-      password,
-      options: {
-        emailRedirectTo: getRedirect('login.html?confirmed=1'),
-        data: {
-          first_name: get('firstname'), last_name: get('lastname'), phone: get('phone'),
-          country: get('country'), state: get('state'), profession: get('profession'),
-          organization: get('organization'), username: get('username'), referral_code: get('referral'),
-          learning_interest: form.querySelector('#interest')?.value || '', account_type: accountType,
-          newsletter: !!form.querySelector('input[name="newsletter"]')?.checked
+    try {
+      // Do not send a custom emailRedirectTo here. That avoids registration
+      // failures when the Supabase project's redirect allow-list has not yet
+      // been updated. Supabase will use its configured Site URL for email
+      // confirmation when confirmation is required.
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: get('firstname'),
+            last_name: get('lastname'),
+            phone: get('phone'),
+            country: get('country'),
+            state: get('state'),
+            profession: get('profession'),
+            organization: get('organization'),
+            username: get('username'),
+            referral_code: get('referral'),
+            learning_interest: form.querySelector('#interest')?.value || '',
+            account_type: accountType,
+            newsletter: !!form.querySelector('input[name="newsletter"]')?.checked
+          }
         }
-      }
-    });
+      });
 
-    submit.disabled = false;
-    if (error) {
-      setStatus(error.message || 'Registration could not be completed. Please try again.', 'error');
-      return;
+      if (error) {
+        setStatus(error.message || 'Registration could not be completed. Please try again.', 'error');
+        return;
+      }
+
+      if (data.session) {
+        setStatus('Account created successfully. Redirecting to your dashboard…', 'success');
+        window.location.href = getRedirect('../dashboard/index.html');
+        return;
+      }
+
+      if (data.user) {
+        setStatus('Account created successfully. Please check your email to confirm your address, then sign in.', 'success');
+        form.reset();
+        return;
+      }
+
+      setStatus('Registration was not completed. Please try again.', 'error');
+    } catch (error) {
+      setStatus(error?.message || 'We could not connect to the registration service. Please try again.', 'error');
+    } finally {
+      submit.disabled = false;
     }
-    if (data.session) {
-      setStatus('Account created successfully. Redirecting to your dashboard…', 'success');
-      window.location.href = getRedirect('../dashboard/index.html');
-      return;
-    }
-    setStatus('Account created. Please check your email and confirm your address before signing in.', 'success');
-    form.reset();
   });
 }
 
@@ -183,7 +210,7 @@ async function initForgotPassword() {
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: getRedirect('reset-password.html') });
     submit.disabled = false;
     if (error) {
-      setStatus('We could not send the reset email. Please verify the address and try again.', 'error');
+      setStatus(error.message || 'We could not send the reset email. Please verify the address and try again.', 'error');
       return;
     }
     setStatus('If an account exists for that email, a password-reset link has been sent. Check your inbox.', 'success');
@@ -221,7 +248,7 @@ async function initResetPassword() {
     const { error } = await supabase.auth.updateUser({ password });
     submit.disabled = false;
     if (error) {
-      setStatus('We could not update your password. Please request a fresh reset link and try again.', 'error');
+      setStatus(error.message || 'We could not update your password. Please request a fresh reset link and try again.', 'error');
       return;
     }
     await supabase.auth.signOut();
