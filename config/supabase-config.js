@@ -6,6 +6,6 @@
  * - NEVER place a Supabase secret/service-role key in this file.
  */
 export const SUPABASE_CONFIG = Object.freeze({
-  url: 'https://luvktpjwycizqennsmom.supabase.co',
-  publishableKey: 'sb_publishable_yfQ17Uydmefi7Gb2FH1-0A_tBEMa_9O'
+  url: 'https://ccxxokxkxhakwwzqwqgn.supabase.co',
+  publishableKey: 'sb_publishable_OaCYNEZJpRPz-6oe15pKvA_jcNPQM-R'
 });
