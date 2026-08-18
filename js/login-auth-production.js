@@ -9,22 +9,37 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
   }
 });
 
-function setLoginStatus(message, type = 'info') {
+function setLoginStatus(message, type = 'info', html = false) {
   let status = document.getElementById('auth-status');
   if (!status) {
     status = document.createElement('div');
     status.id = 'auth-status';
     status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
     status.style.cssText = 'margin:18px 0;padding:14px 16px;border-radius:10px;font-weight:600;';
     const form = document.querySelector('form.contact-form');
     if (form) form.prepend(status);
   }
 
-  status.textContent = message;
+  if (html) status.innerHTML = message;
+  else status.textContent = message;
   status.hidden = false;
   status.style.background = type === 'success' ? '#ecfdf5' : type === 'error' ? '#fef2f2' : '#eff6ff';
   status.style.color = type === 'success' ? '#047857' : type === 'error' ? '#b91c1c' : '#1d4ed8';
   status.style.border = `1px solid ${type === 'success' ? '#a7f3d0' : type === 'error' ? '#fecaca' : '#bfdbfe'}`;
+}
+
+function showUnconfirmedMessage(email) {
+  const safeEmail = email.replace(/[&<>'"]/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[char]));
+
+  setLoginStatus(
+    `Your email address <strong>${safeEmail}</strong> has not been confirmed yet. ` +
+    `Please check your inbox, or <a href="resend-confirmation.html">resend the confirmation email</a>.`,
+    'error',
+    true
+  );
 }
 
 async function initializeProductionLogin() {
@@ -63,13 +78,14 @@ async function initializeProductionLogin() {
     setLoginStatus('Signing you in securely…');
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        setLoginStatus(error.message || 'Login failed. Please check your email and password.', 'error');
+        if (error.code === 'email_not_confirmed' || /email.*not.*confirm/i.test(error.message || '')) {
+          showUnconfirmedMessage(email);
+        } else {
+          setLoginStatus(error.message || 'Login failed. Please check your email and password.', 'error');
+        }
         return;
       }
 
@@ -79,7 +95,9 @@ async function initializeProductionLogin() {
       }
 
       setLoginStatus('Login successful. Redirecting to your dashboard…', 'success');
-      window.location.href = new URL('../dashboard/index.html', window.location.href).href;
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      const destination = redirect && redirect.startsWith('/') ? redirect : '../dashboard/index.html';
+      window.location.href = new URL(destination, window.location.href).href;
     } catch (error) {
       setLoginStatus(error?.message || 'We could not connect to the authentication service. Please try again.', 'error');
     } finally {
