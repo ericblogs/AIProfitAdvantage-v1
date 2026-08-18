@@ -5,7 +5,9 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
-const PRODUCTION_CONFIRMATION_URL = 'https://www.aiprofitadvantage.online/auth/login.html';
+// Supabase verifies the email and returns the authenticated session directly
+// to the protected dashboard. The dashboard auth guard then confirms the session.
+const PRODUCTION_CONFIRMATION_URL = 'https://www.aiprofitadvantage.online/dashboard/index.html';
 
 function setRegisterStatus(message, type = 'info') {
   let status = document.getElementById('auth-status');
@@ -97,7 +99,7 @@ function initializeProductionRegistration() {
         return;
       }
 
-      setRegisterStatus('Account created successfully. Please check your email to confirm your address, then sign in.', 'success');
+      setRegisterStatus('Account created successfully. Please check your email to confirm your address. After confirmation, you will be signed in and taken directly to your APEP dashboard.', 'success');
       form.reset();
     } catch (error) {
       setRegisterStatus(error?.message || 'We could not connect to the registration service. Please try again.', 'error');
