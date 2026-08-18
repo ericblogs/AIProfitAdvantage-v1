@@ -37,5 +37,6 @@
 <script>
 function checkLessonAnswer(){const selected=document.querySelector('input[name="q3"]:checked');const feedback=document.getElementById('quiz-feedback');if(!selected){feedback.textContent='⚠️ Please select an answer first.';feedback.className='quiz-feedback incorrect';return;}if(selected.value==='correct'){feedback.textContent='✅ Correct! Supervised learning uses examples with known labels.';feedback.className='quiz-feedback correct';}else{feedback.textContent='❌ Not quite. Review the lesson content and try again.';feedback.className='quiz-feedback incorrect';}}
 </script>
+<script type="module" src="../script.js"></script>
 </body>
 </html>
