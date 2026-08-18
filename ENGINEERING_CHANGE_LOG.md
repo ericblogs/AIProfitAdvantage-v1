@@ -18,3 +18,30 @@ Not performed:
 - DNS activation.
 - Browser runtime validation.
 - Lighthouse audit.
+
+## APEP Academy — Supabase Integration
+
+Current backend: `ccxxokxkxhakwwzqwqgn`
+
+Implemented:
+- Added Supabase-backed student profile, course, lesson, enrollment and lesson-progress persistence.
+- Connected the existing dashboard and course library data layer to Supabase.
+- Connected AI Foundations lesson-player pages 1–3 to authenticated progress persistence.
+- Added enrollment-aware lesson access and lesson completion persistence.
+- Enabled RLS for Academy application tables and hardened lesson-progress ownership/enrollment checks.
+- Restricted `public.rls_auto_enable()` execution for anonymous/authenticated API callers while preserving its database event-trigger role.
+- Marked AI Foundations lessons 4–5 unpublished because their content is still incomplete.
+
+Current lesson-player scope:
+- Lessons 1–3: active implementation scope.
+- Lessons 4–5: work in progress; not published through the Academy data layer.
+- Planned course length remains 20 lessons.
+
+QA:
+- Supabase schema, lesson publication state and RLS policy inventory verified.
+- Security advisors rechecked after the RLS hardening change.
+- Remaining security advisory: leaked-password protection is disabled in Supabase Auth.
+- Browser-level end-to-end registration/login/enrollment/lesson-completion testing remains to be performed with a controlled test account.
+
+Deployment:
+- No deployment performed in this change set.
