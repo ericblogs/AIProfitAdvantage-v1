@@ -16,6 +16,16 @@ function lessonNumber() {
   return match ? Number(match[1]) : null;
 }
 
+function redirectToLogin() {
+  const loginUrl = new URL('../auth/login.html', window.location.href);
+  loginUrl.searchParams.set('redirect', window.location.pathname + window.location.search);
+  window.location.replace(loginUrl.href);
+}
+
+function redirectToCourses() {
+  window.location.replace(new URL('courses.html', window.location.href).href);
+}
+
 function setCourseProgress(percent) {
   const value = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
   document.querySelectorAll('.course-progress-card .progress-fill').forEach((el) => {
@@ -31,7 +41,10 @@ async function init() {
   if (!number || number > 3) return;
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) return;
+  if (userError || !userData.user) {
+    redirectToLogin();
+    return;
+  }
   const user = userData.user;
 
   const { data: course, error: courseError } = await supabase
@@ -40,7 +53,10 @@ async function init() {
     .eq('slug', COURSE_SLUG)
     .eq('is_published', true)
     .maybeSingle();
-  if (courseError || !course) return;
+  if (courseError || !course) {
+    redirectToCourses();
+    return;
+  }
 
   const { data: lesson, error: lessonError } = await supabase
     .from('lessons')
@@ -49,7 +65,10 @@ async function init() {
     .eq('lesson_number', number)
     .eq('is_published', true)
     .maybeSingle();
-  if (lessonError || !lesson) return;
+  if (lessonError || !lesson) {
+    redirectToCourses();
+    return;
+  }
 
   const { data: enrollment } = await supabase
     .from('enrollments')
@@ -58,7 +77,10 @@ async function init() {
     .eq('course_id', course.id)
     .in('status', ['active', 'completed'])
     .maybeSingle();
-  if (!enrollment) return;
+  if (!enrollment) {
+    redirectToCourses();
+    return;
+  }
 
   const { data: progress } = await supabase
     .from('lesson_progress')
@@ -72,12 +94,16 @@ async function init() {
     .select('progress_percent,completed,lesson_id')
     .eq('user_id', user.id);
 
-  const courseLessonIds = new Set(
-    (await supabase.from('lessons').select('id').eq('course_id', course.id).eq('is_published', true)).data?.map((row) => row.id) || []
-  );
+  const { data: courseLessons } = await supabase
+    .from('lessons')
+    .select('id')
+    .eq('course_id', course.id)
+    .eq('is_published', true);
+
+  const courseLessonIds = new Set((courseLessons || []).map((row) => row.id));
   const relevantProgress = (courseProgress || []).filter((row) => courseLessonIds.has(row.lesson_id));
-  const overall = relevantProgress.length
-    ? relevantProgress.reduce((sum, row) => sum + Number(row.progress_percent || 0), 0) / Math.max(courseLessonIds.size, 1)
+  const overall = courseLessonIds.size
+    ? relevantProgress.reduce((sum, row) => sum + Number(row.progress_percent || 0), 0) / courseLessonIds.size
     : 0;
   setCourseProgress(overall);
 
