@@ -5,7 +5,7 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
-const PRODUCTION_CONFIRMATION_URL = 'https://www.aiprofitadvantage.online/auth/login.html?confirmed=1';
+const PRODUCTION_CONFIRMATION_URL = 'https://www.aiprofitadvantage.online/auth/login.html';
 
 function setRegisterStatus(message, type = 'info') {
   let status = document.getElementById('auth-status');
