@@ -77,18 +77,32 @@ async function initializeResetPassword() {
   if (!form || form.dataset.productionAuthFix === '1') return;
   form.dataset.productionAuthFix = '1';
 
+  let recoverySession = null;
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
+  recoverySession = session;
+
+  if (!recoverySession) {
     setStatus('This password reset link is invalid or has expired. Please request a new reset link.', 'error');
-    return;
   }
+
+  supabase.auth.onAuthStateChange((event, nextSession) => {
+    if (event === 'PASSWORD_RECOVERY' && nextSession) {
+      recoverySession = nextSession;
+      setStatus('Recovery session verified. You can now choose a new password.', 'info');
+    }
+  });
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     event.stopImmediatePropagation();
 
+    if (!recoverySession) {
+      setStatus('Your reset session is no longer valid. Please request a new reset link.', 'error');
+      return;
+    }
+
     const password = form.querySelector('#password')?.value || '';
-    const confirm = form.querySelector('#confirm')?.value || '';
+    const confirm = form.querySelector('#confirm-password')?.value || '';
     const submit = form.querySelector('button[type="submit"]');
 
     if (password.length < 8) {
