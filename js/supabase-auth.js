@@ -72,6 +72,45 @@ async function protectDashboard() {
   }
 }
 
+function updateNavigationForSession(session) {
+  const publicNav = document.querySelector('.primary-nav');
+  if (publicNav && !publicNav.closest('.dashboard-layout')) {
+    const loginLink = Array.from(publicNav.querySelectorAll('a')).find(
+      (link) => ['Login', 'Dashboard'].includes(link.textContent.trim())
+    );
+    if (loginLink) {
+      loginLink.textContent = session ? 'Dashboard' : 'Login';
+      loginLink.href = session ? getRedirect('dashboard/index.html') : getRedirect('auth/login.html');
+    }
+  }
+
+  const dashboardNav = document.querySelector('.dashboard-nav');
+  if (dashboardNav) {
+    let logoutLink = dashboardNav.querySelector('[data-auth-action="logout"]');
+    if (session && !logoutLink) {
+      logoutLink = document.createElement('a');
+      logoutLink.href = '#';
+      logoutLink.dataset.authAction = 'logout';
+      logoutLink.textContent = '🚪 Logout';
+      dashboardNav.appendChild(logoutLink);
+      logoutLink.addEventListener('click', async (event) => {
+        event.preventDefault();
+        if (!supabase) return;
+        logoutLink.setAttribute('aria-disabled', 'true');
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          logoutLink.removeAttribute('aria-disabled');
+          setStatus(error.message || 'We could not sign you out. Please try again.', 'error');
+          return;
+        }
+        window.location.href = getRedirect('../auth/login.html');
+      });
+    } else if (!session && logoutLink) {
+      logoutLink.remove();
+    }
+  }
+}
+
 async function initLogin() {
   if (pageName() !== 'login.html') return;
   const form = document.querySelector('form.contact-form');
@@ -133,7 +172,7 @@ async function initRegister() {
       return;
     }
     if (password !== confirm) {
-      setStatus('The passwords do not match. Please check both password fields.', 'error');
+      setStatus('The passwords do not match. Please check both password fields and try again.', 'error');
       return;
     }
 
@@ -143,10 +182,6 @@ async function initRegister() {
     const accountType = form.querySelector('input[name="account"]:checked')?.value || 'Student';
 
     try {
-      // Do not send a custom emailRedirectTo here. That avoids registration
-      // failures when the Supabase project's redirect allow-list has not yet
-      // been updated. Supabase will use its configured Site URL for email
-      // confirmation when confirmation is required.
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -262,6 +297,18 @@ async function initAuth() {
   await initRegister();
   await initForgotPassword();
   await initResetPassword();
+
+  if (supabase) {
+    const { data } = await supabase.auth.getSession();
+    updateNavigationForSession(data.session);
+    supabase.auth.onAuthStateChange((_event, session) => {
+      updateNavigationForSession(session);
+    });
+  }
 }
 
-initAuth();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAuth, { once: true });
+} else {
+  initAuth();
+}
