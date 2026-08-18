@@ -50,5 +50,6 @@
 <script>
 function checkLessonAnswer(){const selected=document.querySelector('input[name="q2"]:checked');const feedback=document.getElementById('quiz-feedback');if(!selected){feedback.textContent='⚠️ Please select an answer first.';feedback.className='quiz-feedback incorrect';return;}if(selected.value==='correct'){feedback.textContent='✅ Correct! The 1956 Dartmouth workshop helped establish AI as a formal research field.';feedback.className='quiz-feedback correct';}else{feedback.textContent='❌ Not quite. Review the lesson content and try again.';feedback.className='quiz-feedback incorrect';}}
 </script>
+<script type="module" src="../script.js"></script>
 </body>
 </html>
