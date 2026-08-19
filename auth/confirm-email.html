@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Confirming Your Email | AI Profit Advantage</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main class="section">
+  <div class="container" style="max-width:720px;">
+    <div class="card" style="text-align:center;padding:48px 32px;">
+      <div class="brand" style="justify-content:center;margin-bottom:28px;">
+        <span class="brand-mark">AI</span>
+        <span class="brand-wordmark">AI Profit Advantage</span>
+      </div>
+      <div id="confirmation-status" role="status" aria-live="polite">
+        <div style="font-size:3rem;margin-bottom:12px;">🔐</div>
+        <span class="eyebrow">EMAIL CONFIRMATION</span>
+        <h1>Confirming Your Account…</h1>
+        <p class="lead">Please wait while APEP completes your secure email confirmation.</p>
+      </div>
+    </div>
+  </div>
+</main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+
+const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKey, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+const status = document.getElementById('confirmation-status');
+
+function showError(message) {
+  status.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:12px;">⚠️</div>
+    <span class="eyebrow">CONFIRMATION ISSUE</span>
+    <h1>We Could Not Complete Confirmation</h1>
+    <p class="lead">${message}</p>
+    <a class="button button-primary" href="login.html">Go to Login</a>`;
+}
+
+async function confirm() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    showError(error.message || 'Please request a new confirmation link.');
+    return;
+  }
+
+  if (!data.session) {
+    showError('Your confirmation link may be expired or invalid. Please request a new confirmation email.');
+    return;
+  }
+
+  status.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+    <span class="eyebrow">EMAIL CONFIRMED</span>
+    <h1>Registration Confirmed</h1>
+    <p class="lead">Your email has been confirmed successfully. Opening your APEP student dashboard…</p>`;
+
+  setTimeout(() => {
+    window.location.replace('../dashboard/index.html');
+  }, 900);
+}
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) confirm();
+});
+
+confirm();
+</script>
+</body>
+</html>
