@@ -23,6 +23,19 @@ async function ensureProfile(user) {
   return data || null;
 }
 
+async function firstPublishedLesson(courseId) {
+  const { data: lesson, error } = await supabase
+    .from('lessons')
+    .select('lesson_number')
+    .eq('course_id', courseId)
+    .eq('is_published', true)
+    .order('lesson_number', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (error || !lesson) return null;
+  return lesson.lesson_number;
+}
+
 async function loadDashboard(user) {
   await ensureProfile(user);
   const { data: enrollments = [] } = await supabase.from('enrollments').select('id,status,course_id,courses(id,title,slug)').eq('user_id', user.id).neq('status', 'cancelled');
@@ -33,6 +46,7 @@ async function loadDashboard(user) {
   if (cards[0]) cards[0].textContent = String(courseCount).padStart(2, '0');
   if (cards[1]) cards[1].textContent = `${avg}%`;
   if (cards[2]) cards[2].textContent = String(progress.filter(p => p.completed).length).padStart(2, '0');
+
   const firstCourse = enrollments[0]?.courses;
   const continuePanel = document.querySelector('.dashboard-panel');
   if (firstCourse && continuePanel) {
@@ -40,8 +54,9 @@ async function loadDashboard(user) {
     if (title) title.textContent = firstCourse.title;
     const action = continuePanel.querySelector('a.button');
     if (action) {
-      action.textContent = 'Continue Learning →';
-      action.href = `courses.html?course=${encodeURIComponent(firstCourse.slug)}`;
+      const lessonNumber = await firstPublishedLesson(firstCourse.id);
+      action.textContent = lessonNumber ? 'Continue Learning →' : 'View Course Library →';
+      action.href = lessonNumber ? `lesson-${lessonNumber}.html` : 'courses.html';
     }
   }
 }
@@ -52,6 +67,7 @@ async function loadCourses(user) {
   const enrolled = new Set(enrollments.map(e => e.course_id));
   const grid = document.querySelector('.courses-grid');
   if (!grid || !courses.length) return;
+
   grid.innerHTML = courses.map(c => `
     <article class="course-card" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}">
       ${c.image_path ? `<img src="../${c.image_path.replace(/^\.\//, '')}" class="course-image" alt="${escapeHtml(c.title)}">` : ''}
@@ -67,23 +83,9 @@ async function loadCourses(user) {
 
   const requestedSlug = new URLSearchParams(window.location.search).get('course');
   if (requestedSlug) {
-    const requested = grid.querySelector(`[data-course-slug="${CSS.escape(requestedSlug)}"] .academy-course-action`);
-    if (requested) requested.focus();
+    const requested = Array.from(grid.querySelectorAll('.course-card')).find(card => card.dataset.courseSlug === requestedSlug);
+    requested?.querySelector('.academy-course-action')?.focus();
   }
-}
-
-async function getFirstPublishedLesson(courseId) {
-  const { data: lesson, error } = await supabase
-    .from('lessons')
-    .select('lesson_number')
-    .eq('course_id', courseId)
-    .eq('is_published', true)
-    .order('lesson_number', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-
-  if (error || !lesson) return null;
-  return lesson.lesson_number;
 }
 
 async function enrollOrContinue(button, user) {
@@ -110,14 +112,14 @@ async function enrollOrContinue(button, user) {
       if (error) throw error;
     }
 
-    const lessonNumber = await getFirstPublishedLesson(courseId);
+    const lessonNumber = await firstPublishedLesson(courseId);
     if (!lessonNumber) {
       button.disabled = false;
       button.textContent = 'Enrolled ✓ — Course content coming soon';
       return;
     }
 
-    button.textContent = 'Opening Lesson 1…';
+    button.textContent = `Opening Lesson ${lessonNumber}…`;
     window.location.href = `lesson-${lessonNumber}.html`;
   } catch (error) {
     button.disabled = false;
