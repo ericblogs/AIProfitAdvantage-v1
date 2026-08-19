@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>Confirming Your Email | AI Profit Advantage</title>
+<title>Email Confirmed | AI Profit Advantage</title>
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../style.css">
 </head>
@@ -34,6 +34,7 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
 });
 
 const status = document.getElementById('confirmation-status');
+let handled = false;
 
 function showError(message) {
   status.innerHTML = `
@@ -45,13 +46,18 @@ function showError(message) {
 }
 
 async function confirm() {
+  if (handled) return;
+  handled = true;
+
   const { data, error } = await supabase.auth.getSession();
   if (error) {
+    handled = false;
     showError(error.message || 'Please request a new confirmation link.');
     return;
   }
 
   if (!data.session) {
+    handled = false;
     showError('Your confirmation link may be expired or invalid. Please request a new confirmation email.');
     return;
   }
@@ -60,10 +66,19 @@ async function confirm() {
     <div style="font-size:3rem;margin-bottom:12px;">✅</div>
     <span class="eyebrow">EMAIL CONFIRMED</span>
     <h1>Registration Confirmed</h1>
-    <p class="lead">Your email has been confirmed successfully. Opening your APEP student dashboard…</p>`;
+    <p class="lead">Your email has been confirmed successfully. Redirecting you to the APEP login page…</p>`;
+
+  // Email verification must not silently authenticate the new student.
+  // End the confirmation session and require an explicit login.
+  const { error: signOutError } = await supabase.auth.signOut();
+  if (signOutError) {
+    handled = false;
+    showError('Your email was confirmed, but we could not safely finish the sign-in transition. Please go to Login and sign in manually.');
+    return;
+  }
 
   setTimeout(() => {
-    window.location.replace('../dashboard/index.html');
+    window.location.replace('login.html');
   }, 900);
 }
 
