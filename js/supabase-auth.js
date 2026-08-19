@@ -186,6 +186,7 @@ async function initRegister() {
         email,
         password,
         options: {
+          emailRedirectTo: getRedirect('confirm-email.html'),
           data: {
             first_name: get('firstname'),
             last_name: get('lastname'),
@@ -209,14 +210,13 @@ async function initRegister() {
       }
 
       if (data.session) {
-        setStatus('Account created successfully. Redirecting to your dashboard…', 'success');
+        setStatus('Registration successful. Your account is ready. Redirecting to your dashboard…', 'success');
         window.location.href = getRedirect('../dashboard/index.html');
         return;
       }
 
       if (data.user) {
-        setStatus('Account created successfully. Please check your email to confirm your address, then sign in.', 'success');
-        form.reset();
+        window.location.href = getRedirect('registration-success.html');
         return;
       }
 
