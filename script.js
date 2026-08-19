@@ -35,7 +35,7 @@ function initializePublicNavigationLinks() {
     Store: '/pages/store.html',
     Blog: '/pages/blog.html',
     Contact: '/pages/contact.html',
-    Login: '/auth/login.html',
+    Login: '/login.html',
     Register: '/auth/register.html',
     'Get Started': '/index.html#pricing'
   };
