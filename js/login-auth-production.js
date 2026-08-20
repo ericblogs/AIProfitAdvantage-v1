@@ -42,6 +42,16 @@ function showUnconfirmedMessage(email) {
   );
 }
 
+function getSafeDashboardDestination() {
+  const redirect = new URLSearchParams(window.location.search).get('redirect');
+  // Only allow redirects into the real dashboard directory. This prevents
+  // stale/incorrect paths such as /pages/dashboard/index.html from producing 404s.
+  if (redirect && (redirect === '/dashboard' || redirect === '/dashboard/' || redirect.startsWith('/dashboard/'))) {
+    return redirect;
+  }
+  return '/dashboard/index.html';
+}
+
 async function initializeProductionLogin() {
   if (!window.location.pathname.endsWith('/auth/login.html')) return;
 
@@ -52,7 +62,7 @@ async function initializeProductionLogin() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
     setLoginStatus('You are already signed in. Redirecting to your dashboard…', 'success');
-    window.location.href = new URL('../dashboard/index.html', window.location.href).href;
+    window.location.href = new URL('/dashboard/index.html', window.location.origin).href;
     return;
   }
 
@@ -95,9 +105,8 @@ async function initializeProductionLogin() {
       }
 
       setLoginStatus('Login successful. Redirecting to your dashboard…', 'success');
-      const redirect = new URLSearchParams(window.location.search).get('redirect');
-      const destination = redirect && redirect.startsWith('/') ? redirect : '../dashboard/index.html';
-      window.location.href = new URL(destination, window.location.href).href;
+      const destination = getSafeDashboardDestination();
+      window.location.href = new URL(destination, window.location.origin).href;
     } catch (error) {
       setLoginStatus(error?.message || 'We could not connect to the authentication service. Please try again.', 'error');
     } finally {
