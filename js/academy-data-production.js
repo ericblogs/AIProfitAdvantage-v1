@@ -1,7 +1,7 @@
 /**
  * APEP Academy data integration.
  * Uses the existing browser Supabase configuration and never handles passwords.
- * Current lesson-player scope: AI Foundations lessons 1-3.
+ * Course-specific players may provide their own entry route.
  */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_CONFIG } from '../config/supabase-config.js';
@@ -36,6 +36,11 @@ async function firstPublishedLesson(courseId) {
   return lesson.lesson_number;
 }
 
+function courseEntry(course) {
+  if (course.slug === 'chatgpt-mastery') return 'chatgpt-mastery.html';
+  return null;
+}
+
 async function loadDashboard(user) {
   await ensureProfile(user);
   const { data: enrollments = [] } = await supabase.from('enrollments').select('id,status,course_id,courses(id,title,slug)').eq('user_id', user.id).neq('status', 'cancelled');
@@ -54,9 +59,10 @@ async function loadDashboard(user) {
     if (title) title.textContent = firstCourse.title;
     const action = continuePanel.querySelector('a.button');
     if (action) {
-      const lessonNumber = await firstPublishedLesson(firstCourse.id);
-      action.textContent = lessonNumber ? 'Continue Learning →' : 'View Course Library →';
-      action.href = lessonNumber ? `lesson-${lessonNumber}.html` : 'courses.html';
+      const entry = courseEntry(firstCourse);
+      const lessonNumber = entry ? null : await firstPublishedLesson(firstCourse.id);
+      action.textContent = entry ? 'Continue Learning →' : lessonNumber ? 'Continue Learning →' : 'View Course Library →';
+      action.href = entry || (lessonNumber ? `lesson-${lessonNumber}.html` : 'courses.html');
     }
   }
 }
@@ -90,6 +96,7 @@ async function loadCourses(user) {
 
 async function enrollOrContinue(button, user) {
   const courseId = button.dataset.courseId;
+  const courseSlug = button.dataset.courseSlug;
   const originalText = button.textContent;
   button.disabled = true;
   button.textContent = 'Opening course…';
@@ -110,6 +117,13 @@ async function enrollOrContinue(button, user) {
     } else if (existing.status === 'cancelled') {
       const { error } = await supabase.from('enrollments').update({ status: 'active' }).eq('id', existing.id).eq('user_id', user.id);
       if (error) throw error;
+    }
+
+    const entry = courseEntry({ slug: courseSlug });
+    if (entry) {
+      button.textContent = 'Opening course…';
+      window.location.href = entry;
+      return;
     }
 
     const lessonNumber = await firstPublishedLesson(courseId);
