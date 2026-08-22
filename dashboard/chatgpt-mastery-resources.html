@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI & ChatGPT Mastery Resources | APEP Academy</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="dashboard.css">
+<style>
+.resource-tabs{display:flex;gap:.75rem;flex-wrap:wrap;margin:1rem 0}.resource-tabs button{cursor:pointer}.resource-sheet{max-width:900px;margin:auto;background:#fff;padding:2rem;border-radius:12px}.resource-brand{display:flex;align-items:center;gap:1rem;padding-bottom:1rem;margin-bottom:1rem;border-bottom:1px solid #e5e7eb}.resource-brand img{width:88px;height:88px;object-fit:contain;flex:0 0 auto}.resource-brand-copy{display:flex;flex-direction:column;gap:.15rem}.resource-brand-copy strong{font-size:1rem}.resource-brand-copy span{font-size:.9rem;opacity:.8}.resource-header{border-bottom:2px solid #ddd;padding-bottom:1rem;margin-bottom:1.5rem}.resource-section{margin:1.5rem 0}.resource-section li{margin:.65rem 0}.resource-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:2rem}.resource-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #ddd;font-size:.85rem;opacity:.75}@media print{body *{visibility:hidden}.resource-sheet,.resource-sheet *{visibility:visible}.resource-sheet{position:absolute;left:0;top:0;width:auto;box-shadow:none}.dashboard-sidebar,.dashboard-header,.resource-tabs,.resource-actions{display:none!important}}
+</style>
+</head>
+<body>
+<div class="dashboard-layout">
+<aside class="dashboard-sidebar"><h2>AI Profit Advantage</h2><nav>
+<a href="index.html">🏠 Dashboard</a><a href="courses.html" class="active">📚 Courses</a><a href="chatgpt-mastery.html">▶ AI & ChatGPT Mastery</a><a href="certifications.html">🎓 Certifications</a><a href="community.html">💬 Community</a><a href="downloads.html">📁 Downloads</a><a href="../index.html">← Return Website</a>
+</nav></aside>
+<main class="dashboard-main">
+<header class="dashboard-header"><div><h1>APEP Resource Centre</h1><p>AI & ChatGPT Mastery — study, practise and remember.</p></div></header>
+<section class="dashboard-panel">
+<div id="resource-app"><p>Loading resources…</p></div>
+</section>
+</main>
+</div>
+<script type="module">
+import { resourceModes } from '../js/chatgpt-mastery-resources.js';
+const params=new URLSearchParams(location.search);const n=Number(params.get('lesson')||1);const app=document.getElementById('resource-app');const modes=resourceModes(n);
+if(!modes){app.innerHTML='<h2>Resource unavailable</h2><p>The requested lesson resource could not be found.</p>';}
+else{
+let active='notes';
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const render=()=>{const r=modes[active];const b=modes.branding;app.innerHTML=`<div class="resource-tabs"><button class="btn" data-mode="notes">📘 Lesson Notes</button><button class="btn" data-mode="worksheet">📝 Prompt Practice Worksheet</button><button class="btn" data-mode="quick">📚 Quick Reference Guide</button></div><article class="resource-sheet"><div class="resource-brand"><img src="${b.logoDataUri}" alt="${esc(b.logoAlt)}"><div class="resource-brand-copy"><strong>${esc(b.organisation)}</strong><span>${esc(b.academy)}</span><span>${esc(b.course)} • ${esc(b.format)}</span></div></div><header class="resource-header"><p><strong>${esc(b.organisation.toUpperCase())}</strong></p><h2>${esc(r.title)}</h2><p><strong>Lesson ${n} — ${esc(modes.lesson.t)}</strong></p><p>Resource purpose: ${esc(r.purpose)}</p><p>Student Name: ______________________________ &nbsp;&nbsp; Date: __________________</p></header>${r.sections.map(s=>`<section class="resource-section"><h3>${esc(s.heading)}</h3><ul>${s.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></section>`).join('')}<footer class="resource-footer">${esc(b.footer)}</footer><footer class="resource-actions"><button class="btn" id="print">🖨 Print / Save as PDF</button><a class="btn" href="chatgpt-mastery.html?lesson=${n}">← Return to Lesson</a></footer></article>`;app.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{active=button.dataset.mode;render()});app.querySelector('#print').onclick=()=>window.print()};render();}
+</script>
+</body>
+</html>

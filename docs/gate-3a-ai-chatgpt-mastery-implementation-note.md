@@ -1,0 +1,1 @@
+Gate 3A is now moving into controlled implementation on branch `feat/ai-chatgpt-mastery-gate-3b`. No production merge is authorised by this change. The existing `chatgpt-mastery` Supabase course record is being used as the designated course identity; it currently has no lesson rows and will be aligned to the approved 20-lesson curriculum before certification.
