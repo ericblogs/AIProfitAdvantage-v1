@@ -10,6 +10,10 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
+const DASHBOARD_BASE = new URL('/dashboard/', window.location.origin);
+const COURSE_LIBRARY_URL = new URL('courses.html', DASHBOARD_BASE).href;
+const CHATGPT_MASTERY_URL = new URL('chatgpt-mastery.html?lesson=1', DASHBOARD_BASE).href;
+
 async function currentUser() {
   const { data, error } = await supabase.auth.getUser();
   if (error) return null;
@@ -24,20 +28,13 @@ async function ensureProfile(user) {
 }
 
 async function firstPublishedLesson(courseId) {
-  const { data: lesson, error } = await supabase
-    .from('lessons')
-    .select('lesson_number')
-    .eq('course_id', courseId)
-    .eq('is_published', true)
-    .order('lesson_number', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const { data: lesson, error } = await supabase.from('lessons').select('lesson_number').eq('course_id', courseId).eq('is_published', true).order('lesson_number', { ascending: true }).limit(1).maybeSingle();
   if (error || !lesson) return null;
   return lesson.lesson_number;
 }
 
 function courseEntry(course) {
-  if (course.slug === 'chatgpt-mastery') return 'chatgpt-mastery.html';
+  if (course.slug === 'chatgpt-mastery') return CHATGPT_MASTERY_URL;
   return null;
 }
 
@@ -62,7 +59,7 @@ async function loadDashboard(user) {
       const entry = courseEntry(firstCourse);
       const lessonNumber = entry ? null : await firstPublishedLesson(firstCourse.id);
       action.textContent = entry ? 'Continue Learning →' : lessonNumber ? 'Continue Learning →' : 'View Course Library →';
-      action.href = entry || (lessonNumber ? `lesson-${lessonNumber}.html` : 'courses.html');
+      action.href = entry || (lessonNumber ? new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href : COURSE_LIBRARY_URL);
     }
   }
 }
@@ -92,6 +89,7 @@ async function loadCourses(user) {
   const requestedSlug = new URLSearchParams(window.location.search).get('course');
   if (requestedSlug) {
     const requested = Array.from(grid.querySelectorAll('.course-card')).find(card => card.dataset.courseSlug === requestedSlug);
+    requested?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     requested?.querySelector('.academy-course-action')?.focus();
   }
 }
@@ -104,13 +102,7 @@ async function enrollOrContinue(button, user) {
   button.textContent = 'Opening course…';
 
   try {
-    const { data: existing, error: existingError } = await supabase
-      .from('enrollments')
-      .select('id,status')
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .maybeSingle();
-
+    const { data: existing, error: existingError } = await supabase.from('enrollments').select('id,status').eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
     if (existingError) throw existingError;
 
     if (!existing) {
@@ -121,9 +113,10 @@ async function enrollOrContinue(button, user) {
       if (error) throw error;
     }
 
-    const entry = courseEntry({ slug: courseSlug });
-    if (entry) {
-      window.location.href = new URL(entry, window.location.href).href;
+    if (courseSlug === 'chatgpt-mastery') {
+      // Course 2 has a dedicated player. Never use the generic lesson-1.html
+      // route, which belongs to AI Foundations.
+      window.location.assign(CHATGPT_MASTERY_URL);
       return;
     }
 
@@ -135,7 +128,7 @@ async function enrollOrContinue(button, user) {
     }
 
     button.textContent = `Opening Lesson ${lessonNumber}…`;
-    window.location.href = new URL(`lesson-${lessonNumber}.html`, window.location.href).href;
+    window.location.assign(new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href);
   } catch (error) {
     button.disabled = false;
     button.textContent = originalText;
@@ -151,9 +144,6 @@ function escapeHtml(value) {
 async function init() {
   const user = await currentUser();
   if (!user) return;
-
-  // Prefer DOM capability over a single hard-coded pathname. This keeps the
-  // Course Library functional if the deployed dashboard route is rewritten.
   const coursesGrid = document.querySelector('.courses-grid');
   const dashboardPanel = document.querySelector('.dashboard-panel');
   if (coursesGrid) await loadCourses(user);
