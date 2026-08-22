@@ -68,8 +68,10 @@ async function loadDashboard(user) {
 }
 
 async function loadCourses(user) {
-  const { data: courses = [] } = await supabase.from('courses').select('id,slug,title,description,level,duration_hours,lesson_count,image_path,is_published').eq('is_published', true).order('created_at');
-  const { data: enrollments = [] } = await supabase.from('enrollments').select('course_id,status').eq('user_id', user.id).neq('status', 'cancelled');
+  const { data: courses = [], error: coursesError } = await supabase.from('courses').select('id,slug,title,description,level,duration_hours,lesson_count,image_path,is_published').eq('is_published', true).order('created_at');
+  if (coursesError) throw coursesError;
+  const { data: enrollments = [], error: enrollmentsError } = await supabase.from('enrollments').select('course_id,status').eq('user_id', user.id).neq('status', 'cancelled');
+  if (enrollmentsError) throw enrollmentsError;
   const enrolled = new Set(enrollments.map(e => e.course_id));
   const grid = document.querySelector('.courses-grid');
   if (!grid || !courses.length) return;
@@ -121,8 +123,7 @@ async function enrollOrContinue(button, user) {
 
     const entry = courseEntry({ slug: courseSlug });
     if (entry) {
-      button.textContent = 'Opening course…';
-      window.location.href = entry;
+      window.location.href = new URL(entry, window.location.href).href;
       return;
     }
 
@@ -134,10 +135,11 @@ async function enrollOrContinue(button, user) {
     }
 
     button.textContent = `Opening Lesson ${lessonNumber}…`;
-    window.location.href = `lesson-${lessonNumber}.html`;
+    window.location.href = new URL(`lesson-${lessonNumber}.html`, window.location.href).href;
   } catch (error) {
     button.disabled = false;
     button.textContent = originalText;
+    console.error('APEP course launch error:', error);
     alert(error?.message || 'We could not open this course. Please try again.');
   }
 }
@@ -149,9 +151,13 @@ function escapeHtml(value) {
 async function init() {
   const user = await currentUser();
   if (!user) return;
-  const path = location.pathname;
-  if (path.endsWith('/dashboard/index.html') || path.endsWith('/dashboard/')) await loadDashboard(user);
-  if (path.endsWith('/dashboard/courses.html')) await loadCourses(user);
+
+  // Prefer DOM capability over a single hard-coded pathname. This keeps the
+  // Course Library functional if the deployed dashboard route is rewritten.
+  const coursesGrid = document.querySelector('.courses-grid');
+  const dashboardPanel = document.querySelector('.dashboard-panel');
+  if (coursesGrid) await loadCourses(user);
+  if (dashboardPanel) await loadDashboard(user);
 }
 
 init().catch(error => console.error('APEP Academy integration error:', error));
