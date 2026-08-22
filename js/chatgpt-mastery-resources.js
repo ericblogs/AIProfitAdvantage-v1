@@ -1,12 +1,15 @@
 import { getPremiumLesson } from './chatgpt-mastery-lessons.js';
+import { APEP_BRAND } from './apep-branding.js';
 
 export function resourceModes(lessonNumber) {
   const lesson = getPremiumLesson(lessonNumber);
   if (!lesson) return null;
 
   const branding = {
-    organisation: 'AI Profit Advantage Enterprise Platform (APEP)',
-    academy: 'APEP Academy',
+    organisation: APEP_BRAND.organisation,
+    academy: APEP_BRAND.academy,
+    logoAlt: APEP_BRAND.logoAlt,
+    logoDataUri: APEP_BRAND.logoDataUri,
     course: 'AI & ChatGPT Mastery',
     footer: 'APEP Academy • AI Education & Business Automation',
     format: 'Student Resource • Study / Practise / Remember'
