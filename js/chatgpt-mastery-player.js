@@ -39,6 +39,11 @@ async function completeLesson(db,course,n,progress,byNo){
  if(error){btn.disabled=false;btn.textContent='Mark Lesson Complete';root.querySelector('#status').textContent=error.message;return;}
  const updatedProgress=progress.filter(p=>p.lesson_id!==db.id).concat({lesson_id:db.id,completed:true,progress_percent:100});
  if(n<20){root.querySelector('#status').innerHTML=`<p>Lesson ${n} completed. <button class="btn" id="next">Continue to Lesson ${n+1} →</button></p>`;root.querySelector('#next').onclick=()=>{history.replaceState({},'',`chatgpt-mastery.html?lesson=${n+1}`);openLesson(n+1,course,updatedProgress,byNo)};}
- else root.querySelector('#status').innerHTML='<p>🎓 Congratulations — you completed the AI & ChatGPT Mastery course.</p><a class="btn" href="courses.html">Return to Course Library →</a>';
+ else {
+   // Course 2 has its own completion state. Never route to the generic
+   // AI Foundations lesson player or lesson-20.html. Return explicitly to
+   // the Course Library with the completed course selected/focused.
+   root.innerHTML=`<section class="dashboard-panel"><div class="course-badge intermediate">COURSE COMPLETE</div><h1>🎓 AI & ChatGPT Mastery Completed</h1><p>You have completed all 20 lessons in AI & ChatGPT Mastery.</p><p>Your completion is saved to your student progress record.</p><div class="course-meta"><a class="btn" href="courses.html?course=chatgpt-mastery">📚 View Course Library</a><a class="btn" href="chatgpt-mastery.html">↩ Review Course 2</a></div></section>`;
+ }
 }
 init().catch(e=>{console.error(e);root.innerHTML='<section class="dashboard-panel"><h2>Unable to load course</h2><p>Please try again.</p></section>';});
