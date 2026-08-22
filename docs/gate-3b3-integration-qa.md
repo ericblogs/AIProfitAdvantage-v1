@@ -2,43 +2,53 @@
 
 Status: INTEGRATION REVIEW — NOT MERGE APPROVED
 
+## Reconciliation Status
+
+- Protected `main`: `bf18d2a6012dea6927cd3be45ff1fb62e1afbe65`
+- Reconciled Gate 3B branch: `feat/ai-chatgpt-mastery-gate-3b`
+- Reconciled head: `cee896bf7df4d1dc1f26f6d22b4b1442bdcc4b35`
+- Branch topology after reconciliation: **0 commits behind / 21 commits ahead of `main`**
+- Reconciliation method: real Git merge of current `main` into the Gate 3B feature branch
+
 ## Scope
 
-This gate validates the isolated AI & ChatGPT Mastery release after Gate 3B.2 premium-content remediation and APEP branding integration.
+This gate validates the isolated AI & ChatGPT Mastery release after Gate 3B.2 premium-content remediation and APEP branding integration, following reconciliation with the current protected `main` state.
 
-## Results
+## Static QA Results
 
 - 20-lesson course architecture remains intact.
 - Dedicated ChatGPT Mastery Course Player remains isolated from AI Foundations.
 - Existing authentication, enrolment and `lesson_progress` architecture remains the integration target.
 - Resource Centre remains lesson-aware and exposes Study / Practise / Remember resources.
-- APEP Academy branding is now consumed through `js/apep-branding.js` and rendered by the Resource Centre.
-- The supplied APEP artwork is embedded as a compact JPEG data URI for the isolated release. This is a representation of the supplied artwork, not a claim that the original uploaded binary has been committed unchanged.
-- No Supabase production records were modified during this branding pass.
-- AI Foundations 1–20 remains protected.
+- APEP Academy branding remains consumed through `js/apep-branding.js` and rendered by the Resource Centre.
+- AI Foundations 1–20 remains protected; no regression detected in the Gate 3B change set.
+- Git reconciliation: PASS.
 
-## Repository topology check
+## Protected Controls
 
-The release branch is currently diverged from `main` and is 19 commits ahead / 7 commits behind. The merge base is the previously reviewed APEP baseline commit `66be7a843fb587de822817196fc3d469542266e5`.
-
-This divergence is a merge-control condition. It must be reconciled deliberately before merge; it must not be bypassed with a blind force push or direct production merge.
-
-## QA disposition
-
-- Branding integration: PASS for isolated release.
-- Resource template integration: PASS for isolated release.
-- AI Foundations regression: PRESERVE / no changes introduced by this pass.
-- Supabase production: UNCHANGED.
-- Automated CI evidence: PENDING.
-- Authenticated live student journey: PENDING.
-- Production merge: BLOCKED.
+- `main`: PROTECTED — do not move or force-update.
+- AI Foundations: PROTECTED — no regression permitted.
+- Supabase production: UNTOUCHED — no production schema/configuration changes authorized by this gate.
+- Production merge: BLOCKED until all required validation gates pass.
 - Production certification: NOT AUTHORISED.
 
-## Required next actions
+## QA Disposition
 
-1. Reconcile branch divergence safely against current `main`.
-2. Re-run static/integration QA after reconciliation.
-3. Validate Supabase compatibility without destructive schema changes.
-4. Execute authenticated student journey testing from Login through Lesson 20 completion.
-5. Merge only after all required checks pass.
-6. Certify and freeze only after production validation evidence exists.
+**Gate 3B.3 QA: CONDITIONAL PASS — static/repository QA passed; live and integration validation remain required.**
+
+Successful reconciliation and static inspection do not constitute application certification.
+
+## Remaining Validation
+
+1. Supabase compatibility QA.
+2. Authenticated Student Journey QA from Login through Lesson 20 completion, including progress persistence.
+3. Live dashboard/route verification, including the previously reported `/pages/dashboard` 404 path.
+4. Evidence capture and final Gate 3B.3 acceptance.
+
+## Release Sequence
+
+Reconciliation Complete → Static QA → Supabase Compatibility → Student Journey QA → Live Route Verification → Full Gate 3B.3 Acceptance → PR Approval → Merge to `main` → Production Certification → Release Freeze
+
+## Current Authorization
+
+**DO NOT MERGE TO `main`. Supabase remains untouched. Production remains locked.**
