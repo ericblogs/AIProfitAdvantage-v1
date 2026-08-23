@@ -13,6 +13,9 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
 const DASHBOARD_BASE = new URL('/dashboard/', window.location.origin);
 const COURSE_LIBRARY_URL = new URL('courses.html', DASHBOARD_BASE).href;
 const CHATGPT_MASTERY_URL = new URL('chatgpt-mastery.html?lesson=1', DASHBOARD_BASE).href;
+const VERIFY_PAYSTACK_URL = `${SUPABASE_CONFIG.url}/functions/v1/verify-paystack-payment`;
+const INITIALIZE_PAYSTACK_URL = `${SUPABASE_CONFIG.url}/functions/v1/initialize-paystack-payment`;
+const CHATGPT_MASTERY_ID = '5135ced7-c80f-4224-898d-7771b96761df';
 
 async function currentUser() {
   const { data, error } = await supabase.auth.getUser();
@@ -36,6 +39,65 @@ async function firstPublishedLesson(courseId) {
 function courseEntry(course) {
   if (course.slug === 'chatgpt-mastery') return CHATGPT_MASTERY_URL;
   return null;
+}
+
+async function hasActiveEntitlement(userId, courseId) {
+  const { data, error } = await supabase.from('course_entitlements').select('id,status').eq('user_id', userId).eq('course_id', courseId).eq('status', 'active').maybeSingle();
+  if (error) throw error;
+  return Boolean(data);
+}
+
+async function initializePaystackPayment(courseId) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your session has expired. Please sign in again.');
+
+  const response = await fetch(INITIALIZE_PAYSTACK_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`,
+      'apikey': SUPABASE_CONFIG.publishableKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ course_id: courseId })
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.authorization_url) {
+    throw new Error(payload.error || 'Unable to initialize Paystack checkout.');
+  }
+
+  window.location.assign(payload.authorization_url);
+}
+
+async function verifyPaystackReturn(user) {
+  const params = new URLSearchParams(window.location.search);
+  const reference = params.get('reference');
+  const paymentState = params.get('paystack');
+  const courseId = params.get('course_id');
+
+  if (paymentState !== 'success' || !reference || courseId !== CHATGPT_MASTERY_ID) return false;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your session has expired. Please sign in again.');
+
+  const response = await fetch(VERIFY_PAYSTACK_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`,
+      'apikey': SUPABASE_CONFIG.publishableKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ reference, course_id: courseId })
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.success === false) {
+    throw new Error(payload.error || 'Paystack payment verification failed.');
+  }
+
+  window.history.replaceState({}, document.title, COURSE_LIBRARY_URL);
+  window.location.assign(CHATGPT_MASTERY_URL);
+  return true;
 }
 
 async function loadDashboard(user) {
@@ -102,6 +164,17 @@ async function enrollOrContinue(button, user) {
   button.textContent = 'Opening course…';
 
   try {
+    if (courseSlug === 'chatgpt-mastery' || courseId === CHATGPT_MASTERY_ID) {
+      if (await hasActiveEntitlement(user.id, courseId)) {
+        window.location.assign(CHATGPT_MASTERY_URL);
+        return;
+      }
+
+      button.textContent = 'Opening secure checkout…';
+      await initializePaystackPayment(courseId);
+      return;
+    }
+
     const { data: existing, error: existingError } = await supabase.from('enrollments').select('id,status').eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
     if (existingError) throw existingError;
 
@@ -111,13 +184,6 @@ async function enrollOrContinue(button, user) {
     } else if (existing.status === 'cancelled') {
       const { error } = await supabase.from('enrollments').update({ status: 'active' }).eq('id', existing.id).eq('user_id', user.id);
       if (error) throw error;
-    }
-
-    if (courseSlug === 'chatgpt-mastery') {
-      // Course 2 has a dedicated player. Never use the generic lesson-1.html
-      // route, which belongs to AI Foundations.
-      window.location.assign(CHATGPT_MASTERY_URL);
-      return;
     }
 
     const lessonNumber = await firstPublishedLesson(courseId);
@@ -144,6 +210,10 @@ function escapeHtml(value) {
 async function init() {
   const user = await currentUser();
   if (!user) return;
+
+  const verifiedReturn = await verifyPaystackReturn(user);
+  if (verifiedReturn) return;
+
   const coursesGrid = document.querySelector('.courses-grid');
   const dashboardPanel = document.querySelector('.dashboard-panel');
   if (coursesGrid) await loadCourses(user);
