@@ -12,6 +12,7 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
 
 const DASHBOARD_BASE = new URL('/dashboard/', window.location.origin);
 const COURSE_LIBRARY_URL = new URL('courses.html', DASHBOARD_BASE).href;
+const AI_FOUNDATIONS_URL = new URL('lesson-1.html', DASHBOARD_BASE).href;
 const CHATGPT_MASTERY_URL = new URL('chatgpt-mastery.html?lesson=1', DASHBOARD_BASE).href;
 const VERIFY_PAYSTACK_URL = `${SUPABASE_CONFIG.url}/functions/v1/verify-paystack-payment`;
 const INITIALIZE_PAYSTACK_URL = `${SUPABASE_CONFIG.url}/functions/v1/initialize-paystack-payment`;
@@ -37,6 +38,7 @@ async function firstPublishedLesson(courseId) {
 }
 
 function courseEntry(course) {
+  if (course.slug === 'ai-foundations') return AI_FOUNDATIONS_URL;
   if (course.slug === 'chatgpt-mastery') return CHATGPT_MASTERY_URL;
   return null;
 }
@@ -186,15 +188,16 @@ async function enrollOrContinue(button, user) {
       if (error) throw error;
     }
 
-    const lessonNumber = await firstPublishedLesson(courseId);
-    if (!lessonNumber) {
+    const entry = courseEntry({ slug: courseSlug });
+    const lessonNumber = entry ? null : await firstPublishedLesson(courseId);
+    if (!entry && !lessonNumber) {
       button.disabled = false;
       button.textContent = 'Enrolled ✓ — Course content coming soon';
       return;
     }
 
-    button.textContent = `Opening Lesson ${lessonNumber}…`;
-    window.location.assign(new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href);
+    button.textContent = entry ? 'Opening Course…' : `Opening Lesson ${lessonNumber}…`;
+    window.location.assign(entry || new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href);
   } catch (error) {
     button.disabled = false;
     button.textContent = originalText;
