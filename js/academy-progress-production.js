@@ -1,6 +1,7 @@
 /** APEP Academy lesson progress integration for the complete AI Foundations course. */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+import './ai-foundations-player-layout.js';
 const COURSE_SLUG='ai-foundations';
 const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 function lessonNumber(){const m=location.pathname.match(/lesson-(\d+)\.html$/);return m?Number(m[1]):null;}
