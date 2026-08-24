@@ -7,7 +7,18 @@
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="dashboard.css">
 <style>
-.course-card{position:relative}.course-number{font-size:.78rem;font-weight:800;letter-spacing:.08em;margin-bottom:8px;opacity:.75}.course-card[data-level="BEGINNER"] .course-badge{background:#808080;color:#fff}.course-card[data-level="INTERMEDIATE"] .course-badge{background:#2563eb;color:#fff}.course-card[data-level="ADVANCED"] .course-badge{background:#172554;color:#fff}.course-card[data-level="EXPERT"] .course-badge{background:#16a34a;color:#fff}.course-card[data-level="PROFESSIONAL"] .course-badge{background:#d4a017;color:#111}
+.courses-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:stretch}
+.course-card{position:relative;display:flex;flex-direction:column;min-width:0;height:100%;padding:24px}
+.course-number{font-size:.8rem;font-weight:900;letter-spacing:.12em;margin-bottom:10px;opacity:.72}
+.course-card .course-badge{display:inline-flex;align-self:flex-start;align-items:center;justify-content:center;margin-bottom:14px;padding:6px 12px;border-radius:999px;font-size:.72rem;font-weight:900;letter-spacing:.06em}
+.course-card[data-level="BEGINNER"] .course-badge{background:#808080;color:#fff}
+.course-card[data-level="INTERMEDIATE"] .course-badge{background:#2563eb;color:#fff}
+.course-card[data-level="ADVANCED"] .course-badge{background:#172554;color:#fff}
+.course-card[data-level="EXPERT"] .course-badge{background:#16a34a;color:#fff}
+.course-card[data-level="PROFESSIONAL"] .course-badge{background:#d4a017;color:#111}
+.course-card h3{margin:0 0 10px}.course-card p{margin:0 0 18px;flex:1}.course-meta{margin-bottom:18px}.course-card .btn{align-self:flex-start}
+@media (min-width:1100px){.courses-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.course-card:nth-child(4){grid-column:1}.course-card:nth-child(5){grid-column:2}}
+@media (max-width:760px){.courses-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -16,7 +27,7 @@
 <a href="index.html">🏠 Dashboard</a><a href="courses.html" class="active">📚 Courses</a><a href="course-player.html?course=ai-foundations">▶ Course Player</a><a href="certifications.html">🎓 Certifications</a><a href="community.html">💬 Community</a><a href="downloads.html">📁 Downloads</a><a href="#">⚙ Settings</a><a href="../index.html">← Return Website</a>
 </nav></aside>
 <main class="dashboard-main">
-<header class="dashboard-header"><div><h1>Course Library</h1><p>Choose your next learning journey.</p></div><input type="search" class="dashboard-search" placeholder="Search courses..." aria-label="Search courses"></header>
+<header class="dashboard-header"><div><h1>Course Library</h1><p>Follow the Academy pathway from foundational AI skills to professional enterprise application.</p></div><input type="search" class="dashboard-search" placeholder="Search courses..." aria-label="Search courses"></header>
 <section class="courses-grid" aria-label="Available courses">
 <article class="course-card" data-course-slug="ai-foundations" data-level="BEGINNER"><div class="course-number">01</div><div class="course-badge">BEGINNER</div><h3>AI Foundations</h3><p>Build essential AI knowledge and practical confidence through a structured 20-lesson foundation.</p><div class="course-meta"><span>📖 20 Lessons</span></div><a class="btn" href="course-player.html?course=ai-foundations">Open Course Player →</a></article>
 <article class="course-card" data-course-slug="prompt-engineering" data-level="INTERMEDIATE"><div class="course-number">02</div><div class="course-badge">INTERMEDIATE</div><h3>Prompt Engineering</h3><p>Design, test and optimise professional prompts for reliable AI results.</p><div class="course-meta"><span>📖 18 Lessons</span></div><a class="btn" href="prompt-engineering.html?lesson=1">Open Course Player →</a></article>
