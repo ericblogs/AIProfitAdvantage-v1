@@ -13,31 +13,11 @@ const COURSE_LIBRARY_ORDER = [
 ];
 
 const COURSE_PRESENTATION = {
-  'ai-foundations': {
-    level: 'BEGINNER',
-    color: '#6B7280',
-    hover: '#4B5563'
-  },
-  'prompt-engineering': {
-    level: 'INTERMEDIATE',
-    color: '#2563EB',
-    hover: '#1D4ED8'
-  },
-  'chatgpt-mastery': {
-    level: 'ADVANCED',
-    color: '#0B1F3A',
-    hover: '#07152A'
-  },
-  'ai-automation': {
-    level: 'EXPERT',
-    color: '#16A34A',
-    hover: '#15803D'
-  },
-  'business-enterprise': {
-    level: 'PROFESSIONAL',
-    color: '#C9A227',
-    hover: '#A88418'
-  }
+  'ai-foundations': { level: 'BEGINNER', color: '#6B7280', hover: '#4B5563' },
+  'prompt-engineering': { level: 'INTERMEDIATE', color: '#2563EB', hover: '#1D4ED8' },
+  'chatgpt-mastery': { level: 'ADVANCED', color: '#0B1F3A', hover: '#07152A' },
+  'ai-automation': { level: 'EXPERT', color: '#16A34A', hover: '#15803D' },
+  'business-enterprise': { level: 'PROFESSIONAL', color: '#C9A227', hover: '#A88418' }
 };
 
 function applyCoursePresentation() {
@@ -46,6 +26,8 @@ function applyCoursePresentation() {
 
   const cards = Array.from(grid.querySelectorAll('.course-card'));
   if (!cards.length) return;
+
+  observer.disconnect();
 
   cards.sort((a, b) => {
     const aIndex = COURSE_LIBRARY_ORDER.indexOf(a.dataset.courseSlug);
@@ -76,17 +58,22 @@ function applyCoursePresentation() {
       button.style.borderColor = presentation.color;
       button.dataset.courseLevel = presentation.level;
 
-      button.addEventListener('mouseenter', () => {
-        button.style.background = presentation.hover;
-      });
-      button.addEventListener('mouseleave', () => {
-        button.style.background = presentation.color;
-      });
+      if (button.dataset.presentationBound !== 'true') {
+        button.addEventListener('mouseenter', () => {
+          button.style.background = presentation.hover;
+        });
+        button.addEventListener('mouseleave', () => {
+          button.style.background = presentation.color;
+        });
+        button.dataset.presentationBound = 'true';
+      }
     }
   });
+
+  observer.observe(grid, { childList: true, subtree: true });
 }
 
-const observer = new MutationObserver(applyCoursePresentation);
+const observer = new MutationObserver(() => applyCoursePresentation());
 
 function initCourseLibraryPresentation() {
   const grid = document.querySelector('.courses-grid');
