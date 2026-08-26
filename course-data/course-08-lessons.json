@@ -1,0 +1,29 @@
+{
+  "course": "AI-Powered Digital Marketing & Growth",
+  "slug": "ai-powered-digital-marketing-growth",
+  "level": "professional",
+  "price": {"amount": 85000, "currency": "NGN"},
+  "published": false,
+  "lessons": [
+    {"number":1,"slug":"ai-powered-marketing-fundamentals","title":"AI-Powered Marketing Fundamentals"},
+    {"number":2,"slug":"market-research-customer-intelligence","title":"Market Research & Customer Intelligence"},
+    {"number":3,"slug":"buyer-psychology-customer-avatars","title":"Buyer Psychology & Customer Avatars"},
+    {"number":4,"slug":"positioning-offers-value-propositions","title":"Positioning, Offers & Value Propositions"},
+    {"number":5,"slug":"ai-powered-copywriting","title":"AI-Powered Copywriting"},
+    {"number":6,"slug":"content-strategy-systems","title":"Content Strategy & Content Systems"},
+    {"number":7,"slug":"seo-ai-assisted-search","title":"SEO & AI-Assisted Search"},
+    {"number":8,"slug":"social-media-marketing-ai","title":"Social Media Marketing with AI"},
+    {"number":9,"slug":"lead-generation-systems","title":"Lead Generation Systems"},
+    {"number":10,"slug":"email-marketing-ai-personalization","title":"Email Marketing & AI Personalization"},
+    {"number":11,"slug":"paid-advertising-ai","title":"Paid Advertising with AI"},
+    {"number":12,"slug":"landing-pages-conversion-optimization","title":"Landing Pages & Conversion Optimization"},
+    {"number":13,"slug":"marketing-automation","title":"Marketing Automation"},
+    {"number":14,"slug":"ai-agents-marketing-operations","title":"AI Agents for Marketing Operations"},
+    {"number":15,"slug":"marketing-analytics-attribution","title":"Marketing Analytics & Attribution"},
+    {"number":16,"slug":"customer-segmentation-personalization","title":"Customer Segmentation & Personalization"},
+    {"number":17,"slug":"building-ai-marketing-funnel","title":"Building an AI Marketing Funnel"},
+    {"number":18,"slug":"creating-complete-campaign","title":"Creating a Complete Campaign"},
+    {"number":19,"slug":"client-acquisition-marketing-services","title":"Client Acquisition & Marketing Services"},
+    {"number":20,"slug":"capstone-ai-powered-growth-engine","title":"Capstone — Build an AI-Powered Growth Engine"}
+  ]
+}
