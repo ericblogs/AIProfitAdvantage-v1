@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>APEP Admin Command Center</title>
+  <style>
+    :root{--navy:#07111f;--navy2:#0d1b2d;--gold:#d7ad4b;--gold2:#f2d27b;--ink:#142033;--muted:#667085;--line:#e7ebf0;--bg:#f5f7fa;--white:#fff;--ok:#16794c;--danger:#b42318;--shadow:0 12px 30px rgba(7,17,31,.08)}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    .app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.sidebar{background:linear-gradient(180deg,var(--navy),#0a1728);color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:24px}.brand{padding:4px 10px 18px;border-bottom:1px solid rgba(255,255,255,.1)}.brand strong{display:block;font-size:20px;letter-spacing:.08em}.brand span{display:block;margin-top:5px;color:#aeb9c8;font-size:11px;text-transform:uppercase;letter-spacing:.14em}.nav{display:grid;gap:6px}.nav a{color:#c7d0dc;text-decoration:none;padding:11px 12px;border-radius:10px;font-size:14px}.nav a.active,.nav a:hover{background:rgba(215,173,75,.13);color:#fff}.nav a.active{border-left:3px solid var(--gold);padding-left:9px}.side-note{margin-top:auto;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;color:#aeb9c8;font-size:11px;line-height:1.5}.side-note b{color:#fff}.main{min-width:0}.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:10}.topbar h1{font-size:17px;margin:0}.identity{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700}.badge.ok{background:#eaf7f0;color:var(--ok)}.badge.pending{background:#fff6df;color:#8a6500}.content{padding:30px;max-width:1500px;margin:auto}.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:24px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#8a6500;font-weight:800}.hero h2{font-size:30px;margin:7px 0 7px}.hero p{margin:0;color:var(--muted);max-width:720px}.refresh{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}.card{padding:18px}.card .label{color:var(--muted);font-size:12px}.metric{font-size:29px;font-weight:800;margin-top:8px}.sub{font-size:11px;color:var(--muted);margin-top:5px}.section-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-top:16px}.panel{overflow:hidden}.panel-head{padding:17px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-head h3{margin:0;font-size:15px}.panel-head span{font-size:11px;color:var(--muted)}.empty{padding:38px 20px;text-align:center;color:var(--muted);font-size:13px}.empty strong{display:block;color:var(--ink);margin-bottom:5px}.course-list{display:grid;gap:0}.course{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 18px;border-bottom:1px solid var(--line)}.course:last-child{border-bottom:0}.course-title{font-weight:700;font-size:13px}.course-meta{font-size:11px;color:var(--muted);margin-top:3px}.status-dot{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block}.notice{margin-top:16px;border:1px solid #f0dca6;background:#fffaf0;border-radius:12px;padding:14px 16px;color:#6f570e;font-size:12px;line-height:1.55}.denied{display:none;min-height:100vh;place-items:center;padding:24px;background:var(--bg)}.denied-card{max-width:520px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px;box-shadow:var(--shadow);text-align:center}.denied-card h2{margin:0 0 8px}.denied-card p{color:var(--muted);line-height:1.6}.hidden{display:none!important}@media(max-width:1050px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-grid{grid-template-columns:1fr}}@media(max-width:760px){.app{display:block}.sidebar{position:static;padding:15px;gap:14px}.nav{display:flex;overflow:auto}.nav a{white-space:nowrap}.side-note{display:none}.topbar{height:auto;padding:15px 18px}.content{padding:20px 16px}.hero{display:block}.refresh{margin-top:14px}.grid{grid-template-columns:1fr 1fr}}@media(max-width:480px){.grid{grid-template-columns:1fr}.identity{display:none}.hero h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <div id="denied" class="denied" aria-live="polite">
+    <div class="denied-card"><div class="eyebrow">APEP SECURITY</div><h2>Administrator access required</h2><p id="deniedMessage">Your session could not be authorized for the APEP Admin Command Center.</p><button class="refresh" id="returnBtn">Return to dashboard</button></div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><strong>APEP</strong><span>Admin Command Center</span></div>
+      <nav class="nav" aria-label="Admin navigation">
+        <a class="active" href="./index.html">Overview</a>
+        <a href="#users">Users</a><a href="#courses">Courses</a><a href="#enrollments">Enrollments</a><a href="#payments">Payments</a><a href="#progress">Progress</a><a href="#certificates">Certificates</a><a href="#audit">Audit Logs</a>
+      </nav>
+      <div class="side-note"><b>Read-only release</b><br>Gate 3C.21. No administrative CRUD actions are enabled in this release.</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><h1>Operational Overview</h1><div class="identity"><span id="adminEmail">Checking session…</span><span id="adminBadge" class="badge pending">Verifying admin</span></div></header>
+      <section class="content">
+        <div class="hero"><div><div class="eyebrow">AI Profit Advantage Enterprise Platform</div><h2>Command Center</h2><p>Trusted, read-only operational intelligence for the APEP platform.</p></div><button id="refreshBtn" class="refresh">Refresh intelligence</button></div>
+
+        <section class="grid" aria-label="Key performance indicators">
+          <article class="card"><div class="label">Published Courses</div><div id="kpiCourses" class="metric">—</div><div class="sub">Visible through current student-safe RLS</div></article>
+          <article class="card"><div class="label">Students</div><div class="metric">—</div><div class="sub">Admin aggregate access not yet enabled</div></article>
+          <article class="card"><div class="label">Enrollments</div><div class="metric">—</div><div class="sub">Admin aggregate access not yet enabled</div></article>
+          <article class="card"><div class="label">Revenue</div><div class="metric">—</div><div class="sub">Payment data remains protected</div></article>
+        </section>
+
+        <div class="section-grid">
+          <section id="courses" class="panel"><div class="panel-head"><h3>Course & enrollment summary</h3><span>Read-only</span></div><div id="courseList" class="course-list"><div class="empty">Loading published course intelligence…</div></div></section>
+          <section id="progress" class="panel"><div class="panel-head"><h3>Progress overview</h3><span>Read-only</span></div><div class="empty"><strong>Protected student telemetry</strong>Aggregate progress is intentionally withheld until an admin-scoped RLS read path is certified.</div></section>
+        </div>
+
+        <div class="section-grid">
+          <section id="payments" class="panel"><div class="panel-head"><h3>Recent transactions</h3><span>Payment flow frozen</span></div><div class="empty"><strong>No transaction data exposed</strong>Paystack and purchase records remain behind existing student-scoped RLS. This release does not weaken those policies.</div></section>
+          <section id="users" class="panel"><div class="panel-head"><h3>Recent student activity</h3><span>Read-only</span></div><div class="empty"><strong>Admin activity feed pending</strong>User-wide activity requires a separately certified admin read path.</div></section>
+        </div>
+
+        <div class="notice"><b>Security boundary:</b> this page first authenticates the existing Supabase session and then calls the exposed authenticated-only <code>public.is_current_user_admin()</code> authorization function. That function executes as a security definer against the private admin registry; the browser never receives direct access to <code>private.admin_users</code>. No secrets, service-role keys, payment mutations, or student-policy changes are present in this release.</div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+
+    const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKey, { auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true} });
+    const app = document.getElementById('app');
+    const denied = document.getElementById('denied');
+    const deniedMessage = document.getElementById('deniedMessage');
+    const adminEmail = document.getElementById('adminEmail');
+    const adminBadge = document.getElementById('adminBadge');
+    const kpiCourses = document.getElementById('kpiCourses');
+    const courseList = document.getElementById('courseList');
+
+    function deny(message){
+      app.classList.add('hidden'); denied.style.display='grid'; deniedMessage.textContent=message || 'Administrator authorization was not granted.';
+    }
+    function dashboard(){ window.location.href = '../dashboard/index.html'; }
+    document.getElementById('returnBtn').addEventListener('click', dashboard);
+
+    async function verifyAdmin(){
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if(sessionError || !sessionData.session){ return deny('Your session is missing or expired. Please sign in again.'); }
+      const user = sessionData.session.user;
+      adminEmail.textContent = user.email || 'Authenticated user';
+
+      const { data:isAdmin, error:adminError } = await supabase.rpc('is_current_user_admin');
+      if(adminError){ return deny('Administrator authorization could not be verified. Access is denied.'); }
+      if(isAdmin !== true){ return deny('This authenticated account is not authorized for the APEP Admin Command Center.'); }
+
+      adminBadge.textContent='ADMIN AUTHORIZED'; adminBadge.className='badge ok'; app.classList.remove('hidden');
+      await loadSafeOverview();
+    }
+
+    async function loadSafeOverview(){
+      const { count, error } = await supabase.from('courses').select('id', { count:'exact', head:true }).eq('is_published', true);
+      if(!error && typeof count === 'number') kpiCourses.textContent = String(count);
+
+      const { data:courses, error:coursesError } = await supabase.from('courses').select('id,title,level,lesson_count,is_published,is_free').eq('is_published', true).order('created_at',{ascending:true}).limit(8);
+      if(coursesError){ courseList.innerHTML='<div class="empty"><strong>Course intelligence unavailable</strong>The current authenticated read policy did not permit the course query.</div>'; return; }
+      if(!courses?.length){ courseList.innerHTML='<div class="empty"><strong>No published courses found</strong>The current data source returned no published courses.</div>'; return; }
+      courseList.innerHTML = courses.map(c=>`<div class="course"><div><div class="course-title">${escapeHtml(c.title || 'Untitled course')}</div><div class="course-meta">${escapeHtml(c.level || '—')} · ${Number(c.lesson_count || 0)} lessons · ${c.is_free ? 'Free' : 'Paid'}</div></div><span class="status-dot" title="Published"></span></div>`).join('');
+    }
+
+    function escapeHtml(value){ return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch])); }
+    document.getElementById('refreshBtn').addEventListener('click', loadSafeOverview);
+    supabase.auth.onAuthStateChange((event, session)=>{ if(event==='SIGNED_OUT' || !session) deny('Your session ended. Please sign in again.'); });
+    verifyAdmin();
+  </script>
+</body>
+</html>
