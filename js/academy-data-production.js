@@ -1,7 +1,6 @@
 /**
  * APEP Academy data integration.
  * Uses the existing browser Supabase configuration and never handles passwords.
- * Course-specific players may provide their own entry route.
  */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_CONFIG } from '../config/supabase-config.js';
@@ -12,8 +11,21 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
 
 const DASHBOARD_BASE = new URL('/dashboard/', window.location.origin);
 const COURSE_LIBRARY_URL = new URL('courses.html', DASHBOARD_BASE).href;
-const AI_FOUNDATIONS_URL = new URL('lesson-1.html', DASHBOARD_BASE).href;
-const CHATGPT_MASTERY_URL = new URL('chatgpt-mastery.html?lesson=1', DASHBOARD_BASE).href;
+const COURSE_ROUTES = {
+  'ai-foundations': 'lesson-1.html',
+  'prompt-engineering': 'prompt-engineering.html?lesson=1',
+  'chatgpt-mastery': 'chatgpt-mastery.html?lesson=1&enroll=1',
+  'ai-automation': 'ai-automation.html?lesson=1',
+  'business-enterprise': 'business-enterprise.html?lesson=1',
+  'ai-agents-intelligent-automation': 'ai-agents-academy.html?lesson=1',
+  'data-analytics-generative-ai': 'data-analytics-generative-ai.html?lesson=1',
+  'ai-powered-digital-marketing-growth': 'ai-powered-digital-marketing-growth.html?lesson=1'
+};
+const COURSE_ORDER = [
+  'ai-foundations', 'prompt-engineering', 'chatgpt-mastery', 'ai-automation',
+  'business-enterprise', 'ai-agents-intelligent-automation',
+  'data-analytics-generative-ai', 'ai-powered-digital-marketing-growth'
+];
 const VERIFY_PAYSTACK_URL = `${SUPABASE_CONFIG.url}/functions/v1/verify-paystack-payment`;
 const INITIALIZE_PAYSTACK_URL = `${SUPABASE_CONFIG.url}/functions/v1/initialize-paystack-payment`;
 const CHATGPT_MASTERY_ID = '5135ced7-c80f-4224-898d-7771b96761df';
@@ -38,9 +50,8 @@ async function firstPublishedLesson(courseId) {
 }
 
 function courseEntry(course) {
-  if (course.slug === 'ai-foundations') return AI_FOUNDATIONS_URL;
-  if (course.slug === 'chatgpt-mastery') return CHATGPT_MASTERY_URL;
-  return null;
+  const route = COURSE_ROUTES[course.slug];
+  return route ? new URL(route, DASHBOARD_BASE).href : null;
 }
 
 async function hasActiveEntitlement(userId, courseId) {
@@ -52,22 +63,13 @@ async function hasActiveEntitlement(userId, courseId) {
 async function initializePaystackPayment(courseId) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) throw new Error('Your session has expired. Please sign in again.');
-
   const response = await fetch(INITIALIZE_PAYSTACK_URL, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${session.access_token}`,
-      'apikey': SUPABASE_CONFIG.publishableKey,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_CONFIG.publishableKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({ course_id: courseId })
   });
-
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok || !payload.authorization_url) {
-    throw new Error(payload.error || 'Unable to initialize Paystack checkout.');
-  }
-
+  if (!response.ok || !payload.authorization_url) throw new Error(payload.error || 'Unable to initialize Paystack checkout.');
   window.location.assign(payload.authorization_url);
 }
 
@@ -76,29 +78,18 @@ async function verifyPaystackReturn(user) {
   const reference = params.get('reference');
   const paymentState = params.get('paystack');
   const courseId = params.get('course_id');
-
   if (paymentState !== 'success' || !reference || courseId !== CHATGPT_MASTERY_ID) return false;
-
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) throw new Error('Your session has expired. Please sign in again.');
-
   const response = await fetch(VERIFY_PAYSTACK_URL, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${session.access_token}`,
-      'apikey': SUPABASE_CONFIG.publishableKey,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_CONFIG.publishableKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({ reference, course_id: courseId })
   });
-
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok || payload.success === false) {
-    throw new Error(payload.error || 'Paystack payment verification failed.');
-  }
-
+  if (!response.ok || payload.success === false) throw new Error(payload.error || 'Paystack payment verification failed.');
   window.history.replaceState({}, document.title, COURSE_LIBRARY_URL);
-  window.location.assign(CHATGPT_MASTERY_URL);
+  window.location.assign(courseEntry({ slug: 'chatgpt-mastery' }));
   return true;
 }
 
@@ -106,13 +97,10 @@ async function loadDashboard(user) {
   await ensureProfile(user);
   const { data: enrollments = [] } = await supabase.from('enrollments').select('id,status,course_id,courses(id,title,slug)').eq('user_id', user.id).neq('status', 'cancelled');
   const { data: progress = [] } = await supabase.from('lesson_progress').select('lesson_id,progress_percent,completed').eq('user_id', user.id);
-  const courseCount = enrollments.length;
-  const avg = progress.length ? Math.round(progress.reduce((sum, p) => sum + Number(p.progress_percent || 0), 0) / progress.length) : 0;
   const cards = document.querySelectorAll('.dashboard-card strong');
-  if (cards[0]) cards[0].textContent = String(courseCount).padStart(2, '0');
-  if (cards[1]) cards[1].textContent = `${avg}%`;
+  if (cards[0]) cards[0].textContent = String(enrollments.length).padStart(2, '0');
+  if (cards[1]) cards[1].textContent = `${progress.length ? Math.round(progress.reduce((sum, p) => sum + Number(p.progress_percent || 0), 0) / progress.length) : 0}%`;
   if (cards[2]) cards[2].textContent = String(progress.filter(p => p.completed).length).padStart(2, '0');
-
   const firstCourse = enrollments[0]?.courses;
   const continuePanel = document.querySelector('.dashboard-panel');
   if (firstCourse && continuePanel) {
@@ -122,31 +110,47 @@ async function loadDashboard(user) {
     if (action) {
       const entry = courseEntry(firstCourse);
       const lessonNumber = entry ? null : await firstPublishedLesson(firstCourse.id);
-      action.textContent = entry ? 'Continue Learning →' : lessonNumber ? 'Continue Learning →' : 'View Course Library →';
+      action.textContent = entry || lessonNumber ? 'Continue Learning →' : 'View Course Library →';
       action.href = entry || (lessonNumber ? new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href : COURSE_LIBRARY_URL);
     }
   }
 }
 
 async function loadCourses(user) {
-  const { data: courses = [], error: coursesError } = await supabase.from('courses').select('id,slug,title,description,level,duration_hours,lesson_count,image_path,is_published').eq('is_published', true).order('created_at');
+  const { data: courses = [], error: coursesError } = await supabase
+    .from('courses')
+    .select('id,slug,title,description,level,duration_hours,lesson_count,image_path,is_published')
+    .eq('is_published', true);
   if (coursesError) throw coursesError;
-  const { data: enrollments = [], error: enrollmentsError } = await supabase.from('enrollments').select('course_id,status').eq('user_id', user.id).neq('status', 'cancelled');
-  if (enrollmentsError) throw enrollmentsError;
-  const enrolled = new Set(enrollments.map(e => e.course_id));
-  const grid = document.querySelector('.courses-grid');
-  if (!grid || !courses.length) return;
 
-  grid.innerHTML = courses.map(c => `
-    <article class="course-card" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}">
+  const { data: enrollments = [], error: enrollmentsError } = await supabase
+    .from('enrollments').select('course_id,status').eq('user_id', user.id).neq('status', 'cancelled');
+  if (enrollmentsError) throw enrollmentsError;
+
+  const { data: prices = [] } = await supabase
+    .from('course_prices').select('course_id,amount,currency,is_active').eq('is_active', true);
+  const priceByCourse = new Map(prices.map(p => [p.course_id, p]));
+  const enrolled = new Set(enrollments.map(e => e.course_id));
+  const order = new Map(COURSE_ORDER.map((slug, index) => [slug, index]));
+  const orderedCourses = courses.slice().sort((a, b) => (order.get(a.slug) ?? 999) - (order.get(b.slug) ?? 999));
+  const grid = document.querySelector('.courses-grid');
+  if (!grid) return;
+
+  grid.innerHTML = orderedCourses.map((c, index) => {
+    const price = priceByCourse.get(c.id);
+    const route = courseEntry(c);
+    const priceMarkup = price ? `<br><strong>₦${Number(price.amount).toLocaleString('en-NG')} ${escapeHtml(price.currency)}</strong>` : '';
+    const actionLabel = enrolled.has(c.id) ? 'Continue Learning →' : (c.slug === 'chatgpt-mastery' ? 'Enroll & Start Learning →' : 'Open Course Player →');
+    return `<article class="course-card" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}">
+      <small>${String(index + 1).padStart(2, '0')}</small>
       ${c.image_path ? `<img src="../${c.image_path.replace(/^\.\//, '')}" class="course-image" alt="${escapeHtml(c.title)}">` : ''}
-      <div class="course-badge ${escapeHtml(c.level)}">${escapeHtml(c.level)}</div>
+      <span class="course-badge">${escapeHtml(String(c.level || '').toUpperCase())}</span>
       <h3>${escapeHtml(c.title)}</h3>
       <p>${escapeHtml(c.description || '')}</p>
-      <div class="course-meta"><span>⏱ ${c.duration_hours ?? '—'} Hours</span><span>📖 ${c.lesson_count} Lessons</span></div>
-      <div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div><span>0% Complete</span></div>
-      <button class="btn academy-course-action" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}">${enrolled.has(c.id) ? 'Continue Learning →' : 'Enroll & Start Learning →'}</button>
-    </article>`).join('');
+      <div>📖 ${c.lesson_count} Lessons${priceMarkup}</div>
+      <button class="btn academy-course-action" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}" data-course-route="${escapeHtml(route || '')}">${actionLabel}</button>
+    </article>`;
+  }).join('');
 
   grid.querySelectorAll('.academy-course-action').forEach(btn => btn.addEventListener('click', () => enrollOrContinue(btn, user)));
 
@@ -161,17 +165,13 @@ async function loadCourses(user) {
 async function enrollOrContinue(button, user) {
   const courseId = button.dataset.courseId;
   const courseSlug = button.dataset.courseSlug;
+  const route = button.dataset.courseRoute;
   const originalText = button.textContent;
   button.disabled = true;
   button.textContent = 'Opening course…';
-
   try {
     if (courseSlug === 'chatgpt-mastery' || courseId === CHATGPT_MASTERY_ID) {
-      if (await hasActiveEntitlement(user.id, courseId)) {
-        window.location.assign(CHATGPT_MASTERY_URL);
-        return;
-      }
-
+      if (await hasActiveEntitlement(user.id, courseId)) { window.location.assign(route); return; }
       button.textContent = 'Opening secure checkout…';
       await initializePaystackPayment(courseId);
       return;
@@ -179,7 +179,6 @@ async function enrollOrContinue(button, user) {
 
     const { data: existing, error: existingError } = await supabase.from('enrollments').select('id,status').eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
     if (existingError) throw existingError;
-
     if (!existing) {
       const { error } = await supabase.from('enrollments').insert({ user_id: user.id, course_id: courseId });
       if (error) throw error;
@@ -188,16 +187,9 @@ async function enrollOrContinue(button, user) {
       if (error) throw error;
     }
 
-    const entry = courseEntry({ slug: courseSlug });
-    const lessonNumber = entry ? null : await firstPublishedLesson(courseId);
-    if (!entry && !lessonNumber) {
-      button.disabled = false;
-      button.textContent = 'Enrolled ✓ — Course content coming soon';
-      return;
-    }
-
-    button.textContent = entry ? 'Opening Course…' : `Opening Lesson ${lessonNumber}…`;
-    window.location.assign(entry || new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href);
+    const lessonNumber = route ? null : await firstPublishedLesson(courseId);
+    if (!route && !lessonNumber) throw new Error('This course has no published starting lesson.');
+    window.location.assign(route || new URL(`lesson-${lessonNumber}.html`, DASHBOARD_BASE).href);
   } catch (error) {
     button.disabled = false;
     button.textContent = originalText;
@@ -213,14 +205,10 @@ function escapeHtml(value) {
 async function init() {
   const user = await currentUser();
   if (!user) return;
-
   const verifiedReturn = await verifyPaystackReturn(user);
   if (verifiedReturn) return;
-
-  const coursesGrid = document.querySelector('.courses-grid');
-  const dashboardPanel = document.querySelector('.dashboard-panel');
-  if (coursesGrid) await loadCourses(user);
-  if (dashboardPanel) await loadDashboard(user);
+  if (document.querySelector('.courses-grid')) await loadCourses(user);
+  if (document.querySelector('.dashboard-panel')) await loadDashboard(user);
 }
 
 init().catch(error => console.error('APEP Academy integration error:', error));
