@@ -1,0 +1,5 @@
+Deployment synchronization marker.
+
+Purpose: trigger the existing GitHub Pages production source to rebuild from main after the Course 07 Course Library correction.
+
+No application behavior is defined by this file.
