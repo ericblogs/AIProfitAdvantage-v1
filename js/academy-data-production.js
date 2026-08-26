@@ -139,6 +139,7 @@ async function loadCourses(user) {
   grid.innerHTML = orderedCourses.map((c, index) => {
     const price = priceByCourse.get(c.id);
     const route = courseEntry(c);
+    const lessonLabel = c.slug === 'ai-foundations' ? '<strong>FREE</strong> · ' : '';
     const priceMarkup = price ? `<br><strong>₦${Number(price.amount).toLocaleString('en-NG')} ${escapeHtml(price.currency)}</strong>` : '';
     const actionLabel = enrolled.has(c.id) ? 'Continue Learning →' : (c.slug === 'chatgpt-mastery' ? 'Enroll & Start Learning →' : 'Open Course Player →');
     return `<article class="course-card" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}">
@@ -147,7 +148,7 @@ async function loadCourses(user) {
       <span class="course-badge">${escapeHtml(String(c.level || '').toUpperCase())}</span>
       <h3>${escapeHtml(c.title)}</h3>
       <p>${escapeHtml(c.description || '')}</p>
-      <div>📖 ${c.lesson_count} Lessons${priceMarkup}</div>
+      <div>${lessonLabel}📖 ${c.lesson_count} Lessons${priceMarkup}</div>
       <button class="btn academy-course-action" data-course-id="${c.id}" data-course-slug="${escapeHtml(c.slug)}" data-course-route="${escapeHtml(route || '')}">${actionLabel}</button>
     </article>`;
   }).join('');
