@@ -12,25 +12,17 @@ const courseLibraryUrl='courses.html?course=chatgpt-mastery';
 async function init(){
  const {data:{user}}=await supabase.auth.getUser();
  if(!user){root.innerHTML='<section class="dashboard-panel"><h2>Sign in required</h2><p>Please sign in to access AI & ChatGPT Mastery.</p></section>';return;}
- const {data:course,error:courseError}=await supabase.from('courses').select('id,title,slug,lesson_count,is_published').eq('slug',COURSE_SLUG).maybeSingle();
+ const {data:course,error:courseError}=await supabase.from('courses').select('id,title,slug,lesson_count,is_published,is_free').eq('slug',COURSE_SLUG).maybeSingle();
  if(courseError||!course){root.innerHTML='<section class="dashboard-panel"><h2>Course unavailable</h2><p>The course record could not be loaded.</p></section>';return;}
- let {data:enrolment}=await supabase.from('enrollments').select('id,status').eq('user_id',user.id).eq('course_id',course.id).maybeSingle();
+ if(!course.is_published){root.innerHTML='<section class="dashboard-panel"><h2>Course unavailable</h2><p>This course is not currently published.</p><a class="btn" href="courses.html">📚 Open Course Library</a></section>';return;}
+ if(course.is_free){root.innerHTML='<section class="dashboard-panel"><h2>Course configuration error</h2><p>AI & ChatGPT Mastery is configured as a paid course but is marked free.</p></section>';return;}
+ const {data:entitlement,error:entitlementError}=await supabase.from('course_entitlements').select('id,status').eq('user_id',user.id).eq('course_id',course.id).eq('status','active').maybeSingle();
+ if(entitlementError){root.innerHTML='<section class="dashboard-panel"><h2>Access verification failed</h2><p>We could not verify your course entitlement. Please try again.</p></section>';return;}
+ if(!entitlement){
+   root.innerHTML='<section class="dashboard-panel"><h2>Enrollment required</h2><p>A valid paid entitlement is required to access AI & ChatGPT Mastery.</p><a class="btn" href="courses.html?course=chatgpt-mastery">📚 Open Course Library</a></section>';return;
+ }
  const params=new URLSearchParams(window.location.search);
  const requestedLesson=Number(params.get('lesson')||0);
- const requestedEnrollment=params.get('enroll')==='1';
- if((!enrolment||enrolment.status==='cancelled') && requestedEnrollment){
-   if(enrolment?.status==='cancelled'){
-     const {error}=await supabase.from('enrollments').update({status:'active'}).eq('id',enrolment.id).eq('user_id',user.id);
-     if(error){root.innerHTML=`<section class="dashboard-panel"><h2>Enrollment could not be restored</h2><p>${esc(error.message)}</p></section>`;return;}
-   } else {
-     const {data:created,error}=await supabase.from('enrollments').insert({user_id:user.id,course_id:course.id,status:'active'}).select('id,status').single();
-     if(error){root.innerHTML=`<section class="dashboard-panel"><h2>Enrollment could not be created</h2><p>${esc(error.message)}</p></section>`;return;}
-     enrolment=created;
-   }
- }
- if(!enrolment||enrolment.status==='cancelled'){
-   root.innerHTML='<section class="dashboard-panel"><h2>Enrollment required</h2><p>Use the Course Library button to enroll in AI & ChatGPT Mastery.</p><a class="btn" href="courses.html?course=chatgpt-mastery">📚 Open Course Library</a></section>';return;
- }
  const {data:progress=[]}=await supabase.from('lesson_progress').select('lesson_id,progress_percent,completed').eq('user_id',user.id);
  const {data:dbLessons=[]}=await supabase.from('lessons').select('id,lesson_number,title,duration_minutes,is_published').eq('course_id',course.id).order('lesson_number');
  const byNo=new Map(dbLessons.map(l=>[l.lesson_number,l]));
