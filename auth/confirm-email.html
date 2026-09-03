@@ -54,22 +54,9 @@ function showError(message) {
     <a class="button button-primary" href="${loginUrl()}">Go to Login</a>`;
 }
 
-async function confirm() {
+async function finishConfirmation() {
   if (handled) return;
   handled = true;
-
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    handled = false;
-    showError(error.message || 'Please request a new confirmation link.');
-    return;
-  }
-
-  if (!data.session) {
-    handled = false;
-    showError('Your confirmation link may be expired or invalid. Please request a new confirmation email.');
-    return;
-  }
 
   status.innerHTML = `
     <div style="font-size:3rem;margin-bottom:12px;">✅</div>
@@ -89,6 +76,45 @@ async function confirm() {
   setTimeout(() => {
     window.location.replace(loginUrl());
   }, 900);
+}
+
+async function confirm() {
+  if (handled) return;
+
+  // Support the explicit token-hash confirmation callback used by Supabase
+  // email templates as well as the implicit session returned in the URL hash.
+  const tokenHash = params.get('token_hash');
+  const type = params.get('type');
+
+  if (tokenHash && type === 'email') {
+    handled = true;
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: 'email'
+    });
+    if (error) {
+      handled = false;
+      showError(error.message || 'Your confirmation link may be expired or invalid. Please request a new confirmation email.');
+      return;
+    }
+    await finishConfirmation();
+    return;
+  }
+
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    handled = false;
+    showError(error.message || 'Please request a new confirmation link.');
+    return;
+  }
+
+  if (!data.session) {
+    handled = false;
+    showError('Your confirmation link may be expired or invalid. Please request a new confirmation email.');
+    return;
+  }
+
+  await finishConfirmation();
 }
 
 supabase.auth.onAuthStateChange((event, session) => {
