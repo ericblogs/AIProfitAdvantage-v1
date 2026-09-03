@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Apply to become an APEP Assist service provider. Provider eligibility is reviewed and activated by APEP.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#08152B">
+<title>Become a Service Provider | AI Profit Advantage</title>
+<link rel="canonical" href="https://aiprofitadvantage.online/pages/provider-onboarding.html">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+<style>
+.provider-wrap{max-width:920px;margin:0 auto}.provider-card{border:1px solid rgba(0,0,0,.08);border-radius:24px;padding:40px;background:#fff;box-shadow:0 18px 50px rgba(0,0,0,.08)}
+.provider-form{display:grid;gap:20px}.provider-form label{font-weight:700}.provider-form input,.provider-form textarea,.provider-form select{width:100%;box-sizing:border-box;margin-top:7px;padding:13px 14px;border:1px solid #d5d5d5;border-radius:12px;font:inherit;background:#fff}.provider-form textarea{min-height:120px;resize:vertical}.provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.provider-categories{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}.provider-category{border:1px solid #ddd;border-radius:14px;padding:16px;background:#fff;cursor:pointer;font:inherit;text-align:left}.provider-category.selected{border:2px solid #111;padding:15px}.provider-category strong{display:block}.provider-help{font-size:.88rem;opacity:.72;font-weight:400;display:block;margin-top:6px}.provider-status{min-height:24px;font-weight:700}.provider-result{display:none;margin-top:20px;padding:18px;border-radius:14px;background:#f6f7f8}.provider-result.visible{display:block}.provider-notice{padding:16px;border-radius:14px;background:#f6f7f8;margin:20px 0}.provider-locked{font-size:.88rem;opacity:.72;margin:0}@media(max-width:700px){.provider-card{padding:24px}.provider-grid,.provider-categories{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html"><span class="brand-mark">AI</span><span class="brand-wordmark">AI Profit Advantage</span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Open Menu</span><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-menu" aria-label="Primary Navigation"><a href="../index.html">Home</a><a href="about.html">About</a><a href="../index.html#courses">Courses</a><a href="services.html">Services</a><a href="resources.html">Resources</a><a href="community.html">Community</a><a href="store.html">Store</a><a href="blog.html">Blog</a><a href="contact.html">Contact</a><a class="nav-cta" href="../auth/login.html">Login</a></nav></div></header>
+<main id="main-content">
+<section class="hero section"><div class="container"><div class="hero-copy centered"><span class="eyebrow">APEP ASSIST PROVIDER</span><h1>Become a Service Provider</h1><p class="lead">Apply to join APEP Assist and offer trusted local services to customers who need help.</p></div></div></section>
+<section class="section section-tint"><div class="container provider-wrap"><div class="provider-card">
+<div class="provider-notice"><strong>Important: registration does not equal eligibility.</strong><br>Your application starts in <strong>PENDING</strong> status. APEP reviews provider applications before activation. New applicants are not available for customer matching until they are verified, activated, and marked available through the governed provider workflow.</div>
+<form id="provider-form" class="provider-form">
+<div class="provider-grid">
+<label for="full-name">Full name <span aria-hidden="true">*</span><input id="full-name" name="full_name" maxlength="160" required autocomplete="name" placeholder="Your full name"></label>
+<label for="business-name">Business name <span class="provider-help">Optional</span><input id="business-name" name="business_name" maxlength="160" autocomplete="organization" placeholder="Registered or trading business name"></label>
+</div>
+<label for="phone">Phone number <span aria-hidden="true">*</span><input id="phone" name="phone" type="tel" inputmode="tel" maxlength="40" required autocomplete="tel" placeholder="+234 800 000 0000"></label>
+<div><label>Service categories <span aria-hidden="true">*</span></label><span class="provider-help">Select one or more of the three APEP Assist V1 service categories.</span><div id="category-list" class="provider-categories" role="group" aria-label="Service categories"></div></div>
+<label for="service-area">Service area <span aria-hidden="true">*</span><input id="service-area" name="service_area" maxlength="300" required placeholder="Cities, districts, neighborhoods or coverage area"></label>
+<label for="service-description">Service description <span aria-hidden="true">*</span><textarea id="service-description" name="service_description" maxlength="2000" minlength="10" required placeholder="Describe the services you provide and the types of problems you solve."></textarea></label>
+<label for="professional-information">Relevant professional information <span aria-hidden="true">*</span><textarea id="professional-information" name="professional_information" maxlength="3000" minlength="5" required placeholder="Experience, qualifications, trade background, certifications, years in service, or other relevant information."></textarea></label>
+<label for="availability-information">Availability information <span class="provider-help">Optional. This is informational only; operational availability starts as UNAVAILABLE.</span><textarea id="availability-information" name="availability_information" maxlength="1000" placeholder="Typical working days, hours, emergency coverage, etc."></textarea></label>
+<div class="provider-actions"><button class="button button-primary" type="submit" id="submit-provider">Submit Provider Application →</button><p class="provider-locked">🔒 Verification, activation, reputation, settlement and Paystack authorization are controlled by APEP and cannot be set from this form.</p></div>
+<p id="provider-status" class="provider-status" role="status" aria-live="polite"></p>
+</form>
+<div id="provider-result" class="provider-result" aria-live="polite"></div>
+<hr style="margin:40px 0;opacity:.15;"><p><a class="button button-secondary" href="store.html">← Back to APEP Store</a></p>
+</div></div></section>
+</main>
+<footer class="site-footer"><div class="container footer-bottom"><p>© 2026 AI Profit Advantage Enterprise Platform (APEP). All Rights Reserved.</p><a href="../index.html#top">Back to Top ↑</a></div></footer>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey);
+const form=document.getElementById('provider-form');
+const categoryList=document.getElementById('category-list');
+const statusEl=document.getElementById('provider-status');
+const resultEl=document.getElementById('provider-result');
+const submit=document.getElementById('submit-provider');
+const categories=[];
+const selected=new Set();
+function setStatus(text,error=false){statusEl.textContent=text;statusEl.setAttribute('data-error',error?'true':'false')}
+function renderCategories(data){categoryList.innerHTML='';data.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='provider-category';b.dataset.id=c.id;b.setAttribute('aria-pressed','false');b.innerHTML=`<strong>${c.name}</strong><span class="provider-help">${c.slug}</span>`;b.addEventListener('click',()=>{if(selected.has(c.id)){selected.delete(c.id);b.classList.remove('selected');b.setAttribute('aria-pressed','false')}else{if(selected.size>=3){setStatus('You can select up to three service categories.',true);return}selected.add(c.id);b.classList.add('selected');b.setAttribute('aria-pressed','true')}setStatus('')});categoryList.appendChild(b)})}
+async function init(){const {data:{user}}=await supabase.auth.getUser();if(!user){window.location.href='../auth/login.html?redirect=../pages/provider-onboarding.html';return}const {data:existing,error:existingError}=await supabase.from('service_providers').select('verification_status,is_active').eq('user_id',user.id).maybeSingle();if(existingError){setStatus('Unable to check provider application status. Please try again.',true);return}if(existing){form.classList.add('assist-hidden');resultEl.innerHTML=`<strong>Provider application already exists.</strong><br>Status: ${existing.verification_status}<br>Active: ${existing.is_active?'Yes':'No'}`;resultEl.classList.add('visible');return}const {data,error}=await supabase.from('service_categories').select('id,slug,name').eq('is_active',true).order('display_order');if(error){setStatus('Unable to load service categories. Please try again.',true);return}renderCategories(data||[])}
+form.addEventListener('submit',async e=>{e.preventDefault();if(selected.size<1){setStatus('Select at least one service category.',true);return}submit.disabled=true;setStatus('Submitting your provider application securely…');resultEl.classList.remove('visible');try{const {data,error}=await supabase.rpc('create_provider_onboarding',{p_full_name:document.getElementById('full-name').value.trim(),p_business_name:document.getElementById('business-name').value.trim()||null,p_phone:document.getElementById('phone').value.trim(),p_service_category_ids:[...selected],p_service_area:document.getElementById('service-area').value.trim(),p_service_description:document.getElementById('service-description').value.trim(),p_professional_information:document.getElementById('professional-information').value.trim(),p_availability_information:document.getElementById('availability-information').value.trim()||null});if(error){console.error('APEP provider onboarding error',error);const map={provider_profile_already_exists:'A provider application already exists for this account.',invalid_or_inactive_service_category:'One or more selected service categories are invalid or inactive.',invalid_service_categories:'Please select valid service categories.'};throw new Error(map[error.message]||'provider_application_failed')}const r=data;setStatus('Provider application submitted successfully.');resultEl.innerHTML=`<strong>Application received.</strong><br>Status: ${r.verification_status}<br>Active: ${r.is_active?'Yes':'No'}<br>Availability: ${r.availability_status}<br><br>Your application is now awaiting APEP review. You are not eligible for customer matching until the verification and activation workflow is completed.`;resultEl.classList.add('visible');form.reset();selected.clear();[...categoryList.children].forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-pressed','false')})}catch(err){setStatus(err.message||'We could not submit your provider application. Please try again.',true)}finally{submit.disabled=false}});
+init();
+</script>
+<script type="module" src="../script.js"></script>
+</body>
+</html>
