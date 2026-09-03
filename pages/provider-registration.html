@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Create an APEP Assist service-provider account using the existing APEP authentication system.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#08152B">
+<title>APEP Assist Provider Registration | AI Profit Advantage</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+<style>
+.pr-wrap{max-width:760px;margin:0 auto}.pr-card{background:#fff;border:1px solid rgba(8,21,43,.1);border-radius:26px;padding:36px;box-shadow:0 20px 60px rgba(8,21,43,.09)}
+.pr-hero{background:linear-gradient(135deg,#08152B,#132b4d);color:#fff;border-radius:22px;padding:28px;margin-bottom:26px}.pr-badge{display:inline-block;font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:7px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px}.pr-hero h2{margin:12px 0 8px;color:#fff}.pr-hero p{margin:0;color:rgba(255,255,255,.84)}
+.pr-section{border:1px solid #e3e7ed;border-radius:20px;padding:24px;margin:20px 0}.pr-section h3{margin:0 0 6px;color:#08152B}.pr-section>p{margin:0 0 18px;color:#5d6673}.pr-form{display:grid;gap:16px}.pr-form label{display:block;font-weight:700}.pr-form input{width:100%;box-sizing:border-box;margin-top:7px;padding:13px 14px;border:1px solid #ccd3dc;border-radius:12px;font:inherit;background:#fff}.pr-help{display:block;font-size:.84rem;font-weight:400;color:#687383;margin-top:6px}.pr-notice{background:#f5f7fa;border:1px solid #dfe5ec;border-radius:14px;padding:16px;line-height:1.55}.pr-status{min-height:24px;font-weight:700}.pr-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.pr-error{color:#b91c1c}.pr-success{color:#047857}@media(max-width:760px){.pr-card{padding:22px}.pr-section{padding:18px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html"><span class="brand-mark">AI</span><span class="brand-wordmark">AI Profit Advantage</span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Open Menu</span><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-menu" aria-label="Primary Navigation"><a href="../index.html">Home</a><a href="store.html">Store</a><a href="../auth/login.html">Login</a></nav></div></header>
+<main id="main-content">
+<section class="hero section"><div class="container"><div class="hero-copy centered"><span class="eyebrow">APEP ASSIST PROVIDER REGISTRATION</span><h1>Create Your Service Provider Account</h1><p class="lead">Create your secure APEP account first. After confirmation, you will complete the APEP Assist provider application.</p></div></div></section>
+<section class="section section-tint"><div class="container pr-wrap"><div class="pr-card">
+<div class="pr-hero"><span class="pr-badge">APEP Assist</span><h2>One APEP account. One secure identity.</h2><p>Your provider account uses the existing APEP authentication system. Provider eligibility and activation remain controlled by APEP.</p></div>
+<div class="pr-notice">🔐 <strong>Security &amp; governance:</strong> This is not a second authentication system. Your email and password are handled by the existing APEP Supabase Auth integration. Creating an account does not automatically make you a verified or active provider.</div>
+<form id="provider-registration-form" class="pr-form" novalidate>
+<section class="pr-section"><h3>01 · Account credentials</h3><p>These credentials will be used to sign in to your APEP account.</p>
+<label for="email">Email Address *<input id="email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label>
+<label for="password">Password *<input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="At least 8 characters"></label>
+<label for="confirm-password">Confirm Password *<input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="Enter the same password again"></label>
+<span class="pr-help">Use at least 8 characters. Never share your password with APEP staff or another person.</span>
+</section>
+<div class="pr-actions"><button class="button button-primary" type="submit" id="create-provider-account">Create Provider Account →</button><a class="button button-secondary" href="store.html">← Back to APEP Store</a></div>
+<p id="provider-registration-status" class="pr-status" role="status" aria-live="polite"></p>
+</form>
+</div></div></section>
+</main>
+<footer class="site-footer"><div class="container footer-bottom"><p>© 2026 AI Profit Advantage Enterprise Platform (APEP). All Rights Reserved.</p><a href="../index.html#top">Back to Top ↑</a></div></footer>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+
+const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const form=document.getElementById('provider-registration-form');
+const statusEl=document.getElementById('provider-registration-status');
+const submit=document.getElementById('create-provider-account');
+const onboardingPath='/pages/provider-onboarding.html';
+
+function setStatus(message,type='info'){
+  statusEl.textContent=message;
+  statusEl.className=`pr-status ${type==='error'?'pr-error':type==='success'?'pr-success':''}`;
+}
+function absolute(path){return new URL(path,window.location.origin).href}
+function loginUrl(){const encoded=encodeURIComponent(onboardingPath);return `/auth/login.html?redirect=${encoded}&next=${encoded}`}
+
+async function init(){
+  const {data:{session}}=await supabase.auth.getSession();
+  if(session){window.location.replace(onboardingPath);return}
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();
+    const email=document.getElementById('email').value.trim();
+    const password=document.getElementById('password').value;
+    const confirm=document.getElementById('confirm-password').value;
+    if(!email){setStatus('Please enter your email address.','error');return}
+    if(password.length<8){setStatus('Your password must contain at least 8 characters.','error');return}
+    if(password!==confirm){setStatus('The passwords do not match. Please check both fields.','error');return}
+    submit.disabled=true;setStatus('Creating your secure APEP provider account…');
+    try{
+      const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:absolute('/auth/confirm-email.html?redirect='+encodeURIComponent(onboardingPath))}});
+      if(error){
+        const message=(error.message||'').toLowerCase();
+        if(message.includes('already registered')||message.includes('already been registered')||message.includes('user already exists')){
+          setStatus('An APEP account already exists for this email. Please sign in, then continue to provider onboarding.','error');
+          const link=document.createElement('a');link.href=loginUrl();link.textContent=' Go to APEP Login →';link.style.display='inline-block';link.style.marginLeft='8px';statusEl.appendChild(link);
+        }else{setStatus(error.message||'We could not create your account. Please try again.','error')}
+        return
+      }
+      if(data.session){
+        setStatus('Account created successfully. Opening provider onboarding…','success');
+        window.location.replace(onboardingPath);return
+      }
+      if(data.user){
+        setStatus('Account created. Please confirm your email address. We will then send you to APEP Login before provider onboarding.','success');
+        setTimeout(()=>window.location.replace(`/auth/confirm-email.html?redirect=${encodeURIComponent(onboardingPath)}`),700);return
+      }
+      setStatus('The account could not be created. Please try again.','error')
+    }catch(error){setStatus(error?.message||'We could not connect to the registration service. Please try again.','error')}
+    finally{submit.disabled=false}
+  });
+}
+init();
+</script>
+<script type="module" src="../script.js"></script>
+</body>
+</html>
