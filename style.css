@@ -143,3 +143,10 @@ html{scroll-behavior:auto}
 .form-group textarea{resize:vertical;min-height:180px}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(0,119,255,.15)}
 .contact-form button{margin-top:20px}
+
+/* Homepage desktop navigation fit: keep the full primary navigation, including Get Started, visible without changing mobile behavior. */
+@media (min-width:761px){
+.header-inner{gap:.75rem}
+.primary-nav{gap:.75rem;font-size:.82rem;white-space:nowrap}
+.nav-cta{padding:.55rem .75rem}
+}
