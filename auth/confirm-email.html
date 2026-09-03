@@ -34,7 +34,16 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKe
 });
 
 const status = document.getElementById('confirmation-status');
+const params = new URLSearchParams(window.location.search);
+const requestedRedirect = params.get('redirect');
+const providerOnboardingPath = '/pages/provider-onboarding.html';
+const redirectPath = requestedRedirect === providerOnboardingPath ? providerOnboardingPath : '/dashboard/index.html';
+const encodedRedirect = encodeURIComponent(redirectPath);
 let handled = false;
+
+function loginUrl() {
+  return `login.html?redirect=${encodedRedirect}&next=${encodedRedirect}`;
+}
 
 function showError(message) {
   status.innerHTML = `
@@ -42,7 +51,7 @@ function showError(message) {
     <span class="eyebrow">CONFIRMATION ISSUE</span>
     <h1>We Could Not Complete Confirmation</h1>
     <p class="lead">${message}</p>
-    <a class="button button-primary" href="login.html">Go to Login</a>`;
+    <a class="button button-primary" href="${loginUrl()}">Go to Login</a>`;
 }
 
 async function confirm() {
@@ -68,7 +77,7 @@ async function confirm() {
     <h1>Registration Confirmed</h1>
     <p class="lead">Your email has been confirmed successfully. Redirecting you to the APEP login page…</p>`;
 
-  // Email verification must not silently authenticate the new student.
+  // Email verification must not silently authenticate the account.
   // End the confirmation session and require an explicit login.
   const { error: signOutError } = await supabase.auth.signOut();
   if (signOutError) {
@@ -78,7 +87,7 @@ async function confirm() {
   }
 
   setTimeout(() => {
-    window.location.replace('login.html');
+    window.location.replace(loginUrl());
   }, 900);
 }
 
