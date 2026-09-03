@@ -42,11 +42,11 @@ function showUnconfirmedMessage(email) {
   );
 }
 
-function getSafeDashboardDestination() {
+function getSafeDestination() {
   const redirect = new URLSearchParams(window.location.search).get('redirect');
-  // Only allow redirects into the real dashboard directory. This prevents
-  // stale/incorrect paths such as /pages/dashboard/index.html from producing 404s.
-  if (redirect && (redirect === '/dashboard' || redirect === '/dashboard/' || redirect.startsWith('/dashboard/'))) {
+  // Only allow redirects to known application destinations. This preserves the
+  // existing dashboard guard while allowing provider onboarding to resume after login.
+  if (redirect && (redirect === '/dashboard' || redirect === '/dashboard/' || redirect.startsWith('/dashboard/') || redirect === '/pages/provider-onboarding.html')) {
     return redirect;
   }
   return '/dashboard/index.html';
@@ -61,8 +61,9 @@ async function initializeProductionLogin() {
 
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    setLoginStatus('You are already signed in. Redirecting to your dashboard…', 'success');
-    window.location.href = new URL('/dashboard/index.html', window.location.origin).href;
+    const destination = getSafeDestination();
+    setLoginStatus(destination === '/pages/provider-onboarding.html' ? 'You are already signed in. Returning to provider onboarding…' : 'You are already signed in. Redirecting to your dashboard…', 'success');
+    window.location.href = new URL(destination, window.location.origin).href;
     return;
   }
 
@@ -104,8 +105,8 @@ async function initializeProductionLogin() {
         return;
       }
 
-      setLoginStatus('Login successful. Redirecting to your dashboard…', 'success');
-      const destination = getSafeDashboardDestination();
+      const destination = getSafeDestination();
+      setLoginStatus(destination === '/pages/provider-onboarding.html' ? 'Login successful. Returning to provider onboarding…' : 'Login successful. Redirecting to your dashboard…', 'success');
       window.location.href = new URL(destination, window.location.origin).href;
     } catch (error) {
       setLoginStatus(error?.message || 'We could not connect to the authentication service. Please try again.', 'error');
