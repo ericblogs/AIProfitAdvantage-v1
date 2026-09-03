@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="APEP provider application confirmation."><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#08152B">
+<title>Provider Application Confirmation | AI Profit Advantage</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../style.css">
+<style>
+.confirm-wrap{max-width:900px;margin:0 auto}.confirm-card{background:#fff;border:1px solid rgba(8,21,43,.1);border-radius:26px;padding:36px;box-shadow:0 20px 60px rgba(8,21,43,.09)}
+.confirm-hero{background:linear-gradient(135deg,#08152B,#132b4d);color:#fff;border-radius:22px;padding:30px;margin-bottom:24px}.confirm-hero h1{color:#fff;margin:10px 0 8px}.confirm-hero p{color:rgba(255,255,255,.84);margin:0}.confirm-badge{display:inline-block;font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:7px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px}
+.confirm-section{border:1px solid #e3e7ed;border-radius:20px;padding:24px;margin:18px 0}.confirm-section h2{margin:0 0 14px;color:#08152B;font-size:1.15rem}.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.confirm-field{background:#f6f8fa;border-radius:14px;padding:14px}.confirm-field span{display:block;font-size:.78rem;color:#697383;margin-bottom:5px}.confirm-field strong{display:block;color:#08152B;overflow-wrap:anywhere}.confirm-status{display:flex;gap:10px;flex-wrap:wrap}.confirm-pill{padding:9px 12px;border-radius:999px;background:#eef2f6;font-size:.82rem;font-weight:800}.confirm-note{background:#fff8e8;border:1px solid #ead39a;border-radius:14px;padding:16px}.confirm-note strong{color:#624900}.confirm-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}.confirm-loading,.confirm-error{padding:20px;border-radius:14px;background:#f6f8fa;font-weight:700}.confirm-error{background:#fff1f1;border:1px solid #efcaca;color:#8a1c1c}@media(max-width:760px){.confirm-card{padding:22px}.confirm-grid{grid-template-columns:1fr}.confirm-section{padding:18px}}
+</style></head>
+<body><a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html"><span class="brand-mark">AI</span><span class="brand-wordmark">AI Profit Advantage</span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Open Menu</span><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-menu" aria-label="Primary Navigation"><a href="../index.html">Home</a><a href="about.html">About</a><a href="../index.html#courses">Courses</a><a href="services.html">Services</a><a href="resources.html">Resources</a><a href="community.html">Community</a><a href="store.html">Store</a><a href="blog.html">Blog</a><a href="contact.html">Contact</a><a class="nav-cta" href="../auth/login.html">Login</a></nav></div></div></header>
+<main id="main-content"><section class="hero section"><div class="container"><div class="hero-copy centered"><span class="eyebrow">APEP ASSIST PROVIDER GOVERNANCE</span><h1>Provider Application Confirmation</h1><p class="lead">Your submission is confirmed from the authoritative APEP provider record.</p></div></div></section>
+<section class="section section-tint"><div class="container confirm-wrap"><div class="confirm-card" id="confirmation-root"><div class="confirm-loading" id="loading">Loading your authoritative provider record…</div></div></div></section></main>
+<footer class="site-footer"><div class="container footer-bottom"><p>© 2026 AI Profit Advantage Enterprise Platform (APEP). All Rights Reserved.</p><a href="../index.html#top">Back to Top ↑</a></div></footer>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey);const root=document.getElementById('confirmation-root');
+function esc(v){const d=document.createElement('div');d.textContent=v??'—';return d.innerHTML}
+function field(label,value){return `<div class="confirm-field"><span>${label}</span><strong>${esc(value)}</strong></div>`}
+async function load(){
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError||!user){window.location.href='../auth/login.html?redirect=../pages/provider-application-confirmation.html';return}
+  const params=new URLSearchParams(window.location.search);const providerId=params.get('provider_id');
+  if(!providerId){root.innerHTML='<div class="confirm-error">No provider application reference was supplied. Please return to the provider application page.</div><div class="confirm-actions"><a class="button button-secondary" href="provider-onboarding.html">← Back to Provider Application</a></div>';return}
+  const {data:provider,error}=await supabase.from('service_providers').select('id,display_name,business_name,phone,state,city,lga,service_area,home_contact_information,business_office_information,verification_status,is_active').eq('id',providerId).eq('user_id',user.id).maybeSingle();
+  if(error||!provider){root.innerHTML='<div class="confirm-error">We could not load the authoritative provider record for this application. No application details are being inferred from the submission form.</div><div class="confirm-actions"><a class="button button-secondary" href="provider-onboarding.html">← Back to Provider Application</a></div>';return}
+  const pending=provider.verification_status==='PENDING'&&!provider.is_active;
+  root.innerHTML=`<div class="confirm-hero"><span class="confirm-badge">APEP VERIFIED SERVICE PROVIDER™</span><h1>Application submitted successfully</h1><p>Your application has been recorded in the APEP provider system. The details below are loaded from your authoritative provider record.</p></div>
+  <section class="confirm-section"><h2>Application Reference</h2><div class="confirm-grid">${field('Provider ID',provider.id)}${field('Application status',pending?'PENDING':provider.verification_status)}</div></section>
+  <section class="confirm-section"><h2>Applicant & Business</h2><div class="confirm-grid">${field('Full name',provider.display_name)}${field('Business / trading name',provider.business_name)}${field('Primary phone',provider.phone)}</div></section>
+  <section class="confirm-section"><h2>Location & Contact</h2><div class="confirm-grid">${field('State',provider.state)}${field('City',provider.city)}${field('LGA',provider.lga)}${field('Service area',provider.service_area)}${field('Home / contact information',provider.home_contact_information)}${field('Business / office information',provider.business_office_information)}</div></section>
+  <section class="confirm-section"><h2>APEP Governance Status</h2><div class="confirm-status"><span class="confirm-pill">Application: ${pending?'PENDING':esc(provider.verification_status)}</span><span class="confirm-pill">Verification: NOT STARTED</span><span class="confirm-pill">Account: ${provider.is_active?'ACTIVE':'INACTIVE'}</span><span class="confirm-pill">Availability: UNAVAILABLE</span></div></section>
+  <div class="confirm-note"><strong>What happens next:</strong> APEP review and verification are still required. Submission does not authorize activation, customer matching, availability or settlement. Identity verification is one part of the trust process; professional review and ongoing customer performance remain accountable requirements.</div>
+  <div class="confirm-actions"><a class="button button-primary" href="store.html">← Back to APEP Store</a><a class="button button-secondary" href="provider-onboarding.html">Provider Governance</a></div>`;
+}
+load();
+</script><script type="module" src="../script.js"></script></body></html>
