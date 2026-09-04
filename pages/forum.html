@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="APEP Community Forum — practical AI learning, business, automation and peer support.">
+<link rel="canonical" href="https://aiprofitadvantage.online/pages/forum.html">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<title>APEP Community Forum | AI Profit Advantage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="../css/forum.css">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header"><div class="container header-inner">
+<a class="brand" href="../index.html"><span class="brand-mark">AI</span><span class="brand-wordmark">AI Profit Advantage</span></a>
+<nav class="primary-nav" aria-label="Primary navigation"><a href="../index.html">Home</a><a href="about.html">About</a><a href="../index.html#courses">Courses</a><a href="services.html">Services</a><a href="resources.html">Resources</a><a href="community.html" class="active">Community</a><a href="store.html">Store</a><a href="blog.html">Blog</a><a href="contact.html">Contact</a><a href="../auth/login.html">Login</a><a class="nav-cta" href="../auth/register.html">Register</a></nav>
+</div></header>
+<main id="main-content">
+<section class="forum-hero"><div class="container forum-hero-inner">
+<div><p class="eyebrow">APEP Community</p><h1>Learn. Build. <span>Grow together.</span></h1><p>Join practical conversations about AI, automation, business, digital growth and the skills that turn knowledge into results.</p></div>
+<div class="forum-hero-card"><strong>Community Forum</strong><span>Ask questions, share wins, exchange practical ideas and learn from the APEP community.</span></div>
+</div></section>
+<section class="forum-section"><div class="container">
+<div class="forum-toolbar"><div><p class="eyebrow">Discussion space</p><h2>Community conversations</h2><p>Choose a category or browse the latest discussions.</p></div><div class="forum-actions"><button class="button button-primary" type="button" id="forum-new-topic">+ New topic</button><a class="button button-secondary forum-login" href="../auth/login.html">Sign in to participate</a></div></div>
+<div id="forum-status" class="forum-status" role="status" aria-live="polite"></div>
+<div class="forum-layout">
+<aside class="forum-sidebar" aria-label="Forum categories"><div class="forum-panel"><div class="forum-panel-title"><h3>Categories</h3><span id="forum-category-count">—</span></div><div id="forum-categories" class="forum-category-list"><div class="forum-skeleton"></div><div class="forum-skeleton"></div><div class="forum-skeleton"></div></div></div><div class="forum-panel forum-guidance"><h3>Community standard</h3><p>Keep discussions practical, respectful and useful. Share knowledge, not spam.</p></div></aside>
+<section class="forum-main" aria-label="Forum discussions"><div class="forum-panel"><div class="forum-panel-title"><h3>Latest discussions</h3><button class="forum-refresh" type="button" id="forum-refresh" aria-label="Refresh discussions">↻ Refresh</button></div><div id="forum-topics" class="forum-topic-list"><div class="forum-skeleton large"></div><div class="forum-skeleton large"></div><div class="forum-skeleton large"></div></div></div></section>
+</div></div></section>
+</main>
+<div class="forum-modal" id="forum-topic-modal" hidden><div class="forum-modal-backdrop" data-close-forum-modal></div><section class="forum-dialog" role="dialog" aria-modal="true" aria-labelledby="forum-dialog-title"><button class="forum-close" type="button" data-close-forum-modal aria-label="Close">×</button><p class="eyebrow">Start a discussion</p><h2 id="forum-dialog-title">Create a new topic</h2><form id="forum-topic-form"><label for="forum-topic-category">Category</label><select id="forum-topic-category" required></select><label for="forum-topic-title">Title</label><input id="forum-topic-title" maxlength="200" minlength="3" required placeholder="What would you like to discuss?"><label for="forum-topic-body">Opening post</label><textarea id="forum-topic-body" maxlength="10000" minlength="1" rows="7" required placeholder="Share the context, question or practical idea..."></textarea><div class="forum-form-actions"><button class="button button-secondary" type="button" data-close-forum-modal>Cancel</button><button class="button button-primary" type="submit">Publish topic</button></div></form></section></div>
+<footer class="site-footer"><div class="container footer-bottom"><p>© 2026 AI Profit Advantage. All rights reserved.</p><a href="#">Back to top ↑</a></div>
+<script type="module" src="../script.js"></script><script type="module" src="../js/forum.js"></script>
+</body></html>
