@@ -13,15 +13,15 @@
 <div id="tableWrap" class="meta">Loading enrollment records…</div>
 </section></main>
 <script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/supabase-config.js';
-const supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const notice=document.getElementById('notice'), wrap=document.getElementById('tableWrap'), toolbar=document.getElementById('toolbar'), search=document.getElementById('search'), count=document.getElementById('count');
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import{SUPABASE_CONFIG}from'../config/supabase-config.js';
+const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const notice=document.getElementById('notice'),wrap=document.getElementById('tableWrap'),toolbar=document.getElementById('toolbar'),search=document.getElementById('search'),count=document.getElementById('count');
 let rows=[];
 function fail(message){notice.className='notice error';notice.textContent=message;wrap.textContent='';toolbar.hidden=true;}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function render(){const q=search.value.trim().toLowerCase();const filtered=rows.filter(r=>[r.student_name,r.student_email,r.course_title,r.status,r.user_id,r.enrollment_id].some(v=>String(v??'').toLowerCase().includes(q)));count.textContent=`${filtered.length} of ${rows.length} enrollment${rows.length===1?'':'s'}`;if(!filtered.length){wrap.innerHTML='<div class="empty">No enrollment records match the current search.</div>';return;}wrap.innerHTML=`<table><thead><tr><th>Student</th><th>Email</th><th>Course</th><th>Status</th><th>Enrolled</th><th>Completed</th><th>Enrollment ID</th></tr></thead><tbody>${filtered.map(r=>`<tr><td>${esc(r.student_name||'—')}</td><td>${esc(r.student_email||'—')}</td><td>${esc(r.course_title||'—')}</td><td class="status">${esc(r.status)}</td><td>${r.enrolled_at?new Date(r.enrolled_at).toLocaleString():'—'}</td><td>${r.completed_at?new Date(r.completed_at).toLocaleString():'—'}</td><td class="meta">${esc(r.enrollment_id)}</td></tr>`).join('')}</tbody></table>`;}
-async function load(){wrap.textContent='Loading enrollment records…';const {data,error}=await supabase.rpc('admin_get_enrollments');if(error){fail(`Enrollment data path unavailable: ${error.message}`);return;}rows=data||[];notice.className='notice';notice.textContent='Administrator authorized. Enrollment records are read-only in this gate.';toolbar.hidden=false;render();}
-async function init(){const {data:{session},error}=await supabase.auth.getSession();if(error||!session){fail('Administrator authentication required.');return;}const {data:isAdmin,error:adminError}=await supabase.rpc('is_current_user_admin');if(adminError||!isAdmin){fail('Access denied. Administrator authorization is required.');return;}await load();}
+async function load(){wrap.textContent='Loading enrollment records…';const{data,error}=await supabase.rpc('admin_get_enrollments');if(error){fail(`Enrollment data path unavailable: ${error.message}`);return;}rows=data||[];notice.className='notice';notice.textContent='Administrator authorized. Enrollment records are read-only in this gate.';toolbar.hidden=false;render();}
+async function init(){const{data:{session},error}=await supabase.auth.getSession();if(error||!session){fail('Administrator authentication required.');return;}const{data:isAdmin,error:adminError}=await supabase.rpc('is_current_user_admin');if(adminError||!isAdmin){fail('Access denied. Administrator authorization is required.');return;}await load();}
 search.addEventListener('input',render);document.getElementById('refresh').addEventListener('click',load);init();
 </script></body></html>
