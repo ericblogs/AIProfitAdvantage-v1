@@ -1,3 +1,0 @@
-# Gate 9D — Acceptance
-
-Authenticated learners receive an authoritative certification experience backed by the certificate ledger. Empty state is valid when no certificates exist. Issued credentials show certificate number, course and status. Verification resolves through the public verification boundary. Administrative issue/reissue/revoke operations remain server-authoritative and eligibility-gated. No Paystack, provider, onboarding, authentication or Course Player changes are in scope.
