@@ -18,15 +18,30 @@
       </div>
       <div style="font-size:3rem;margin-bottom:12px;">✅</div>
       <span class="eyebrow">REGISTRATION SUCCESSFUL</span>
-      <h1>Check Your Inbox</h1>
-      <p class="lead">Your APEP account has been created successfully. Check your email inbox and click the confirmation link to activate your account.</p>
-      <p>After confirmation, you will be taken into the APEP student dashboard automatically.</p>
+      <h1 id="success-title">Check Your Inbox</h1>
+      <p class="lead" id="success-message">Your APEP account has been created successfully. Check your email inbox and click the confirmation link to activate your account.</p>
+      <p id="success-next">After confirmation, you will be taken into the APEP student dashboard automatically.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px;">
-        <a class="button button-primary" href="login.html">Go to Login</a>
+        <a class="button button-primary" id="login-link" href="login.html">Go to Login</a>
         <a class="button button-secondary" href="../index.html">Return to Website</a>
       </div>
     </div>
   </div>
 </main>
+<script>
+(function(){
+  const params=new URLSearchParams(window.location.search);
+  const provider=params.get('flow')==='provider';
+  const next=params.get('next')||'/pages/provider-onboarding.html';
+  if(!provider)return;
+  document.title='Provider Registration Successful | AI Profit Advantage';
+  document.getElementById('success-title').textContent='Check Your Email';
+  document.getElementById('success-message').textContent='Your APEP Assist provider account has been created successfully. Check your email inbox and spam/junk folder, then click the APEP confirmation link to activate your account.';
+  document.getElementById('success-next').textContent='After confirmation, sign in with your APEP credentials to continue to the APEP Assist provider application.';
+  const encoded=encodeURIComponent(next);
+  document.getElementById('login-link').href='login.html?redirect='+encoded+'&next='+encoded;
+  document.getElementById('login-link').textContent='Go to APEP Login →';
+})();
+</script>
 </body>
 </html>
