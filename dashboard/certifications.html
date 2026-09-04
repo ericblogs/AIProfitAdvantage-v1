@@ -1,29 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Certifications | AI Profit Advantage</title>
-<link rel="stylesheet" href="../style.css">
-<link rel="stylesheet" href="dashboard.css">
-</head>
-<body>
-<div class="dashboard-layout">
-<aside class="dashboard-sidebar"><h2>AI Profit Advantage</h2><nav>
-<a href="index.html">🏠 Dashboard</a><a href="courses.html">📚 Courses</a><a href="lesson-1.html">▶ Course Player</a><a href="certifications.html" class="active">🎓 Certifications</a><a href="community.html">💬 Community</a><a href="downloads.html">📁 Downloads</a><a href="#">⚙ Settings</a><a href="../index.html">← Return Website</a>
-</nav></aside>
-<main class="dashboard-main">
-<header class="dashboard-header"><div><h1>Certifications</h1><p>Recognizing practical AI learning and achievement.</p></div></header>
-<section class="dashboard-section"><div class="dashboard-panel">
-<h2>🎓 APEP Academy Certification Pathway</h2>
-<p>APEP Academy is building a practical certification pathway around demonstrated learning, applied AI skills, and responsible use of AI.</p>
-<h3>What certification will emphasize</h3>
-<ul><li>Understanding core AI concepts.</li><li>Applying AI tools to practical tasks.</li><li>Prompting and workflow design.</li><li>Responsible evaluation of AI outputs.</li><li>Practical project application.</li></ul>
-<h3>Current status</h3>
-<p>The certification pathway is being developed alongside the AI Foundations curriculum. Learners should use the course lessons and knowledge checks as preparation while the formal assessment and certificate issuance process is finalized.</p>
-<a class="button button-primary" href="courses.html">Continue Learning →</a>
-</div></section>
-</main></div>
-<script type="module" src="../script.js"></script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Certifications | AI Profit Advantage</title><link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="dashboard.css"></head>
+<body><div class="dashboard-layout"><aside class="dashboard-sidebar"><h2>AI Profit Advantage</h2><nav><a href="index.html">🏠 Dashboard</a><a href="courses.html">📚 Courses</a><a href="lesson-1.html">▶ Course Player</a><a href="certifications.html" class="active">🎓 Certifications</a><a href="community.html">💬 Community</a><a href="downloads.html">📁 Downloads</a><a href="#">⚙ Settings</a><a href="../index.html">← Return Website</a></nav></aside>
+<main class="dashboard-main"><header class="dashboard-header"><div><h1>My Certifications</h1><p>Your authoritative APEP Academy credentials and certification status.</p></div><button class="button button-secondary" type="button" id="refresh">Refresh</button></header>
+<section class="dashboard-cards"><div class="dashboard-card"><h3>Certificates</h3><strong id="count">—</strong><p>Issued credentials</p></div><div class="dashboard-card"><h3>Current Credentials</h3><strong id="current">—</strong><p>Issued or reissued</p></div></section>
+<section class="dashboard-section"><div class="dashboard-panel"><h2>🎓 APEP Academy Credentials</h2><p>Certificates appear here only after the APEP certification authority confirms eligibility and an authorized administrator issues the credential.</p><div id="state">Loading certification records…</div><div id="list"></div></div></section></main></div>
+<script type="module">
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_CONFIG}from'../config/supabase-config.js';const sb=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});const $=id=>document.getElementById(id);const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const fmt=v=>v?new Date(v).toLocaleDateString():'—';async function load(){const{data:session}=await sb.auth.getSession();if(!session.session){location.replace('/auth/login.html?redirect=%2Fdashboard%2Fcertifications.html');return}const{data,error}=await sb.rpc('get_my_certificates');if(error){$('state').textContent='Certification records could not be loaded. Please try again.';return}const rows=data||[];$('count').textContent=rows.length;$('current').textContent=rows.filter(x=>['ISSUED','REISSUED'].includes(x.status)).length;if(!rows.length){$('state').innerHTML='<p>No certificates have been issued to your account yet.</p><p>Continue your enrolled courses and complete all published lessons. Certification eligibility is evaluated by the APEP certification authority.</p>';$('list').innerHTML='';return}$('state').textContent='Your authoritative certificate records:';$('list').innerHTML=rows.map(x=>`<article class="dashboard-panel" style="margin-top:16px"><h3>${esc(x.course_title)}</h3><p><b>Certificate:</b> ${esc(x.certificate_number)}</p><p><b>Status:</b> ${esc(x.status)}<br><b>Issued:</b> ${fmt(x.issued_at)}${x.revoked_at?`<br><b>Revoked:</b> ${fmt(x.revoked_at)}`:''}</p>${x.verification_url?`<p><a class="button button-primary" href="${esc(x.verification_url)}">Verify Credential →</a></p>`:''}</article>`).join('')}$('refresh').onclick=load;load();
+</script></body></html>
