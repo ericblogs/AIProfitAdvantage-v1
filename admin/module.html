@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>APEP Admin Module</title></head>
-<body style="margin:0;font-family:Inter,system-ui,sans-serif;background:#f5f7fa;color:#142033"><main style="max-width:720px;margin:12vh auto;padding:32px;background:#fff;border:1px solid #e7ebf0;border-radius:16px"><strong>APEP ADMINISTRATION</strong><h1 id="title">Opening module…</h1><p id="message">Routing to the dedicated administration surface.</p><p><a href="./index.html">Command Center</a> · <a href="./courses.html">Course Management</a></p></main>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>APEP Administration</title></head>
+<body style="margin:0;font-family:Inter,system-ui,sans-serif;background:#f5f7fa;color:#142033"><main style="max-width:720px;margin:12vh auto;padding:32px;background:#fff;border:1px solid #e7ebf0;border-radius:16px"><strong>APEP ADMINISTRATION</strong><h1 id="title">Opening administration module…</h1><p id="message">Routing to the appropriate administrative surface.</p><p><a href="./index.html">Command Center</a> · <a href="./courses.html">Course Management</a></p></main>
 <script type="module">
 const key=new URLSearchParams(location.search).get('module');
-const dedicated={users:'./users.html',enrollments:'./enrollments.html',payments:'./payments.html',progress:'./progress.html',providers:'./providers.html'};
-if(dedicated[key]){location.replace(dedicated[key]);}else{document.getElementById('title').textContent=key?`${key.charAt(0).toUpperCase()+key.slice(1)} — Pending Module Certification`:'Unknown admin module';document.getElementById('message').textContent=key?'This route remains a controlled compatibility boundary until its dedicated backend authorization/data path is certified. No fabricated operational data is exposed.':'The requested administration route is not recognized.';}
+const dedicated={users:'./users.html',enrollments:'./enrollments.html',payments:'./payments.html',progress:'./progress.html',providers:'./providers.html',certificates:'./certificates.html',audit:'./audit.html'};
+if(dedicated[key]){location.replace(dedicated[key]);}else{document.getElementById('title').textContent=key?'Administration module not found':'Administration module';document.getElementById('message').textContent=key?'The requested administration route is not recognized.':'Select an authorized administration function from the Command Center.';}
 </script></body></html>
