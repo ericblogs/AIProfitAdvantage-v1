@@ -8,8 +8,10 @@ export function setCurrentYear() {
 export function initializeNavigation() {
   const toggle = query('.menu-toggle');
   const navigation = query('.primary-nav');
+  if (!toggle || !navigation) return;
+
   const toggleLabel = query('.sr-only', toggle);
-  if (!toggle || !navigation || !toggleLabel) return;
+  if (!toggleLabel) return;
 
   const closeNavigation = ({ returnFocus = false } = {}) => {
     toggle.setAttribute('aria-expanded', 'false');
