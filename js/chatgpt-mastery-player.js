@@ -17,19 +17,8 @@ async function init(){
  let {data:enrolment}=await supabase.from('enrollments').select('id,status').eq('user_id',user.id).eq('course_id',course.id).maybeSingle();
  const params=new URLSearchParams(window.location.search);
  const requestedLesson=Number(params.get('lesson')||0);
- const requestedEnrollment=params.get('enroll')==='1';
- if((!enrolment||enrolment.status==='cancelled') && requestedEnrollment){
-   if(enrolment?.status==='cancelled'){
-     const {error}=await supabase.from('enrollments').update({status:'active'}).eq('id',enrolment.id).eq('user_id',user.id);
-     if(error){root.innerHTML=`<section class="dashboard-panel"><h2>Enrollment could not be restored</h2><p>${esc(error.message)}</p></section>`;return;}
-   } else {
-     const {data:created,error}=await supabase.from('enrollments').insert({user_id:user.id,course_id:course.id,status:'active'}).select('id,status').single();
-     if(error){root.innerHTML=`<section class="dashboard-panel"><h2>Enrollment could not be created</h2><p>${esc(error.message)}</p></section>`;return;}
-     enrolment=created;
-   }
- }
  if(!enrolment||enrolment.status==='cancelled'){
-   root.innerHTML='<section class="dashboard-panel"><h2>Enrollment required</h2><p>Use the Course Library button to enroll in AI & ChatGPT Mastery.</p><a class="btn" href="courses.html?course=chatgpt-mastery">📚 Open Course Library</a></section>';return;
+   root.innerHTML='<section class="dashboard-panel"><h2>Enrollment required</h2><p>Complete the approved enrollment or payment process before accessing AI & ChatGPT Mastery.</p><a class="btn" href="courses.html?course=chatgpt-mastery">📚 Open Course Library</a></section>';return;
  }
  const {data:progress=[]}=await supabase.from('lesson_progress').select('lesson_id,progress_percent,completed').eq('user_id',user.id);
  const {data:dbLessons=[]}=await supabase.from('lessons').select('id,lesson_number,title,duration_minutes,is_published').eq('course_id',course.id).order('lesson_number');
