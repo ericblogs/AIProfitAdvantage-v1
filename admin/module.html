@@ -4,6 +4,6 @@
 <body style="margin:0;font-family:Inter,system-ui,sans-serif;background:#f5f7fa;color:#142033"><main style="max-width:720px;margin:12vh auto;padding:32px;background:#fff;border:1px solid #e7ebf0;border-radius:16px"><strong>APEP ADMINISTRATION</strong><h1 id="title">Opening module…</h1><p id="message">Routing to the dedicated administration surface.</p><p><a href="./index.html">Command Center</a> · <a href="./courses.html">Course Management</a></p></main>
 <script type="module">
 const key=new URLSearchParams(location.search).get('module');
-const dedicated={users:'./users.html',enrollments:'./enrollments.html'};
+const dedicated={users:'./users.html',enrollments:'./enrollments.html',payments:'./payments.html'};
 if(dedicated[key]){location.replace(dedicated[key]);}else{document.getElementById('title').textContent=key?`${key.charAt(0).toUpperCase()+key.slice(1)} — Pending Module Certification`:'Unknown admin module';document.getElementById('message').textContent=key?'This route remains a controlled compatibility boundary until its dedicated backend authorization/data path is certified. No fabricated operational data is exposed.':'The requested administration route is not recognized.';}
 </script></body></html>
