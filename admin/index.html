@@ -20,15 +20,15 @@
     <aside class="sidebar">
       <div class="brand"><strong>APEP</strong><span>Admin Command Center</span></div>
       <nav class="nav" aria-label="Admin navigation">
-        <a data-nav="overview" class="active" href="./index.html#overview">Overview</a>
-        <a data-nav="users" href="#users">Users</a>
+        <a data-nav="overview" class="active" href="./index.html">Overview</a>
+        <a data-nav="users" href="./module.html?module=users">Users</a>
         <a data-nav="courses" href="./courses.html">Courses</a>
-        <a data-nav="enrollments" href="#enrollments">Enrollments</a>
-        <a data-nav="payments" href="#payments">Payments</a>
-        <a data-nav="progress" href="#progress">Progress</a>
-        <a data-nav="providers" href="#providers">Providers</a>
-        <a data-nav="certificates" href="#certificates">Certificates</a>
-        <a data-nav="audit" href="#audit">Audit Logs</a>
+        <a data-nav="enrollments" href="./module.html?module=enrollments">Enrollments</a>
+        <a data-nav="payments" href="./module.html?module=payments">Payments</a>
+        <a data-nav="progress" href="./module.html?module=progress">Progress</a>
+        <a data-nav="providers" href="./module.html?module=providers">Providers</a>
+        <a data-nav="certificates" href="./module.html?module=certificates">Certificates</a>
+        <a data-nav="audit" href="./module.html?module=audit">Audit Logs</a>
       </nav>
       <div class="side-note"><b>Controlled release</b><br>Gate 3B.2A.7C.6. Provider identity governance is enabled; live NIN/NINAuth collection remains disabled pending official authorization.</div>
     </aside>
@@ -94,27 +94,7 @@
       navItems.forEach(item=>item.classList.toggle('active',item.dataset.nav===key));
       if(sectionTitles[key]) pageTitle.textContent=sectionTitles[key];
     }
-    function syncNavigation(){
-      const hash=(window.location.hash||'#overview').slice(1);
-      if(hash==='courses') setActiveNav('courses');
-      else if(sectionTitles[hash]) setActiveNav(hash);
-      else setActiveNav('overview');
-    }
-    navItems.forEach(item=>{
-      item.addEventListener('click',event=>{
-        const key=item.dataset.nav;
-        if(key==='courses') return;
-        const target=key==='overview'?'overview':key;
-        const element=document.getElementById(target);
-        if(!element) return;
-        event.preventDefault();
-        history.pushState(null,'',`#${target}`);
-        element.scrollIntoView({behavior:'smooth',block:'start'});
-        setActiveNav(key);
-      });
-    });
-    window.addEventListener('hashchange',syncNavigation);
-    window.addEventListener('popstate',syncNavigation);
+    function syncNavigation(){ setActiveNav('overview'); }
 
     async function verifyAdmin(){
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
