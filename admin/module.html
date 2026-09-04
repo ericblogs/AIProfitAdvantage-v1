@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>APEP Admin Module</title>
+  <style>
+    :root{--navy:#07111f;--gold:#d7ad4b;--ink:#142033;--muted:#667085;--line:#e7ebf0;--bg:#f5f7fa;--white:#fff;--danger:#b42318;--shadow:0 12px 30px rgba(7,17,31,.08)}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(720px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:32px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#8a6500;font-weight:800}.title{font-size:30px;margin:8px 0}.desc{color:var(--muted);line-height:1.6}.status{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:18px;background:#fafbfc}.status strong{display:block;margin-bottom:6px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:700;color:var(--ink);background:#fff}.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}.denied{display:none;text-align:center}.error{color:var(--danger)}code{font-size:.9em}
+  </style>
+</head>
+<body>
+  <main id="app" class="wrap">
+    <section class="card">
+      <div class="eyebrow">APEP ADMINISTRATION</div>
+      <h1 id="title" class="title">Verifying module…</h1>
+      <p id="description" class="desc">Administrator authorization is required before this module can be opened.</p>
+      <div id="status" class="status"><strong>Authorization check in progress</strong><span>Existing Supabase session and <code>is_current_user_admin()</code> authorization are being verified.</span></div>
+      <div class="actions"><a class="btn primary" href="./index.html">Command Center</a><a id="coursesLink" class="btn" href="./courses.html">Course Management</a></div>
+    </section>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+    const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    const modules={
+      users:{title:'Users',description:'User administration is a dedicated module boundary. No user-wide records are exposed until its admin-scoped read/write path is certified.'},
+      enrollments:{title:'Enrollments',description:'Enrollment administration remains protected. The student enrollment RLS boundary is unchanged; an admin-scoped management path must be certified before records or controls are exposed.'},
+      payments:{title:'Payments',description:'Payment administration remains protected. Paystack transactions and purchase records are not exposed through a browser-side bypass.'},
+      progress:{title:'Progress',description:'Protected student telemetry remains intentionally withheld until an admin-scoped RLS read path is certified.'},
+      providers:{title:'Providers',description:'Provider governance is a separate administrative capability. Identity and activation controls remain governed by their existing server-side authorization paths.'},
+      certificates:{title:'Certificates',description:'Certificate administration is not exposed until the certificate data model, issuance workflow, and authorization path are independently verified.'},
+      audit:{title:'Audit Logs',description:'Audit log administration is not exposed until a dedicated admin-scoped read path, retention policy, and authorization model are independently verified.'}
+    };
+    const key=new URLSearchParams(location.search).get('module');
+    const meta=modules[key];
+    const title=document.getElementById('title');
+    const description=document.getElementById('description');
+    const status=document.getElementById('status');
+    if(!meta){title.textContent='Unknown admin module';description.textContent='The requested administration route is not recognized.';status.innerHTML='<strong class="error">Route rejected</strong><span>Use the Command Center navigation to select a valid module.</span>';}else{
+      title.textContent=meta.title;description.textContent=meta.description;
+      const {data:sessionData,error:sessionError}=await supabase.auth.getSession();
+      if(sessionError||!sessionData.session){status.innerHTML='<strong class="error">Administrator session required</strong><span>Sign in with an authorized administrator account before accessing this module.</span>';}
+      else{
+        const {data:isAdmin,error:adminError}=await supabase.rpc('is_current_user_admin');
+        if(adminError||isAdmin!==true){status.innerHTML='<strong class="error">Access denied</strong><span>This authenticated account is not authorized for APEP administration.</span>';}
+        else{status.innerHTML='<strong>Route verified</strong><span>Administrator authorization succeeded. This module is reachable as a real page; protected data and controls remain unavailable until their own backend authorization path is certified.</span>';}
+      }
+    }
+  </script>
+</body>
+</html>
