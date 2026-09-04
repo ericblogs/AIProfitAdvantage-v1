@@ -80,8 +80,8 @@ async function init(){
         window.location.replace(onboardingPath);return
       }
       if(data.user){
-        setStatus('Account created. Please confirm your email address. We will then send you to APEP Login before provider onboarding.','success');
-        setTimeout(()=>window.location.replace(`/auth/confirm-email.html?redirect=${encodeURIComponent(onboardingPath)}`),700);return
+        setStatus('Account created successfully. Please check your email inbox (and spam/junk folder) and click the APEP confirmation link. After confirmation, sign in to continue to provider onboarding.','success');
+        return
       }
       setStatus('The account could not be created. Please try again.','error')
     }catch(error){setStatus(error?.message||'We could not connect to the registration service. Please try again.','error')}
