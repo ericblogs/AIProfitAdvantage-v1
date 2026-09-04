@@ -101,6 +101,21 @@ async function confirm() {
     return;
   }
 
+  // Supabase may return a one-time `code` query parameter. Exchange it for
+  // the confirmation session before checking getSession().
+  const code = params.get('code');
+  if (code) {
+    handled = true;
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      handled = false;
+      showError(error.message || 'Your confirmation link may be expired or invalid. Please request a new confirmation email.');
+      return;
+    }
+    await finishConfirmation();
+    return;
+  }
+
   const { data, error } = await supabase.auth.getSession();
   if (error) {
     handled = false;
