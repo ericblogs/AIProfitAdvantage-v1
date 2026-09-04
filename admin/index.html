@@ -113,7 +113,25 @@
       const { count, error } = await supabase.from('courses').select('id', { count:'exact', head:true }).eq('is_published', true);
       if(!error && typeof count === 'number') kpiCourses.textContent = String(count);
       const { data:courses, error:coursesError } = await supabase.from('courses').select('id,title,level,lesson_count,is_published,is_free').eq('is_published', true).order('created_at',{ascending:true}).limit(8);
-      if(coursesError){ courseList.innerHTML='<div class="empty"><strong>Course intelligence unavailable</strong>The current authenticated read policy did not permit the course query.</div>'; } else if(!courses?.length){ courseList.innerHTML='<div class="empty"><strong>No published courses found</strong>The current data source returned no published courses.</div>'; } else { courseList.innerHTML = courses.map(c=>`<div class="course"><div><div class="course-title">${escapeHtml(c.title || 'Untitled course')}</div><div class="course-meta">${escapeHtml(c.level || '—')} · ${Number(c.lesson_count || 0)} lessons · ${c.is_free ? 'Free' : 'Paid'}</div></div><span class="status-dot" title="Published"></span></div>`).join(''); }
+      if(coursesError){ courseList.innerHTML='<div class="empty"><strong>Course intelligence unavailable</strong>The current authenticated read policy did not permit the course query.</div>'; } else if(!courses?.length){ courseList.innerHTML='<div class="empty"><strong>No published courses found</strong>The current data source returned no published courses.</div>'; } else {
+        const courseOrder=[
+          'AI Foundations',
+          'Prompt Engineering',
+          'AI & ChatGPT Mastery',
+          'AI Automation',
+          'Business Enterprise',
+          'AI Agents & Intelligent Automation',
+          'Data Analytics with Generative AI',
+          'AI-Powered Digital Marketing & Growth'
+        ];
+        const orderIndex=new Map(courseOrder.map((title,index)=>[title,index]));
+        courses.sort((a,b)=>{
+          const ai=orderIndex.has(a.title)?orderIndex.get(a.title):courseOrder.length;
+          const bi=orderIndex.has(b.title)?orderIndex.get(b.title):courseOrder.length;
+          return ai-bi || String(a.title||'').localeCompare(String(b.title||''));
+        });
+        courseList.innerHTML = courses.map(c=>`<div class="course"><div><div class="course-title">${escapeHtml(c.title || 'Untitled course')}</div><div class="course-meta">${escapeHtml(c.level || '—')} · ${Number(c.lesson_count || 0)} lessons · ${c.is_free ? 'Free' : 'Paid'}</div></div><span class="status-dot" title="Published"></span></div>`).join('');
+      }
       await loadProviders();
     }
 
