@@ -55,10 +55,7 @@ async function loadReactionState(postIds, userId) {
   const state = { counts: new Map(), mine: new Map() };
   if (!postIds.length) return state;
 
-  const { data: countRows, error: countError } = await supabase
-    .from('forum_post_reaction_counts')
-    .select('post_id,reaction,reaction_count')
-    .in('post_id', postIds);
+  const { data: countRows, error: countError } = await supabase.from('forum_post_reaction_counts').select('post_id,reaction,reaction_count').in('post_id', postIds);
   if (countError) throw countError;
   (countRows || []).forEach((row) => {
     if (!state.counts.has(row.post_id)) state.counts.set(row.post_id, {});
@@ -66,26 +63,14 @@ async function loadReactionState(postIds, userId) {
   });
 
   if (userId) {
-    const { data: mineRows, error: mineError } = await supabase
-      .from('forum_post_reactions')
-      .select('post_id,reaction')
-      .eq('user_id', userId)
-      .in('post_id', postIds);
+    const { data: mineRows, error: mineError } = await supabase.from('forum_post_reactions').select('post_id,reaction').eq('user_id', userId).in('post_id', postIds);
     if (mineError) throw mineError;
     (mineRows || []).forEach((row) => {
       if (!state.mine.has(row.post_id)) state.mine.set(row.post_id, new Set());
       state.mine.get(row.post_id).add(row.reaction);
     });
   }
-
   return state;
-}
-
-function updateReactionButton(button, count, active) {
-  button.classList.toggle('is-active', active);
-  button.setAttribute('aria-pressed', String(active));
-  const countNode = button.querySelector('.forum-reaction-count');
-  if (countNode) countNode.textContent = String(count);
 }
 
 async function handleReaction(button) {
@@ -103,6 +88,8 @@ async function handleReaction(button) {
 
   const wasActive = button.getAttribute('aria-pressed') === 'true';
   button.disabled = true;
+  const status = document.querySelector('#forum-topic-reaction-status');
+  if (status) status.textContent = 'Saving reaction…';
   try {
     if (wasActive) {
       const { error } = await supabase.from('forum_post_reactions').delete().eq('post_id', postId).eq('user_id', user.id).eq('reaction', reaction);
@@ -114,10 +101,12 @@ async function handleReaction(button) {
 
     const countNode = button.querySelector('.forum-reaction-count');
     const currentCount = Number(countNode?.textContent || 0);
-    updateReactionButton(button, Math.max(0, currentCount + (wasActive ? -1 : 1)), !wasActive);
+    button.classList.toggle('is-active', !wasActive);
+    button.setAttribute('aria-pressed', String(!wasActive));
+    if (countNode) countNode.textContent = String(Math.max(0, currentCount + (wasActive ? -1 : 1)));
+    if (status) status.textContent = '';
   } catch (error) {
     console.error('Forum reaction failed:', error);
-    const status = document.querySelector('#forum-topic-reaction-status');
     if (status) status.textContent = 'Your reaction could not be saved. Please try again.';
   } finally {
     button.disabled = false;
@@ -137,11 +126,11 @@ async function loadTopic() {
   const reactionState = await loadReactionState(posts.map((post) => post.id), user?.id || null);
 
   root.innerHTML = `<p class="eyebrow">${escapeHtml(topic.forum_categories?.name || 'COMMUNITY')}</p><h1>${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</h1><div class="forum-topic-meta"><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div><div id="forum-topic-reaction-status" class="forum-reaction-status" role="status" aria-live="polite"></div><div class="forum-posts">${posts.length ? posts.map((post, index) => `<article class="forum-post"><div class="forum-post-number">#${index + 1}</div><div><p class="forum-post-meta">Community member · ${formatDate(post.created_at)}</p><div class="forum-post-body">${renderPostBody(post.body)}</div>${renderReactionBar(post.id, reactionState.counts.get(post.id) || {}, reactionState.mine.get(post.id) || new Set())}</div></article>`).join('') : '<div class="forum-empty">No visible posts are available for this discussion.</div>'}</div>`;
-
-  root.addEventListener('click', (event) => {
-    const button = event.target.closest('.forum-reaction');
-    if (button) handleReaction(button);
-  }, { once: true });
 }
+
+root.addEventListener('click', (event) => {
+  const button = event.target.closest('.forum-reaction');
+  if (button) handleReaction(button);
+});
 
 loadTopic().catch((error) => { console.error(error); root.innerHTML = '<div class="forum-empty">This discussion could not be loaded. Please return to the forum and try again.</div>'; });
