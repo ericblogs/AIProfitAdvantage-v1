@@ -7,6 +7,21 @@
   <title>Discussion | APEP Community</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../css/forum.css">
+  <style>
+    .forum-welcome-cta{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;margin:1.5rem 0;padding:1.25rem 1.4rem;border:1px solid #cbdcf6;border-radius:18px;background:linear-gradient(135deg,#f2f7ff,#fffaf0);box-shadow:0 10px 28px rgba(18,42,85,.07)}
+    .forum-welcome-cta h2{margin:.15rem 0 .35rem;font-size:1.25rem}
+    .forum-welcome-cta p:not(.eyebrow){margin:0;color:#61708a;line-height:1.55}
+    .forum-intro-composer{margin:1.5rem 0;padding:1.4rem;border:1px solid #cbdcf6;border-radius:18px;background:#fff;box-shadow:0 12px 32px rgba(18,42,85,.08)}
+    .forum-intro-composer[hidden]{display:none}
+    .forum-intro-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+    .forum-intro-heading h3{margin:.15rem 0 .35rem}
+    .forum-intro-heading p:not(.eyebrow){margin:0;color:#61708a;line-height:1.55}
+    .forum-close-composer{border:0;background:transparent;color:#61708a;font-size:1.8rem;line-height:1;cursor:pointer;padding:.1rem .3rem}
+    .forum-intro-template{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.8rem;color:#61708a;font-size:.78rem}
+    .forum-intro-status{min-height:1.4rem;margin-top:.8rem;color:#61708a;font-size:.85rem}
+    .forum-editor-content.is-over-limit{box-shadow:inset 0 0 0 2px #c53b3b}
+    @media(max-width:760px){.forum-welcome-cta{align-items:stretch;flex-direction:column}.forum-welcome-cta .button{width:100%}.forum-intro-composer{padding:1rem}}
+  </style>
 </head>
 <body>
   <header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html" aria-label="AI Profit Advantage home"><span class="brand-mark">AI</span><span class="brand-wordmark">AI Profit Advantage</span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Open menu</span><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-menu" aria-label="Primary navigation"><a href="../index.html">Home</a><a href="about.html">About</a><a href="../index.html#courses">Courses</a><a href="services.html">Services</a><a href="providers.html">Providers</a><a href="resources.html">Resources</a><a href="community.html">Community</a><a href="store.html">Store</a><a href="blog.html">Blog</a><a href="contact.html">Contact</a><a href="../auth/login.html">Login</a><a class="nav-cta" href="../auth/register.html">Register</a></nav></div></header>
@@ -14,5 +29,6 @@
   <footer class="site-footer"></footer>
   <script type="module" src="../script.js"></script>
   <script type="module" src="../js/forum-topic.js"></script>
+  <script type="module" src="../js/forum-welcome.js"></script>
 </body>
 </html>
