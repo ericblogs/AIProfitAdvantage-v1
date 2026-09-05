@@ -1,7 +1,9 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { FORUM_QA_CONFIG } from '../config/forum-qa-config.js';
+import { FORUM_CONFIG } from '../config/forum-config.js';
 
-const supabase = createClient(FORUM_QA_CONFIG.url, FORUM_QA_CONFIG.publishableKey);
+const supabase = createClient(FORUM_CONFIG.url, FORUM_CONFIG.publishableKey, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 const categoriesEl = document.querySelector('#forum-categories');
 const topicsEl = document.querySelector('#forum-topics');
 const statusEl = document.querySelector('#forum-status');
@@ -14,16 +16,6 @@ let activeCategory = null;
 const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[char]));
 const setStatus = (message = '') => { statusEl.textContent = message; };
 const formatDate = (value) => new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium' }).format(new Date(value));
-
-function setupMobileNavigation() {
-  const nav = document.querySelector('.primary-nav');
-  if (!nav || document.querySelector('.menu-toggle')) return;
-  const button = document.createElement('button');
-  button.className = 'menu-toggle'; button.type = 'button'; button.setAttribute('aria-expanded', 'false');
-  button.innerHTML = '<span aria-hidden="true">☰</span><span class="sr-only">Toggle navigation</span>';
-  document.querySelector('.header-inner')?.appendChild(button);
-  button.addEventListener('click', () => { const open = nav.classList.toggle('is-open'); button.setAttribute('aria-expanded', String(open)); });
-}
 
 async function loadCategories() {
   const { data, error } = await supabase.from('forum_categories').select('id,name,slug,description,display_order').eq('is_active', true).order('display_order');
@@ -71,6 +63,6 @@ document.querySelector('#forum-topic-form')?.addEventListener('submit', async (e
 });
 
 (async () => {
-  try { setupMobileNavigation(); await loadCategories(); await loadTopics(); }
-  catch (error) { console.error(error); setStatus('The QA forum could not load. Please inspect the browser console and Supabase request.'); topicsEl.innerHTML = '<div class="forum-empty">Forum data could not be loaded.</div>'; }
+  try { await loadCategories(); await loadTopics(); }
+  catch (error) { console.error(error); setStatus('The forum could not load. Please try again.'); topicsEl.innerHTML = '<div class="forum-empty">Forum data could not be loaded.</div>'; }
 })();
