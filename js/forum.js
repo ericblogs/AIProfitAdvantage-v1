@@ -13,7 +13,31 @@ const categorySelect = document.querySelector('#forum-topic-category');
 let categories = [];
 let activeCategory = null;
 
+const CATEGORY_VISUALS = Object.freeze({
+  'apep-academy': ['🎓', 'Learning & certification'],
+  'ai-chatgpt': ['🤖', 'AI knowledge & ChatGPT'],
+  'ai-automation': ['⚙️', 'Workflows & automation'],
+  'ai-agents-intelligent-automation': ['🧠', 'Agents & intelligent systems'],
+  'digital-business-income': ['💰', 'Business & income'],
+  'prompt-engineering': ['✍️', 'Prompts & AI control'],
+  'digital-marketing': ['📣', 'Marketing & campaigns'],
+  'ai-powered-digital-marketing-growth': ['🚀', 'AI-powered growth'],
+  'data-analytics-generative-ai': ['📊', 'Data & AI analytics'],
+  'entrepreneurship-business': ['🏢', 'Entrepreneurship & leadership'],
+  'tools-resources-support': ['🛠️', 'Tools & community support'],
+  'community-wins-introductions': ['🌟', 'Introductions & wins'],
+  'ai-business-strategy-transformation': ['🧭', 'Strategy & transformation'],
+  'ai-powered-content-copy-systems': ['📝', 'Content & copy systems'],
+  'ai-sales-lead-generation-conversion': ['🎯', 'Sales & conversion'],
+  'ai-productivity-personal-operating-systems': ['⚡', 'Productivity & workflows'],
+  'ai-development-app-building': ['💻', 'Development & apps'],
+  'ai-research-evaluation-prompt-testing': ['🔬', 'Research & testing'],
+  'ai-monetization-freelancing-client-services': ['💵', 'Monetization & services'],
+  'ai-governance-security-responsible-ai': ['🔐', 'Governance & responsible AI']
+});
+
 const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[char]));
+const getVisual = (category) => CATEGORY_VISUALS[category.slug] || ['💬', 'Community discussion'];
 const setStatus = (message = '') => { statusEl.textContent = message; };
 const formatDate = (value) => new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium' }).format(new Date(value));
 
@@ -22,19 +46,29 @@ async function loadCategories() {
   if (error) throw error;
   categories = data || [];
   categoryCountEl.textContent = `${categories.length}`;
-  categoriesEl.innerHTML = categories.length ? categories.map((category) => `<button class="forum-category" type="button" data-category-id="${category.id}"><strong>${escapeHtml(category.name)}</strong><br><small>${escapeHtml(category.description || '')}</small></button>`).join('') : '<div class="forum-empty">No forum categories are available yet.</div>';
-  categorySelect.innerHTML = categories.map((category) => `<option value="${category.id}">${escapeHtml(category.name)}</option>`).join('');
+  categoriesEl.innerHTML = categories.length ? categories.map((category) => {
+    const [icon, visualLabel] = getVisual(category);
+    return `<button class="forum-category" type="button" data-category-id="${category.id}"><span class="forum-category-icon" aria-hidden="true">${icon}</span><span class="forum-category-copy"><strong>${escapeHtml(category.name)}</strong><small>${escapeHtml(category.description || visualLabel)}</small></span></button>`;
+  }).join('') : '<div class="forum-empty">No forum categories are available yet.</div>';
+  categorySelect.innerHTML = categories.map((category) => {
+    const [icon] = getVisual(category);
+    return `<option value="${category.id}">${icon} ${escapeHtml(category.name)}</option>`;
+  }).join('');
   categoriesEl.querySelectorAll('[data-category-id]').forEach((button) => button.addEventListener('click', () => { activeCategory = button.dataset.categoryId; categoriesEl.querySelectorAll('.forum-category').forEach((item) => item.classList.toggle('is-active', item === button)); loadTopics(); }));
 }
 
 async function loadTopics() {
   topicsEl.innerHTML = '<div class="forum-skeleton large"></div><div class="forum-skeleton large"></div>';
-  let query = supabase.from('forum_topics').select('id,title,slug,status,is_pinned,view_count,created_at,forum_categories(name)').in('status', ['open','locked']).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(30);
+  let query = supabase.from('forum_topics').select('id,title,slug,status,is_pinned,view_count,created_at,forum_categories(name,slug)').in('status', ['open','locked']).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(30);
   if (activeCategory) query = query.eq('category_id', activeCategory);
   const { data, error } = await query;
   if (error) throw error;
   if (!data?.length) { topicsEl.innerHTML = '<div class="forum-empty"><strong>No discussions yet.</strong><br>Be the first to start a useful community conversation.</div>'; return; }
-  topicsEl.innerHTML = data.map((topic) => `<article class="forum-topic"><h4><a href="forum-topic.html?id=${encodeURIComponent(topic.id)}">${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</a></h4><div class="forum-topic-meta"><span class="forum-topic-category">${escapeHtml(topic.forum_categories?.name || 'Community')}</span><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div></article>`).join('');
+  topicsEl.innerHTML = data.map((topic) => {
+    const category = categories.find((item) => item.slug === topic.forum_categories?.slug) || { slug: topic.forum_categories?.slug || '' };
+    const [icon] = getVisual(category);
+    return `<article class="forum-topic"><h4><a href="forum-topic.html?id=${encodeURIComponent(topic.id)}">${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</a></h4><div class="forum-topic-meta"><span class="forum-topic-category">${icon} ${escapeHtml(topic.forum_categories?.name || 'Community')}</span><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div></article>`;
+  }).join('');
 }
 
 function openModal() { modal.hidden = false; document.body.style.overflow = 'hidden'; categorySelect.focus(); }
