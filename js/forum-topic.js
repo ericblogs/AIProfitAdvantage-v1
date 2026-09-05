@@ -1,5 +1,6 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { FORUM_CONFIG } from '../config/forum-config.js';
+import { renderShareBar, bindShareBar, updateSocialMeta } from './forum-share.js';
 
 const supabase = createClient(FORUM_CONFIG.url, FORUM_CONFIG.publishableKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -21,9 +22,7 @@ const safeAvatarUrl = (value = '') => {
   try {
     const url = new URL(String(value), window.location.href);
     return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 };
 const renderAuthor = (profile) => {
   const name = String(profile?.full_name || '').trim() || 'Community member';
@@ -118,9 +117,7 @@ async function handleReaction(button) {
   } catch (error) {
     console.error('Forum reaction failed:', error);
     if (status) status.textContent = 'Your reaction could not be saved. Please try again.';
-  } finally {
-    button.disabled = false;
-  }
+  } finally { button.disabled = false; }
 }
 
 async function loadTopic() {
@@ -139,7 +136,11 @@ async function loadTopic() {
     if (profileError) console.warn('Forum member identity unavailable:', profileError);
     profileMap = new Map((profiles || []).map((profile) => [profile.id, profile]));
   }
-  root.innerHTML = `<p class="eyebrow">${escapeHtml(topic.forum_categories?.name || 'COMMUNITY')}</p><h1>${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</h1><div class="forum-topic-meta"><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div><div id="forum-topic-reaction-status" class="forum-reaction-status" role="status" aria-live="polite"></div><div class="forum-posts">${posts.length ? posts.map((post, index) => `<article class="forum-post"><div class="forum-post-number">#${index + 1}</div><div><div class="forum-post-body">${renderPostBody(post.body)}</div><p class="forum-post-meta">${renderAuthor(profileMap.get(post.user_id))} <span aria-hidden="true">·</span> <time datetime="${post.created_at}">${formatDate(post.created_at)}</time></p>${renderReactionBar(post.id, reactionState.counts.get(post.id) || {}, reactionState.mine.get(post.id) || new Set())}</div></article>`).join('') : '<div class="forum-empty">No visible posts are available for this discussion.</div>'}</div>`;
+  const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(topic.id)}`;
+  const shareDescription = posts[0]?.body ? posts[0].body.replace(/<[^>]*>/g, ' ') : `Join the conversation: ${topic.title}`;
+  updateSocialMeta({ title: topic.title, description: shareDescription, url: shareUrl });
+  root.innerHTML = `<p class="eyebrow">${escapeHtml(topic.forum_categories?.name || 'COMMUNITY')}</p><h1>${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</h1><div class="forum-topic-meta"><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div>${renderShareBar({ title: topic.title, url: shareUrl })}<div id="forum-topic-reaction-status" class="forum-reaction-status" role="status" aria-live="polite"></div><div class="forum-posts">${posts.length ? posts.map((post, index) => `<article class="forum-post"><div class="forum-post-number">#${index + 1}</div><div><div class="forum-post-body">${renderPostBody(post.body)}</div><p class="forum-post-meta">${renderAuthor(profileMap.get(post.user_id))} <span aria-hidden="true">·</span> <time datetime="${post.created_at}">${formatDate(post.created_at)}</time></p>${renderReactionBar(post.id, reactionState.counts.get(post.id) || {}, reactionState.mine.get(post.id) || new Set())}</div></article>`).join('') : '<div class="forum-empty">No visible posts are available for this discussion.</div>'}</div>`;
+  bindShareBar(root, { title: topic.title, url: shareUrl });
 }
 
 root.addEventListener('click', (event) => {
