@@ -15,21 +15,21 @@ export function updateSocialMeta({ title = '', description = '', url = window.lo
     let node = document.head.querySelector(selector);
     if (!node) {
       node = document.createElement('meta');
-      node.setAttribute(attribute, selector.includes('property=') ? selector.match(/property="([^"]+)"/)?.[1] || '' : selector.match(/name="([^"]+)"/)?.[1] || '');
+      node.setAttribute(attribute, selector.includes('property=') ? selector.match(/property=\"([^\"]+)\"/)?.[1] || '' : selector.match(/name=\"([^\"]+)\"/)?.[1] || '');
       document.head.appendChild(node);
     }
     node.setAttribute('content', value);
   };
-  ensureMeta('meta[name="description"]', 'name', cleanDescription);
-  ensureMeta('meta[property="og:title"]', 'property', cleanTitle);
-  ensureMeta('meta[property="og:description"]', 'property', cleanDescription);
-  ensureMeta('meta[property="og:type"]', 'property', 'article');
-  ensureMeta('meta[property="og:url"]', 'property', url);
-  ensureMeta('meta[property="og:site_name"]', 'property', 'APEP Community');
-  ensureMeta('meta[name="twitter:card"]', 'name', 'summary');
-  ensureMeta('meta[name="twitter:title"]', 'name', cleanTitle);
-  ensureMeta('meta[name="twitter:description"]', 'name', cleanDescription);
-  let canonical = document.head.querySelector('link[rel="canonical"]');
+  ensureMeta('meta[name=\"description\"]', 'name', cleanDescription);
+  ensureMeta('meta[property=\"og:title\"]', 'property', cleanTitle);
+  ensureMeta('meta[property=\"og:description\"]', 'property', cleanDescription);
+  ensureMeta('meta[property=\"og:type\"]', 'property', 'article');
+  ensureMeta('meta[property=\"og:url\"]', 'property', url);
+  ensureMeta('meta[property=\"og:site_name\"]', 'property', 'APEP Community');
+  ensureMeta('meta[name=\"twitter:card\"]', 'name', 'summary');
+  ensureMeta('meta[name=\"twitter:title\"]', 'name', cleanTitle);
+  ensureMeta('meta[name=\"twitter:description\"]', 'name', cleanDescription);
+  let canonical = document.head.querySelector('link[rel=\"canonical\"]');
   if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
   canonical.href = url;
 }
@@ -49,24 +49,45 @@ export function renderShareBar({ title = '', url = window.location.href } = {}) 
 
 export function bindShareBar(root, { title = '', url = window.location.href } = {}) {
   if (!root) return;
+  const nativeButton = root.querySelector('[data-share-native]');
+  const status = root.querySelector('[data-share-status]');
+
+  // Web Share is an optional browser capability. Unsupported browsers should
+  // not expose a dead control or display an error after a user clicks it.
+  if (nativeButton && typeof navigator.share !== 'function') {
+    nativeButton.hidden = true;
+  }
+
   root.addEventListener('click', async (event) => {
-    const nativeButton = event.target.closest('[data-share-native]');
+    const clickedNativeButton = event.target.closest('[data-share-native]');
     const copyButton = event.target.closest('[data-share-copy]');
-    const status = root.querySelector('[data-share-status]');
-    if (!nativeButton && !copyButton) return;
-    if (nativeButton && navigator.share) {
+    if (!clickedNativeButton && !copyButton) return;
+
+    if (clickedNativeButton && typeof navigator.share === 'function') {
       try {
         await navigator.share({ title, text: title, url });
         if (status) status.textContent = 'Shared successfully.';
       } catch (error) {
-        if (error?.name !== 'AbortError' && status) status.textContent = 'Sharing was cancelled or unavailable.';
+        if (error?.name !== 'AbortError' && status) status.textContent = 'Sharing is currently unavailable.';
       }
       return;
     }
-    if (nativeButton && status) status.textContent = 'Native sharing is not available in this browser.';
+
     if (copyButton) {
       try {
-        await navigator.clipboard.writeText(url);
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const fallback = document.createElement('textarea');
+          fallback.value = url;
+          fallback.setAttribute('readonly', '');
+          fallback.style.position = 'fixed';
+          fallback.style.opacity = '0';
+          document.body.appendChild(fallback);
+          fallback.select();
+          document.execCommand('copy');
+          fallback.remove();
+        }
         if (status) status.textContent = 'Discussion link copied to your clipboard.';
       } catch {
         if (status) status.textContent = 'Could not copy automatically. Please copy the page address from your browser.';
