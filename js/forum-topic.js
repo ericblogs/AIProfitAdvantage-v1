@@ -16,10 +16,6 @@ const REACTIONS = Object.freeze([
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[char]));
 const formatDate = (value) => new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
-const initials = (name = '') => {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  return escapeHtml((parts.length > 1 ? `${parts[0][0]}${parts[parts.length - 1][0]}` : (parts[0]?.slice(0, 2) || 'CM')).toUpperCase());
-};
 const safeAvatarUrl = (value = '') => {
   if (value === null || value === undefined || String(value).trim() === '') return '';
   try {
@@ -33,7 +29,7 @@ const renderAuthor = (profile) => {
   const name = String(profile?.full_name || '').trim() || 'Community member';
   const safeName = escapeHtml(name);
   const avatar = safeAvatarUrl(profile?.avatar_url);
-  return `<div class="forum-author" aria-label="Posted by ${safeName}">${avatar ? `<img class="forum-author-avatar" src="${escapeHtml(avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.nextElementSibling.hidden=false">` : ''}<span class="forum-author-avatar forum-author-avatar--initials"${avatar ? ' hidden' : ''} aria-hidden="true">${initials(name)}</span><span class="forum-author-name">${safeName}</span></div>`;
+  return `<span class="forum-author" aria-label="Posted by ${safeName}">${avatar ? `<img class="forum-author-avatar" src="${escapeHtml(avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="forum-author-name">${safeName}</span></span>`;
 };
 
 function sanitizePostHtml(html = '') {
@@ -73,14 +69,12 @@ function renderReactionBar(postId, counts = {}, mine = new Set()) {
 async function loadReactionState(postIds, userId) {
   const state = { counts: new Map(), mine: new Map() };
   if (!postIds.length) return state;
-
   const { data: countRows, error: countError } = await supabase.from('forum_post_reaction_counts').select('post_id,reaction,reaction_count').in('post_id', postIds);
   if (countError) throw countError;
   (countRows || []).forEach((row) => {
     if (!state.counts.has(row.post_id)) state.counts.set(row.post_id, {});
     state.counts.get(row.post_id)[row.reaction] = row.reaction_count;
   });
-
   if (userId) {
     const { data: mineRows, error: mineError } = await supabase.from('forum_post_reactions').select('post_id,reaction').eq('user_id', userId).in('post_id', postIds);
     if (mineError) throw mineError;
@@ -97,14 +91,12 @@ async function handleReaction(button) {
   const postId = bar?.dataset.reactionPost;
   const reaction = button.dataset.reactionType;
   if (!postId || !reaction) return;
-
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     const next = `${window.location.pathname}${window.location.search}`;
     window.location.href = `../auth/login.html?next=${encodeURIComponent(next)}`;
     return;
   }
-
   const wasActive = button.getAttribute('aria-pressed') === 'true';
   button.disabled = true;
   const status = document.querySelector('#forum-topic-reaction-status');
@@ -117,7 +109,6 @@ async function handleReaction(button) {
       const { error } = await supabase.from('forum_post_reactions').insert({ post_id: postId, user_id: user.id, reaction });
       if (error) throw error;
     }
-
     const countNode = button.querySelector('.forum-reaction-count');
     const currentCount = Number(countNode?.textContent || 0);
     button.classList.toggle('is-active', !wasActive);
@@ -135,15 +126,12 @@ async function handleReaction(button) {
 async function loadTopic() {
   const id = new URLSearchParams(window.location.search).get('id');
   if (!id) throw new Error('This discussion link is missing its topic ID.');
-
   const { data: topic, error: topicError } = await supabase.from('forum_topics').select('id,title,user_id,status,is_pinned,view_count,created_at,updated_at,forum_categories(name),forum_posts(id,user_id,body,status,created_at,updated_at,parent_post_id)').eq('id', id).in('status', ['open', 'locked']).single();
   if (topicError) throw topicError;
-
   document.title = `${topic.title} | APEP Community`;
   const posts = (topic.forum_posts || []).filter((post) => post.status === 'visible').sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
   const { data: { user } } = await supabase.auth.getUser();
   const reactionState = await loadReactionState(posts.map((post) => post.id), user?.id || null);
-
   const authorIds = [...new Set([topic.user_id, ...posts.map((post) => post.user_id)].filter(Boolean))];
   let profileMap = new Map();
   if (authorIds.length) {
@@ -151,7 +139,6 @@ async function loadTopic() {
     if (profileError) console.warn('Forum member identity unavailable:', profileError);
     profileMap = new Map((profiles || []).map((profile) => [profile.id, profile]));
   }
-
   root.innerHTML = `<p class="eyebrow">${escapeHtml(topic.forum_categories?.name || 'COMMUNITY')}</p><h1>${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</h1><div class="forum-topic-meta"><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div><div id="forum-topic-reaction-status" class="forum-reaction-status" role="status" aria-live="polite"></div><div class="forum-posts">${posts.length ? posts.map((post, index) => `<article class="forum-post"><div class="forum-post-number">#${index + 1}</div><div><p class="forum-post-meta">${renderAuthor(profileMap.get(post.user_id))} <span aria-hidden="true">·</span> <time datetime="${post.created_at}">${formatDate(post.created_at)}</time></p><div class="forum-post-body">${renderPostBody(post.body)}</div>${renderReactionBar(post.id, reactionState.counts.get(post.id) || {}, reactionState.mine.get(post.id) || new Set())}</div></article>`).join('') : '<div class="forum-empty">No visible posts are available for this discussion.</div>'}</div>`;
 }
 
