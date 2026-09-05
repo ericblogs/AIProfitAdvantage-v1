@@ -23,6 +23,31 @@ const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => 
 const getVisual = (category) => CATEGORY_VISUALS[category.slug] || ['💬', 'Community discussion'];
 const setStatus = (message = '') => { statusEl.textContent = message; };
 const formatDate = (value) => new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium' }).format(new Date(value));
+const initials = (name = '') => {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  return escapeHtml((parts.length > 1 ? `${parts[0][0]}${parts[parts.length - 1][0]}` : (parts[0]?.slice(0, 2) || 'CM')).toUpperCase());
+};
+const safeAvatarUrl = (value = '') => {
+  try {
+    const url = new URL(String(value), window.location.href);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch { return ''; }
+};
+const renderAuthor = (profile) => {
+  const name = String(profile?.full_name || '').trim() || 'Community member';
+  const avatar = safeAvatarUrl(profile?.avatar_url);
+  const safeName = escapeHtml(name);
+  const fallback = initials(name);
+  return `<div class="forum-author" aria-label="Posted by ${safeName}">${avatar ? `<img class="forum-author-avatar" src="${escapeHtml(avatar)}" alt="${safeName} avatar" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.nextElementSibling.hidden=false">` : ''}<span class="forum-author-avatar forum-author-avatar--initials"${avatar ? ' hidden' : ''} aria-hidden="true">${fallback}</span><span class="forum-author-name">${safeName}</span></div>`;
+};
+
+async function loadPublicProfiles(userIds = []) {
+  const ids = [...new Set(userIds.filter(Boolean))];
+  if (!ids.length) return new Map();
+  const { data, error } = await supabase.from('forum_public_profiles').select('id,full_name,avatar_url').in('id', ids);
+  if (error) throw error;
+  return new Map((data || []).map((profile) => [profile.id, profile]));
+}
 
 function sanitizeEditorHtml(html = '') {
   const template = document.createElement('template');
@@ -76,12 +101,14 @@ async function loadCategories() {
 
 async function loadTopics() {
   topicsEl.innerHTML = '<div class="forum-skeleton large"></div><div class="forum-skeleton large"></div>';
-  let query = supabase.from('forum_topics').select('id,title,slug,status,is_pinned,view_count,created_at,forum_categories(name,slug)').in('status', ['open','locked']).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(30);
+  let query = supabase.from('forum_topics').select('id,title,slug,status,is_pinned,view_count,created_at,user_id,forum_categories(name,slug)').in('status', ['open','locked']).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(30);
   if (activeCategory) query = query.eq('category_id', activeCategory);
   const { data, error } = await query;
   if (error) throw error;
   if (!data?.length) { topicsEl.innerHTML = '<div class="forum-empty"><strong>No discussions yet.</strong><br>Be the first to start a useful community conversation.</div>'; return; }
-  topicsEl.innerHTML = data.map((topic) => { const category = categories.find((item) => item.slug === topic.forum_categories?.slug) || { slug: topic.forum_categories?.slug || '' }; const [icon] = getVisual(category); return `<article class="forum-topic"><h4><a href="forum-topic.html?id=${encodeURIComponent(topic.id)}">${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</a></h4><div class="forum-topic-meta"><span class="forum-topic-category">${icon} ${escapeHtml(topic.forum_categories?.name || 'Community')}</span><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div></article>`; }).join('');
+  let profiles = new Map();
+  try { profiles = await loadPublicProfiles(data.map((topic) => topic.user_id)); } catch (profileError) { console.warn('Forum author profiles unavailable:', profileError); }
+  topicsEl.innerHTML = data.map((topic) => { const category = categories.find((item) => item.slug === topic.forum_categories?.slug) || { slug: topic.forum_categories?.slug || '' }; const [icon] = getVisual(category); return `<article class="forum-topic"><h4><a href="forum-topic.html?id=${encodeURIComponent(topic.id)}">${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</a></h4><div class="forum-topic-author">${renderAuthor(profiles.get(topic.user_id))}</div><div class="forum-topic-meta"><span class="forum-topic-category">${icon} ${escapeHtml(topic.forum_categories?.name || 'Community')}</span><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div></article>`; }).join('');
 }
 
 function openModal() { modal.hidden = false; document.body.style.overflow = 'hidden'; categorySelect.focus(); updateEditorCount(); }
