@@ -6,9 +6,34 @@ const SHARE_NETWORKS = Object.freeze([
   ['telegram', 'Telegram', '↗']
 ]);
 
+const SHARE_STYLE_ID = 'apep-forum-share-colors';
+
+function ensureShareStyles() {
+  if (document.getElementById(SHARE_STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = SHARE_STYLE_ID;
+  style.textContent = `
+    .forum-share-actions{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center}
+    .forum-share-button{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:42px;padding:.65rem .9rem;border:0;border-radius:10px;color:#fff!important;font:700 .78rem var(--sans,Arial,sans-serif);text-decoration:none;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.12);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+    .forum-share-button:hover,.forum-share-button:focus-visible{color:#fff!important;transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,.18);filter:brightness(1.08);text-decoration:none}
+    .forum-share-button:focus-visible{outline:3px solid rgba(255,255,255,.9);outline-offset:2px}
+    .forum-share-facebook{background:#1877F2!important}
+    .forum-share-x{background:#111!important}
+    .forum-share-linkedin{background:#0A66C2!important}
+    .forum-share-whatsapp{background:#25D366!important}
+    .forum-share-telegram{background:#229ED9!important}
+    .forum-share-native{background:#7C3AED!important}
+    .forum-share-copy{background:#D4A017!important}
+    .forum-share-button[hidden]{display:none!important}
+    @media(max-width:640px){.forum-share-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.forum-share-button{width:100%}}
+  `;
+  document.head.appendChild(style);
+}
+
 const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[char]));
 
 export function updateSocialMeta({ title = '', description = '', url = window.location.href } = {}) {
+  ensureShareStyles();
   const cleanTitle = String(title).trim() || 'APEP Community Discussion';
   const cleanDescription = String(description).replace(/\s+/g, ' ').trim().slice(0, 240) || 'Join the conversation in the APEP Community.';
   const ensureMeta = (selector, attribute, value) => {
@@ -35,6 +60,7 @@ export function updateSocialMeta({ title = '', description = '', url = window.lo
 }
 
 export function renderShareBar({ title = '', url = window.location.href } = {}) {
+  ensureShareStyles();
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
   const links = {
@@ -49,6 +75,7 @@ export function renderShareBar({ title = '', url = window.location.href } = {}) 
 
 export function bindShareBar(root, { title = '', url = window.location.href } = {}) {
   if (!root) return;
+  ensureShareStyles();
   const nativeButton = root.querySelector('[data-share-native]');
   const status = root.querySelector('[data-share-status]');
 
