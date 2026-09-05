@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-labelledby="title desc">
+  <title id="title">APEP Community Forum</title>
+  <desc id="desc">Abstract illustration of people collaborating around an AI network.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071225"/><stop offset="1" stop-color="#123a78"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#63d5ff" stop-opacity=".55"/><stop offset="1" stop-color="#63d5ff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7e7b3"/><stop offset="1" stop-color="#c99732"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000" flood-opacity=".3"/></filter>
+  </defs>
+  <rect width="900" height="620" rx="38" fill="url(#bg)"/>
+  <circle cx="610" cy="260" r="250" fill="url(#glow)" filter="url(#blur)"/>
+  <g opacity=".16" stroke="#fff">
+    <path d="M470 105L790 105M430 160L850 160M390 215L880 215M390 270L880 270M390 325L880 325M430 380L850 380M470 435L790 435"/>
+    <path d="M510 70L510 480M565 55L565 500M620 45L620 510M675 55L675 500M730 70L730 480"/>
+  </g>
+  <g stroke="#63d5ff" stroke-width="2" opacity=".55" fill="none">
+    <path d="M570 220L455 145L385 260L490 370L650 420L770 300L700 170Z"/>
+    <path d="M455 145L700 170M385 260L770 300M490 370L650 420M570 220L770 300"/>
+  </g>
+  <g fill="#63d5ff">
+    <circle cx="570" cy="220" r="7"/><circle cx="455" cy="145" r="6"/><circle cx="385" cy="260" r="6"/><circle cx="490" cy="370" r="6"/><circle cx="650" cy="420" r="6"/><circle cx="770" cy="300" r="6"/><circle cx="700" cy="170" r="6"/>
+  </g>
+  <g filter="url(#shadow)">
+    <circle cx="610" cy="280" r="78" fill="#0b1c38" stroke="url(#gold)" stroke-width="3"/>
+    <circle cx="610" cy="280" r="54" fill="none" stroke="#63d5ff" stroke-width="2" opacity=".8"/>
+    <path d="M575 278c18-25 52-25 70 0M590 305c12 9 28 9 40 0M595 255h1M624 255h1" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <circle cx="610" cy="280" r="92" fill="none" stroke="#d7ad4f" stroke-opacity=".28" stroke-dasharray="5 12"/>
+  </g>
+  <g filter="url(#shadow)">
+    <circle cx="330" cy="360" r="34" fill="#d7ad4f"/>
+    <path d="M276 455c7-52 35-76 54-76s47 24 54 76" fill="#fff"/>
+    <circle cx="805" cy="390" r="32" fill="#63d5ff"/>
+    <path d="M755 480c8-48 31-70 50-70s42 22 50 70" fill="#fff"/>
+    <circle cx="760" cy="105" r="28" fill="#f7e7b3"/>
+    <path d="M718 175c7-42 25-58 42-58s36 16 43 58" fill="#fff"/>
+  </g>
+  <g fill="#fff" opacity=".92">
+    <circle cx="245" cy="170" r="10"/><circle cx="820" cy="210" r="9"/><circle cx="305" cy="535" r="8"/>
+  </g>
+  <g font-family="Arial,sans-serif" font-weight="800" letter-spacing="5" fill="#d7ad4f" opacity=".9">
+    <text x="58" y="550" font-size="16">APEP COMMUNITY</text>
+  </g>
+</svg>
