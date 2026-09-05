@@ -16,6 +16,25 @@ const REACTIONS = Object.freeze([
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[char]));
 const formatDate = (value) => new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+const initials = (name = '') => {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  return escapeHtml((parts.length > 1 ? `${parts[0][0]}${parts[parts.length - 1][0]}` : (parts[0]?.slice(0, 2) || 'CM')).toUpperCase());
+};
+const safeAvatarUrl = (value = '') => {
+  if (value === null || value === undefined || String(value).trim() === '') return '';
+  try {
+    const url = new URL(String(value), window.location.href);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+};
+const renderAuthor = (profile) => {
+  const name = String(profile?.full_name || '').trim() || 'Community member';
+  const safeName = escapeHtml(name);
+  const avatar = safeAvatarUrl(profile?.avatar_url);
+  return `<div class="forum-author" aria-label="Posted by ${safeName}">${avatar ? `<img class="forum-author-avatar" src="${escapeHtml(avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.nextElementSibling.hidden=false">` : ''}<span class="forum-author-avatar forum-author-avatar--initials"${avatar ? ' hidden' : ''} aria-hidden="true">${initials(name)}</span><span class="forum-author-name">${safeName}</span></div>`;
+};
 
 function sanitizePostHtml(html = '') {
   const template = document.createElement('template');
@@ -117,7 +136,7 @@ async function loadTopic() {
   const id = new URLSearchParams(window.location.search).get('id');
   if (!id) throw new Error('This discussion link is missing its topic ID.');
 
-  const { data: topic, error: topicError } = await supabase.from('forum_topics').select('id,title,status,is_pinned,view_count,created_at,updated_at,forum_categories(name),forum_posts(id,user_id,body,status,created_at,updated_at,parent_post_id)').eq('id', id).in('status', ['open', 'locked']).single();
+  const { data: topic, error: topicError } = await supabase.from('forum_topics').select('id,title,user_id,status,is_pinned,view_count,created_at,updated_at,forum_categories(name),forum_posts(id,user_id,body,status,created_at,updated_at,parent_post_id)').eq('id', id).in('status', ['open', 'locked']).single();
   if (topicError) throw topicError;
 
   document.title = `${topic.title} | APEP Community`;
@@ -125,7 +144,15 @@ async function loadTopic() {
   const { data: { user } } = await supabase.auth.getUser();
   const reactionState = await loadReactionState(posts.map((post) => post.id), user?.id || null);
 
-  root.innerHTML = `<p class="eyebrow">${escapeHtml(topic.forum_categories?.name || 'COMMUNITY')}</p><h1>${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</h1><div class="forum-topic-meta"><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div><div id="forum-topic-reaction-status" class="forum-reaction-status" role="status" aria-live="polite"></div><div class="forum-posts">${posts.length ? posts.map((post, index) => `<article class="forum-post"><div class="forum-post-number">#${index + 1}</div><div><p class="forum-post-meta">Community member · ${formatDate(post.created_at)}</p><div class="forum-post-body">${renderPostBody(post.body)}</div>${renderReactionBar(post.id, reactionState.counts.get(post.id) || {}, reactionState.mine.get(post.id) || new Set())}</div></article>`).join('') : '<div class="forum-empty">No visible posts are available for this discussion.</div>'}</div>`;
+  const authorIds = [...new Set([topic.user_id, ...posts.map((post) => post.user_id)].filter(Boolean))];
+  let profileMap = new Map();
+  if (authorIds.length) {
+    const { data: profiles, error: profileError } = await supabase.from('forum_public_profiles').select('id,full_name,avatar_url').in('id', authorIds);
+    if (profileError) console.warn('Forum member identity unavailable:', profileError);
+    profileMap = new Map((profiles || []).map((profile) => [profile.id, profile]));
+  }
+
+  root.innerHTML = `<p class="eyebrow">${escapeHtml(topic.forum_categories?.name || 'COMMUNITY')}</p><h1>${topic.is_pinned ? '📌 ' : ''}${escapeHtml(topic.title)}</h1><div class="forum-topic-meta"><span>${escapeHtml(topic.status)}</span><span>${topic.view_count || 0} views</span><time datetime="${topic.created_at}">${formatDate(topic.created_at)}</time></div><div id="forum-topic-reaction-status" class="forum-reaction-status" role="status" aria-live="polite"></div><div class="forum-posts">${posts.length ? posts.map((post, index) => `<article class="forum-post"><div class="forum-post-number">#${index + 1}</div><div><p class="forum-post-meta">${renderAuthor(profileMap.get(post.user_id))} <span aria-hidden="true">·</span> <time datetime="${post.created_at}">${formatDate(post.created_at)}</time></p><div class="forum-post-body">${renderPostBody(post.body)}</div>${renderReactionBar(post.id, reactionState.counts.get(post.id) || {}, reactionState.mine.get(post.id) || new Set())}</div></article>`).join('') : '<div class="forum-empty">No visible posts are available for this discussion.</div>'}</div>`;
 }
 
 root.addEventListener('click', (event) => {
