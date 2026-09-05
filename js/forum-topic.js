@@ -1,10 +1,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { FORUM_QA_CONFIG } from '../config/forum-qa-config.js';
+import { FORUM_CONFIG } from '../config/forum-config.js';
 
-const supabase = createClient(FORUM_QA_CONFIG.url, FORUM_QA_CONFIG.publishableKey);
+const supabase = createClient(FORUM_CONFIG.url, FORUM_CONFIG.publishableKey, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 const root = document.querySelector('#forum-topic');
 
-const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[char]));
+const escapeHtml = (value = '') => String(value).replace(/[&<>\"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[char]));
 const formatDate = (value) => new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 
 async function loadTopic() {
