@@ -1,0 +1,15 @@
+APEP AI TOOL EVALUATION CHECKLIST
+
+Purpose: What specific problem does the tool solve?
+Fit: Does it match the workflow and user skill level?
+Evidence: Is there credible evidence of useful performance?
+Accuracy: How are outputs checked?
+Privacy: What data is collected or retained?
+Security: What access and permissions are required?
+Cost: What is the total cost at expected usage?
+Reliability: What happens when the service fails?
+Portability: Can work be exported or migrated?
+Governance: Who owns the decision and output?
+
+DECISION: Adopt / Pilot / Monitor / Reject
+REASON:
