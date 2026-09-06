@@ -1,15 +1,70 @@
-APEP AI TOOL EVALUATION CHECKLIST
+APEP TECHNOLOGY DUE-DILIGENCE CHECKLIST v2.0
+Decision-grade AI product evaluation
+Review date: September 2026
 
-Purpose: What specific problem does the tool solve?
-Fit: Does it match the workflow and user skill level?
-Evidence: Is there credible evidence of useful performance?
-Accuracy: How are outputs checked?
-Privacy: What data is collected or retained?
-Security: What access and permissions are required?
-Cost: What is the total cost at expected usage?
-Reliability: What happens when the service fails?
-Portability: Can work be exported or migrated?
-Governance: Who owns the decision and output?
+INSTRUCTIONS
+Evaluate the product against the intended business job, not its popularity. Record evidence for every material conclusion. If evidence is insufficient, mark UNKNOWN rather than assuming.
 
-DECISION: Adopt / Pilot / Monitor / Reject
-REASON:
+A. BUSINESS CASE
+[ ] Problem and desired outcome are explicitly defined
+[ ] Current process/baseline is documented
+[ ] Target users and owner are identified
+[ ] Alternative tools/processes have been considered
+[ ] Expected value can be measured
+
+B. CAPABILITY VALIDATION
+[ ] Representative test cases prepared
+[ ] Output quality tested against acceptance criteria
+[ ] Edge cases/failure modes tested
+[ ] Important limitations documented
+[ ] Human review requirement defined
+
+C. DATA / PRIVACY
+[ ] Data categories entering the system are classified
+[ ] Sensitive/confidential data policy reviewed
+[ ] Retention/deletion terms reviewed
+[ ] Training/use-of-input policy reviewed
+[ ] Data residency or jurisdiction requirements considered
+
+D. SECURITY / ACCESS
+[ ] Authentication and access controls reviewed
+[ ] Required permissions are understood
+[ ] Integration/API exposure assessed
+[ ] Account recovery/admin controls assessed
+[ ] Organisational security requirements satisfied
+
+E. OPERATIONS
+[ ] Reliability/service dependency assessed
+[ ] Export/portability path identified
+[ ] Failure/rollback procedure defined
+[ ] Vendor dependency and lock-in considered
+[ ] Support/escalation path identified
+
+F. COMMERCIAL
+[ ] Current pricing/usage model verified from official source
+[ ] Expected usage cost estimated
+[ ] Additional integration/storage costs considered
+[ ] Cancellation/switching implications understood
+
+G. GOVERNANCE
+[ ] Accountable owner assigned
+[ ] Acceptable-use boundaries defined
+[ ] Audit/evidence requirements defined
+[ ] Review cadence established
+[ ] Approval authority identified
+
+DECISION RECORD
+Tool: ______________________________________
+Business job: _______________________________
+Owner: _____________________________________
+Risk class: Low / Moderate / High / Critical
+Evidence reviewed: __________________________
+Key strengths: _______________________________
+Key limitations: _____________________________
+Required controls: ___________________________
+Decision: ADOPT / PILOT / MONITOR / REJECT
+Decision rationale: __________________________
+Next review date: ____________________________
+
+APEP STANDARD
+A tool earns adoption through demonstrated fitness, controlled risk and measurable value—not hype, novelty or popularity.

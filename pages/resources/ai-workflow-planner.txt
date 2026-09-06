@@ -1,19 +1,69 @@
-APEP AI WORKFLOW PLANNER
+APEP AI WORKFLOW DESIGN & GOVERNANCE WORKBOOK v2.0
 
-Workflow name:
-Business goal:
-Current manual process:
-Inputs required:
-AI task(s):
-Human decision/checkpoint:
-Expected output:
-Quality criteria:
-Failure risks:
-Data/privacy considerations:
-Tools involved:
-Owner:
-Frequency:
-Time saved target:
-Review date:
+PURPOSE
+Design an AI-assisted workflow from business outcome through controls, acceptance testing and ongoing ownership. Do not automate a process merely because a tool can perform part of it.
 
-DESIGN RULE: automate repeatable work only after the process and quality standard are understood.
+1. OUTCOME DEFINITION
+Workflow name: ______________________________________
+Business objective: ___________________________________
+Customer/user affected: ______________________________
+Current baseline (time/cost/quality): __________________
+Target improvement: __________________________________
+Process owner: _______________________________________
+
+2. PROCESS MAP
+Trigger: _____________________________________________
+Inputs: ______________________________________________
+Step 1: ______________________________________________
+Step 2: ______________________________________________
+AI intervention: ______________________________________
+Human decision/checkpoint: ____________________________
+Final output: _________________________________________
+Exception path: _______________________________________
+
+3. AI ROLE
+AI performs: __________________________________________
+AI must not perform: __________________________________
+Required context/sources: _____________________________
+Output format/schema: __________________________________
+
+4. CONTROL DESIGN
+[ ] Input validation
+[ ] Output validation
+[ ] Human approval
+[ ] Access restriction
+[ ] Sensitive-data control
+[ ] Audit trail
+[ ] Error handling
+[ ] Rollback/manual fallback
+
+5. ACCEPTANCE TEST
+Representative cases: _________________________________
+Edge cases: ___________________________________________
+Accuracy threshold: ____________________________________
+Quality threshold: _____________________________________
+Maximum acceptable failure rate: _______________________
+Test owner: ___________________________________________
+
+6. OPERATING MODEL
+Tools/systems: ________________________________________
+Integration dependencies: ______________________________
+Expected frequency/volume: ____________________________
+Estimated time/cost impact: ____________________________
+Monitoring metric: ____________________________________
+Review cadence: _______________________________________
+
+7. RISK REGISTER
+Risk: __________________ Impact: ______ Likelihood: ____
+Control: ______________________________________________
+Risk owner: ___________________________________________
+
+8. RELEASE DECISION
+Status: DESIGN / PILOT / APPROVED / REJECTED / RETIRE
+Evidence attached: ____________________________________
+Approval authority: ____________________________________
+Approval date: ________________________________________
+Next review: __________________________________________
+
+GOVERNANCE PRINCIPLE
+Standardise the process before automating it. Preserve accountable human ownership wherever errors can materially affect people, money, security, reputation or compliance.
