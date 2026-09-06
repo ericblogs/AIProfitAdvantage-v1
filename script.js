@@ -27,14 +27,14 @@ function initializePublicNavigationLinks() {
   if (!navigation || navigation.closest('.dashboard-layout')) return;
 
   const destinations = {
-    Home: '/index.html', About: '/pages/about.html', Courses: '/index.html#courses', Services: '/pages/services.html', Resources: '/pages/resources.html', Community: '/pages/community.html', Store: '/pages/store.html', Blog: '/pages/blog.html', Contact: '/pages/contact.html', Login: '/login.html', Register: '/auth/register.html', 'Get Started': '/index.html#pricing'
+    Home: '/index.html', About: '/pages/about.html', Courses: '/index.html#courses', Services: '/pages/services.html', Resources: '/pages/resources.html', Community: '/pages/community.html', Store: '/pages/store.html', Blog: '/pages/blog.html', Contact: '/pages/contact.html', Login: '/login.html', Register: '/auth/register.html', 'Get Started': '/index.html#pricing', 'Explore Courses': '/index.html#courses'
   };
 
   const links = navigation.querySelectorAll('a');
   links.forEach((link) => { const label = link.textContent.trim(); const destination = destinations[label]; if (destination) link.setAttribute('href', destination); });
 
   if (!navigation.querySelector('a[href="/auth/register.html"]')) {
-    const getStarted = Array.from(links).find((link) => link.textContent.trim() === 'Get Started');
+    const getStarted = Array.from(links).find((link) => link.textContent.trim() === 'Get Started' || link.textContent.trim() === 'Explore Courses');
     const register = document.createElement('a'); register.className = 'nav-cta'; register.href = '/auth/register.html'; register.textContent = 'Register';
     if (getStarted) navigation.insertBefore(register, getStarted); else navigation.appendChild(register);
   }
@@ -64,11 +64,21 @@ function initializePublicFooter() {
   const currentYear = new Date().getFullYear();
   const isRoot = window.location.pathname === '/' || window.location.pathname === '/index.html';
   const base = isRoot ? '' : '../';
-  footer.innerHTML = `<div class="container footer-top"><a class="brand brand-footer" href="${base}index.html" aria-label="AI Profit Advantage home"><span class="brand-mark" aria-hidden="true">AI</span><span class="brand-wordmark" aria-hidden="true">AI Profit Advantage</span></a><p>AI Profit Advantage Enterprise Platform (APEP) provides practical AI education, consulting, automation and digital growth guidance for learners, professionals, entrepreneurs and organizations.</p><nav aria-label="Footer navigation"><a href="${base}index.html#courses">Courses</a><a href="${base}pages/about.html">About</a><a href="${base}pages/resources.html">Resources</a><a href="${base}pages/community.html">Community</a><a href="${base}pages/store.html">Store</a><a href="${base}pages/blog.html">Blog</a><a href="${base}pages/contact.html">Contact</a><a href="${base}pages/privacy-policy.html">Privacy Policy</a><a href="${base}pages/terms.html">Terms of Use</a><a href="${base}pages/cookie-policy.html">Cookie Policy</a><a href="${base}pages/forum.html">Forum</a><a href="${base}pages/disclaimer.html">Disclaimer</a></nav></div><div class="container footer-bottom"><p>© <span id="current-year">${currentYear}</span> AI Profit Advantage Enterprise Platform (APEP). All rights reserved.</p><a href="${isRoot ? '#top' : base + 'index.html#top'}">Back to top ↑</a></div>`;
+  footer.innerHTML = `<div class="container footer-top"><a class="brand brand-footer" href="${base}index.html" aria-label="AI Profit Advantage home"><span class="brand-mark" aria-hidden="true">AI</span><span class="brand-wordmark" aria-hidden="true">AI Profit Advantage</span></a><p>AI Profit Advantage Enterprise Platform (APEP) provides practical AI education, consulting, automation and digital growth guidance for learners, professionals, entrepreneurs and organizations.</p><nav aria-label="Footer navigation"><a href="${base}index.html#courses">Courses</a><a href="${base}pages/about.html">About</a><a href="${base}pages/resources.html">Resources</a><a href="${base}pages/community.html">Community</a><a href="${base}pages/store.html">Store</a><a href="${base}pages/blog.html">Blog</a><a href="${base}pages/contact.html">Contact</a><a href="${base}pages/privacy-policy.html">Privacy Policy</a><a href="${base}pages/terms.html">Terms of Use</a><a href="${base}pages/cookie-policy.html">Cookie Policy</a><a href="${base}pages/forum.html">Forum</a><a href="${base}pages/disclaimer.html">Disclaimer</a></nav></div><div class="container footer-bottom"><p>© ${currentYear} AI Profit Advantage Enterprise Platform (APEP). All rights reserved.</p><a href="${isRoot ? '#top' : base + 'index.html#top'}">Back to top ↑</a></div>`;
+}
+
+function initializeHomepageEnterpriseStyles() {
+  const isRoot = window.location.pathname === '/' || window.location.pathname === '/index.html';
+  if (!isRoot || document.getElementById('homepage-enterprise-styles')) return;
+  const link = document.createElement('link');
+  link.id = 'homepage-enterprise-styles';
+  link.rel = 'stylesheet';
+  link.href = '/css/homepage-enterprise.css';
+  document.head.appendChild(link);
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => { initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter(); }, { once: true });
+  document.addEventListener('DOMContentLoaded', () => { initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter(); initializeHomepageEnterpriseStyles(); }, { once: true });
 } else {
-  initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter();
+  initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter(); initializeHomepageEnterpriseStyles();
 }
