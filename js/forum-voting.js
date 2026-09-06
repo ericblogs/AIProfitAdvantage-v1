@@ -28,21 +28,17 @@ export function bindGovernanceEngagement(root) {
     const status = panel.querySelector('.forum-vote-status');
     const { data:{user} } = await supabase.auth.getUser();
     if (!user) { const next = `${window.location.pathname}${window.location.search}`; window.location.href=`../auth/login.html?next=${encodeURIComponent(next)}`; return; }
+    button.disabled = true;
+    if (status) status.textContent = 'Saving vote…';
     try {
-      const { data: current, error: currentError } = await supabase.from('forum_topic_votes').select('vote').eq('topic_id',topicId).eq('user_id',user.id).maybeSingle();
-      if (currentError) throw currentError;
-      if (current?.vote === vote) {
-        const { error } = await supabase.from('forum_topic_votes').delete().eq('topic_id',topicId).eq('user_id',user.id);
-        if(error) throw error;
-      } else if (current) {
-        const { error } = await supabase.from('forum_topic_votes').update({ vote }).eq('topic_id',topicId).eq('user_id',user.id);
-        if(error) throw error;
-      } else {
-        const { error } = await supabase.from('forum_topic_votes').insert({ topic_id: topicId, user_id: user.id, vote });
-        if(error) throw error;
-      }
+      const { error } = await supabase.rpc('cast_forum_topic_vote', { p_topic_id: topicId, p_vote: vote });
+      if (error) throw error;
       window.location.reload();
-    } catch (error) { console.error('Forum vote failed', error); if(status) status.textContent='Your vote could not be saved. Please try again.'; }
+    } catch (error) {
+      console.error('Forum vote failed', error);
+      if (status) status.textContent = error?.message || 'Your vote could not be saved. Please try again.';
+      button.disabled = false;
+    }
   }));
 
   root.querySelectorAll('.forum-poll-panel').forEach(panel => panel.querySelector('.forum-poll-submit')?.addEventListener('click', async () => {
