@@ -6,9 +6,12 @@ const esc = (v='') => String(v).replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt
 
 export async function renderGovernanceEngagement(topicId) {
   if (!topicId) return '';
+  const { data: { user } } = await supabase.auth.getUser();
   const [{ data: counts }, { data: mine }, { data: poll }] = await Promise.all([
     supabase.from('forum_topic_vote_counts').select('upvotes,downvotes,score').eq('topic_id', topicId).maybeSingle(),
-    supabase.from('forum_topic_votes').select('vote').eq('topic_id', topicId).maybeSingle(),
+    user
+      ? supabase.from('forum_topic_votes').select('vote').eq('topic_id', topicId).eq('user_id', user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
     supabase.from('forum_polls').select('id,question,is_multiple_choice,is_anonymous,status,closes_at,forum_poll_options(id,option_text,display_order)').eq('topic_id', topicId).maybeSingle()
   ]);
   const score = Number(counts?.score || 0);
@@ -26,17 +29,26 @@ export function bindGovernanceEngagement(root) {
     const { data:{user} } = await supabase.auth.getUser();
     if (!user) { const next = `${window.location.pathname}${window.location.search}`; window.location.href=`../auth/login.html?next=${encodeURIComponent(next)}`; return; }
     try {
-      const { data: current } = await supabase.from('forum_topic_votes').select('vote').eq('topic_id',topicId).eq('user_id',user.id).maybeSingle();
-      if (current?.vote === vote) { const { error } = await supabase.from('forum_topic_votes').delete().eq('topic_id',topicId).eq('user_id',user.id); if(error) throw error; }
-      else { const { error } = await supabase.from('forum_topic_votes').upsert({topic_id:topicId,user_id:user.id,vote},{onConflict:'topic_id,user_id'}); if(error) throw error; }
+      const { data: current, error: currentError } = await supabase.from('forum_topic_votes').select('vote').eq('topic_id',topicId).eq('user_id',user.id).maybeSingle();
+      if (currentError) throw currentError;
+      if (current?.vote === vote) {
+        const { error } = await supabase.from('forum_topic_votes').delete().eq('topic_id',topicId).eq('user_id',user.id);
+        if(error) throw error;
+      } else if (current) {
+        const { error } = await supabase.from('forum_topic_votes').update({ vote }).eq('topic_id',topicId).eq('user_id',user.id);
+        if(error) throw error;
+      } else {
+        const { error } = await supabase.from('forum_topic_votes').insert({ topic_id: topicId, user_id: user.id, vote });
+        if(error) throw error;
+      }
       window.location.reload();
-    } catch (error) { console.error(error); if(status) status.textContent='Your vote could not be saved. Please try again.'; }
+    } catch (error) { console.error('Forum vote failed', error); if(status) status.textContent='Your vote could not be saved. Please try again.'; }
   }));
 
   root.querySelectorAll('.forum-poll-panel').forEach(panel => panel.querySelector('.forum-poll-submit')?.addEventListener('click', async () => {
     const pollId = panel.dataset.forumPoll; const selected=[...panel.querySelectorAll('input:checked')].map(i=>i.value); const status=panel.querySelector('.forum-poll-status');
     if(!selected.length){status.textContent='Select an option first.';return;}
     const {data:{user}}=await supabase.auth.getUser(); if(!user){const next=`${window.location.pathname}${window.location.search}`;window.location.href=`../auth/login.html?next=${encodeURIComponent(next)}`;return;}
-    try { const {error}=await supabase.from('forum_poll_votes').insert(selected.map(option_id=>({poll_id,option_id,user_id:user.id}))); if(error) throw error; status.textContent='Vote recorded. Thank you for participating.'; panel.querySelector('.forum-poll-submit').disabled=true; panel.querySelectorAll('input').forEach(i=>i.disabled=true); } catch(error){console.error(error);status.textContent=error.message.includes('already voted')?'You have already voted in this poll.':'Your poll vote could not be saved. Please try again.';}
+    try { const {error}=await supabase.from('forum_poll_votes').insert(selected.map(option_id=>({poll_id,option_id,user_id:user.id}))); if(error) throw error; status.textContent='Vote recorded. Thank you for participating.'; panel.querySelector('.forum-poll-submit').disabled=true; panel.querySelectorAll('input').forEach(i=>i.disabled=true); } catch(error){console.error(error);status.textContent=error.message.includes('already voted')?'You have already voted in this poll.':'Your poll vote could not be saved.';}
   }));
 }
