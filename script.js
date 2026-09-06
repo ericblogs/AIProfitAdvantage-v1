@@ -77,8 +77,10 @@ function initializeHomepageEnterpriseStyles() {
   document.head.appendChild(link);
 }
 
+initializeHomepageEnterpriseStyles();
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => { initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter(); initializeHomepageEnterpriseStyles(); }, { once: true });
+  document.addEventListener('DOMContentLoaded', () => { initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter(); }, { once: true });
 } else {
-  initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter(); initializeHomepageEnterpriseStyles();
+  initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter();
 }
