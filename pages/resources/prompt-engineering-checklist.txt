@@ -1,0 +1,12 @@
+APEP PROMPT ENGINEERING CHECKLIST
+
+1. Define the task and desired outcome.
+2. Identify the audience and context.
+3. Provide authoritative source material when available.
+4. Specify constraints, exclusions and assumptions.
+5. Define the desired format, length and tone.
+6. Ask for missing information to be identified.
+7. Request an evaluation or quality check where appropriate.
+8. Review the output and refine the instruction.
+
+Professional rule: clearer inputs plus explicit success criteria usually produce more useful outputs.

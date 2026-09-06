@@ -1,0 +1,20 @@
+APEP AI BUSINESS OPPORTUNITY CANVAS
+
+Customer segment:
+Pain/problem:
+Current alternative:
+AI capability used:
+Human value added:
+Proposed service/product:
+Proof of demand:
+Delivery workflow:
+Required tools:
+Estimated delivery cost:
+Target price:
+Differentiator:
+Risks/constraints:
+First validation experiment:
+Success metric:
+Next decision:
+
+RULE: validate a painful customer problem before investing heavily in the technology.

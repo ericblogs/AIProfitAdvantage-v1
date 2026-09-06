@@ -1,0 +1,19 @@
+APEP AI WORKFLOW PLANNER
+
+Workflow name:
+Business goal:
+Current manual process:
+Inputs required:
+AI task(s):
+Human decision/checkpoint:
+Expected output:
+Quality criteria:
+Failure risks:
+Data/privacy considerations:
+Tools involved:
+Owner:
+Frequency:
+Time saved target:
+Review date:
+
+DESIGN RULE: automate repeatable work only after the process and quality standard are understood.
