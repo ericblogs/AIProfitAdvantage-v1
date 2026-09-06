@@ -48,3 +48,5 @@ export function bindGovernanceEngagement(root) {
     try { const {error}=await supabase.from('forum_poll_votes').insert(selected.map(option_id=>({poll_id,option_id,user_id:user.id}))); if(error) throw error; status.textContent='Vote recorded. Thank you for participating.'; panel.querySelector('.forum-poll-submit').disabled=true; panel.querySelectorAll('input').forEach(i=>i.disabled=true); } catch(error){console.error(error);status.textContent=error.message.includes('already voted')?'You have already voted in this poll.':'Your poll vote could not be saved.';}
   }));
 }
+
+// Deployment reconciliation marker: authenticated RPC vote path is production-authoritative.
