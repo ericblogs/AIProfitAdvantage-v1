@@ -1,0 +1,40 @@
+name: One-time PayPal SDK patch
+
+on:
+  push:
+    branches:
+      - feat/paypal-client-id-integration
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add PayPal SDK client ID
+        env:
+          PAYPAL_CLIENT_ID: BAO_Bk9tGyyfMWIF0_LAurq6LPSjYHvjkXsinz20GFY6fe4nx7D0GYE0hxw8tKyKJvWLzW13lm3FovlG3g
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('pages/store.html')
+          text = p.read_text(encoding='utf-8')
+          marker = '<script src="https://www.paypal.com/sdk/js?client-id='
+          if marker not in text:
+              sdk = f'<script src="https://www.paypal.com/sdk/js?client-id={__import__("os").environ["PAYPAL_CLIENT_ID"]}&currency=USD&components=buttons"></script>'
+              text = text.replace('</head>', sdk + '\n</head>', 1)
+              p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit storefront change and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/one-time-paypal-sdk-patch.yml
+          git add pages/store.html .github/workflows/one-time-paypal-sdk-patch.yml
+          git diff --cached --quiet || git commit -m "feat: enable PayPal checkout on APEP store"
+          git push
