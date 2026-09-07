@@ -86,7 +86,7 @@ if (document.readyState === 'loading') {
   initializeApplication(); initializePublicNavigationLinks(); initializePublicFooter();
 }
 
-/* APEP Learning Store enhancement: resilient product covers + complete product information. */
+/* APEP Learning Store enhancement: resilient product covers + complete product information + social sharing. */
 function initializeLearningStoreEnhancements() {
   const grid = document.getElementById('apep-products-grid');
   if (!grid) return;
@@ -104,14 +104,21 @@ function initializeLearningStoreEnhancements() {
       .apep-cover-title{font-size:clamp(30px,4vw,48px);line-height:1.02;font-weight:800;max-width:85%;position:relative;z-index:1}
       .apep-cover-subtitle{font-size:20px;font-weight:700;color:#F4D58D;margin-top:10px;position:relative;z-index:1}
       .apep-cover-footer{font-size:12px;color:rgba(255,255,255,.72);position:relative;z-index:1}
-      .apep-product-description-full{font-size:14px;color:#555;line-height:1.65;margin:0}
+      .apep-product-description-full{font-size:14px;color:#555;line-height:1.65;margin:0;white-space:pre-line}
       .apep-product-includes{margin:2px 0 0;padding:14px 16px;border:1px solid #E8E8E8;border-radius:10px;background:#FAFAFA}
       .apep-product-includes strong{display:block;color:#2B3A55;margin-bottom:8px}
       .apep-product-includes ul{margin:0;padding-left:18px;color:#555;line-height:1.6}
-      .apep-product-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px}
+      .apep-product-meta-share{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:4px}
+      .apep-product-meta{display:flex;flex-wrap:wrap;gap:7px;min-width:0}
       .apep-product-meta span{font-size:12px;font-weight:600;padding:6px 9px;border-radius:999px;background:#F4F0E6;color:#6D531F}
+      .apep-product-share{display:flex;align-items:center;gap:5px;margin-left:auto}
+      .apep-product-share-label{font-size:11px;font-weight:700;color:#7A8494;margin-right:2px;white-space:nowrap}
+      .apep-share-btn{width:30px;height:30px;padding:0;border:1px solid #DDE3EC;border-radius:50%;background:#fff;color:#2B3A55;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;line-height:1;cursor:pointer;text-decoration:none;transition:all .18s ease}
+      .apep-share-btn:hover{transform:translateY(-1px);border-color:#B8C5D8;background:#F7F9FC}
+      .apep-share-btn.facebook{color:#1877F2}.apep-share-btn.whatsapp{color:#168C4B}.apep-share-btn.linkedin{color:#0A66C2}.apep-share-btn.x{color:#111}.apep-share-btn.copy{color:#6D531F}
       .apep-product-note{font-size:12px;color:#777;margin:0}
       .apep-btn-paystack{min-height:46px}
+      @media(max-width:620px){.apep-product-meta-share{align-items:flex-start}.apep-product-share{margin-left:0}.apep-product-share-label{font-size:10px}.apep-share-btn{width:29px;height:29px}}
     `;
     document.head.appendChild(style);
   }
@@ -137,6 +144,55 @@ function initializeLearningStoreEnhancements() {
     image.replaceWith(fallback);
   }
 
+  function getProductShareUrl(detail) {
+    const url = new URL(window.location.href);
+    url.search = '';
+    url.hash = `product-${detail?.id || ''}`;
+    if (detail?.slug) url.searchParams.set('product', detail.slug);
+    return url.toString();
+  }
+
+  function addProductSharing(body, detail) {
+    if (!body || body.querySelector('.apep-product-meta-share')) return;
+    const meta = body.querySelector('.apep-product-meta');
+    if (!meta) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'apep-product-meta-share';
+    meta.parentNode.insertBefore(wrapper, meta);
+    wrapper.appendChild(meta);
+
+    const share = document.createElement('div');
+    share.className = 'apep-product-share';
+    share.setAttribute('aria-label', `Share ${detail?.title || 'this product'}`);
+    const shareUrl = getProductShareUrl(detail);
+    const shareTitle = detail?.title || 'AI Profit Advantage digital product';
+    const shareText = `${shareTitle} — practical digital resources from AI Profit Advantage.`;
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedText = encodeURIComponent(shareText);
+    share.innerHTML = `
+      <span class="apep-product-share-label">Share</span>
+      <a class="apep-share-btn facebook" href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" title="Share on Facebook">f</a>
+      <a class="apep-share-btn whatsapp" href="https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp" title="Share on WhatsApp">WA</a>
+      <a class="apep-share-btn linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" title="Share on LinkedIn">in</a>
+      <a class="apep-share-btn x" href="https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}" target="_blank" rel="noopener noreferrer" aria-label="Share on X" title="Share on X">X</a>
+      <button type="button" class="apep-share-btn copy" aria-label="Copy product link" title="Copy product link">↗</button>
+    `;
+    wrapper.appendChild(share);
+
+    const copyButton = share.querySelector('.copy');
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        copyButton.textContent = '✓';
+        copyButton.title = 'Link copied';
+        setTimeout(() => { copyButton.textContent = '↗'; copyButton.title = 'Copy product link'; }, 1600);
+      } catch {
+        window.prompt('Copy this product link:', shareUrl);
+      }
+    });
+  }
+
   function enhanceCard(card, detail) {
     if (!card) return;
 
@@ -150,6 +206,7 @@ function initializeLearningStoreEnhancements() {
 
     if (!detail || card.dataset.apepDetailsEnhanced === 'true') return;
     card.dataset.apepDetailsEnhanced = 'true';
+    card.id = `product-${detail.id}`;
     const body = card.querySelector('.apep-product-body');
     const desc = card.querySelector('.apep-product-desc');
     if (!body) return;
@@ -170,6 +227,8 @@ function initializeLearningStoreEnhancements() {
       const price = body.querySelector('.apep-product-price');
       if (price) price.before(meta); else body.appendChild(meta);
     }
+
+    addProductSharing(body, detail);
 
     if (/prompt vault/i.test(detail.title || '') && !body.querySelector('.apep-product-includes')) {
       const includes = document.createElement('div');
@@ -241,6 +300,13 @@ function initializeLearningStoreEnhancements() {
       const image = card.querySelector('.apep-product-cover');
       if (image && image.complete && image.naturalWidth === 0) addCoverFallback(card);
     });
+    const requestedSlug = new URLSearchParams(window.location.search).get('product');
+    if (requestedSlug) {
+      const requested = [...details.values()].find((item) => item.slug === requestedSlug);
+      if (requested) {
+        requestAnimationFrame(() => document.getElementById(`product-${requested.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+      }
+    }
   });
 }
 
