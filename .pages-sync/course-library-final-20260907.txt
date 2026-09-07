@@ -1,0 +1,3 @@
+Course Library final source marker.
+Approved artwork sprite payload is served from the verified course-library-sprite.svg asset.
+Scope: Course Library artwork only.
