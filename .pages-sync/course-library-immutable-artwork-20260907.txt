@@ -1,0 +1,3 @@
+Course Library immutable artwork deployment marker.
+Purpose: force the existing GitHub Pages publisher to rebuild main after the approved Course Library sprite was moved to an immutable asset path.
+Scope: Course Library artwork only.
