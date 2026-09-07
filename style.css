@@ -167,3 +167,14 @@ html{scroll-behavior:auto}
 .apep-store-subheading{margin-bottom:28px}
 @media(max-width:900px){.apep-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.apep-products-grid{grid-template-columns:1fr;gap:18px}.apep-product-cover{width:130px!important;height:174px!important;margin-top:18px}.apep-product-body{padding:16px 18px 18px}.apep-buy-row{align-items:stretch}.apep-paypal-container{width:200px}.apep-store-section{padding-inline:16px}}
+
+/* APEP social sharing: recognisable, premium icon treatment without external icon dependencies. */
+.apep-product-share .apep-share-btn{font-size:0!important;position:relative;overflow:hidden}
+.apep-product-share .apep-share-btn::before{display:block;font-family:Arial,sans-serif;font-size:14px;font-weight:800;line-height:1}
+.apep-product-share .apep-share-btn.facebook::before{content:"f"}
+.apep-product-share .apep-share-btn.whatsapp::before{content:"◔";font-size:17px}
+.apep-product-share .apep-share-btn.linkedin::before{content:"in";font-size:12px}
+.apep-product-share .apep-share-btn.x::before{content:"X";font-size:13px}
+.apep-product-share .apep-share-btn.copy::before{content:"↗";font-size:16px}
+.apep-product-share .apep-share-btn:hover{box-shadow:0 4px 12px rgba(19,44,90,.10)}
+.apep-product-share .apep-share-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
