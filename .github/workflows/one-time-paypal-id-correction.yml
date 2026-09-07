@@ -1,0 +1,33 @@
+name: One-time PayPal client ID correction
+
+on:
+  push:
+    branches:
+      - feat/paypal-client-id-integration
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Correct PayPal client ID
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('pages/store.html')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace('BAO_Bk9tGyyfMWIF0_LAurq6LPSjYHvjkXsinz20GFY6fe4nx7D0GYE0hxw8tKyKJvWLzW13lm3FovlG3g', 'BAAoBk9tGyyfMWIF0_LAurq6LPSjYHvjkXsinz20GFY6fe4nx7D0GYE0hxw8tKyKJvWLzW13lm3FovlG3g')
+          p.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit storefront correction and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/one-time-paypal-id-correction.yml
+          git add pages/store.html .github/workflows/one-time-paypal-id-correction.yml
+          git commit -m "fix: correct PayPal client ID"
+          git push
