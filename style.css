@@ -178,3 +178,20 @@ html{scroll-behavior:auto}
 .apep-product-share .apep-share-btn.copy::before{content:"↗";font-size:16px}
 .apep-product-share .apep-share-btn:hover{box-shadow:0 4px 12px rgba(19,44,90,.10)}
 .apep-product-share .apep-share-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* Final storefront spacing pass: preserve all content and functionality while reducing unused whitespace. */
+.apep-store-section{padding:32px 18px 44px!important}
+.apep-store-subheading{margin-bottom:18px!important}
+.apep-products-grid{gap:16px!important;align-items:start!important}
+.apep-product-card{height:auto!important;min-height:0!important;align-self:start!important;display:block!important}
+.apep-product-cover{width:132px!important;height:176px!important;margin:14px auto 0!important}
+.apep-product-body{padding:14px 16px 16px!important;gap:6px!important;display:block!important}
+.apep-product-title{font-size:17px!important;line-height:1.28!important;margin:0 0 6px!important}
+.apep-product-desc{font-size:13px!important;line-height:1.45!important;-webkit-line-clamp:7!important;margin:0!important}
+.apep-product-price{font-size:18px!important;margin-top:7px!important;padding-top:8px!important}
+.apep-buy-row{gap:6px!important;margin-top:5px!important}
+.apep-btn-paystack,.apep-download-btn{min-height:38px!important;height:38px!important;padding:8px 12px!important;font-size:12.5px!important}
+.apep-paypal-container{min-height:38px!important;height:38px!important;width:205px!important}
+.apep-product-share{margin-top:6px!important}
+@media(max-width:900px){.apep-products-grid{gap:14px!important}}
+@media(max-width:620px){.apep-store-section{padding:24px 12px 36px!important}.apep-products-grid{gap:14px!important}.apep-product-cover{width:124px!important;height:165px!important;margin-top:12px!important}.apep-product-body{padding:13px 14px 15px!important}.apep-product-title{font-size:16px!important}.apep-product-desc{font-size:12.8px!important;line-height:1.42!important;-webkit-line-clamp:7!important}}
