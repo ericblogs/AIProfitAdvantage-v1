@@ -1,4 +1,5 @@
 import { RELEASE_CONFIG } from '../../config/release-config.js';
+import './store-catalogue.js';
 
 export function initializeReleaseMetadata() {
   document.documentElement.dataset.release = RELEASE_CONFIG.release;
