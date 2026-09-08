@@ -14,8 +14,8 @@ function injectStoreCatalogueStyles(){
     #apep-products-grid .apep-product-title{font-size:17px!important;line-height:1.25!important;margin:0 0 6px!important;min-height:43px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
     #apep-products-grid .apep-product-description-full,#apep-products-grid .apep-product-desc{position:relative!important;font-size:12.9px!important;line-height:1.45!important;margin:0!important;max-height:112px;overflow:hidden!important;padding-bottom:28px!important}
     #apep-products-grid .apep-product-description-full.is-expanded,#apep-products-grid .apep-product-desc.is-expanded{max-height:none!important;overflow:visible!important;padding-bottom:0!important}
-    #apep-products-grid .apep-read-more-wrap{margin:0 0 8px!important;min-height:28px;display:flex;align-items:flex-start}
-    #apep-products-grid .apep-read-more{appearance:none;border:1px solid #1266ed!important;background:#1266ed!important;color:#fff!important;border-radius:7px!important;padding:5px 9px!important;font:700 11px/1.2 "DM Sans",Arial,sans-serif!important;cursor:pointer!important;box-shadow:0 3px 8px rgba(18,102,237,.16);transition:transform .18s ease,background .18s ease!important}
+    #apep-products-grid .apep-read-more-wrap{width:100%!important;margin:0 0 8px!important;min-height:28px;display:flex;align-items:flex-start;justify-content:center!important;text-align:center!important}
+    #apep-products-grid .apep-read-more{appearance:none;border:1px solid #1266ed!important;background:#1266ed!important;color:#fff!important;border-radius:7px!important;padding:5px 12px!important;margin:0 auto!important;font:700 11px/1.2 "DM Sans",Arial,sans-serif!important;cursor:pointer!important;box-shadow:0 3px 8px rgba(18,102,237,.16);transition:transform .18s ease,background .18s ease!important}
     #apep-products-grid .apep-read-more:hover{background:#0b53c7!important;transform:translateY(-1px)!important}
     #apep-products-grid .apep-product-description-full.is-expanded + .apep-read-more-wrap{margin-top:5px!important}
     #apep-products-grid .apep-product-meta-share{margin-top:3px!important}
