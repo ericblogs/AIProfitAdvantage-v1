@@ -1,78 +1,23 @@
-const STORE_SELECTOR='#apep-learning-store';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { SUPABASE_CONFIG } from '../../config/supabase-config.js';
 
-function injectStoreCatalogueStyles(){
-  if(document.getElementById('apep-store-catalogue-styles')) return;
-  const style=document.createElement('style');
-  style.id='apep-store-catalogue-styles';
-  style.textContent=`
-    #apep-learning-store{padding-top:30px!important;padding-bottom:42px!important}
-    #apep-learning-store .apep-store-subheading{margin-bottom:16px!important}
-    #apep-products-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;align-items:start!important}
-    #apep-products-grid .apep-product-card{display:flex!important;flex-direction:column!important;height:auto!important;min-height:0!important;align-self:start!important}
-    #apep-products-grid .apep-product-cover{width:132px!important;height:176px!important;aspect-ratio:3/4!important;object-fit:cover!important;margin:12px auto 0!important;flex:0 0 auto!important}
-    #apep-products-grid .apep-product-body{display:flex!important;flex-direction:column!important;padding:13px 15px 15px!important;gap:0!important;flex:1 1 auto!important;min-width:0!important}
-    #apep-products-grid .apep-product-title{font-size:17px!important;line-height:1.25!important;margin:0 0 6px!important;min-height:43px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-    #apep-products-grid .apep-product-description-full,#apep-products-grid .apep-product-desc{position:relative!important;font-size:12.9px!important;line-height:1.45!important;margin:0!important;max-height:112px;overflow:hidden!important;padding-bottom:28px!important}
-    #apep-products-grid .apep-product-description-full.is-expanded,#apep-products-grid .apep-product-desc.is-expanded{max-height:none!important;overflow:visible!important;padding-bottom:0!important}
-    #apep-products-grid .apep-read-more-wrap{width:100%!important;margin:0 0 8px!important;min-height:28px;display:flex;align-items:flex-start;justify-content:center!important;text-align:center!important}
-    #apep-products-grid .apep-read-more{appearance:none;border:1px solid #1266ed!important;background:#1266ed!important;color:#fff!important;border-radius:7px!important;padding:5px 12px!important;margin:0 auto!important;font:700 11px/1.2 "DM Sans",Arial,sans-serif!important;cursor:pointer!important;box-shadow:0 3px 8px rgba(18,102,237,.16);transition:transform .18s ease,background .18s ease!important}
-    #apep-products-grid .apep-read-more:hover{background:#0b53c7!important;transform:translateY(-1px)!important}
-    #apep-products-grid .apep-product-description-full.is-expanded + .apep-read-more-wrap{margin-top:5px!important}
-    #apep-products-grid .apep-product-meta-share{margin-top:3px!important}
-    #apep-products-grid .apep-product-meta{display:none!important}
-    #apep-products-grid .apep-product-price{font-size:18px!important;margin:5px 0 0!important;padding-top:8px!important;border-top:1px solid #edf0f5!important;text-align:center!important}
-    #apep-products-grid .apep-buy-row{display:flex!important;flex-direction:row!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;gap:6px!important;margin-top:5px!important;width:100%!important}
-    #apep-products-grid .apep-btn-paystack,#apep-products-grid .apep-download-btn{min-height:38px!important;height:38px!important;width:auto!important;padding:8px 11px!important;font-size:12px!important;border-radius:8px!important;white-space:nowrap!important}
-    #apep-products-grid .apep-paypal-container{width:205px!important;max-width:100%!important;min-height:38px!important;height:38px!important;overflow:hidden!important;margin:0!important}
-    #apep-products-grid .apep-product-note{font-size:10.5px!important;line-height:1.3!important;margin:4px 0 0!important;color:#7b8492!important;text-align:center!important}
-    #apep-products-grid .apep-product-share{margin:5px 0 0 auto!important}
-    #apep-products-grid .apep-product-includes{display:none!important}
-    @media(max-width:900px){#apep-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}}
-    @media(max-width:620px){#apep-learning-store{padding:22px 12px 34px!important}#apep-products-grid{grid-template-columns:1fr!important;gap:14px!important}#apep-products-grid .apep-product-cover{width:124px!important;height:165px!important}#apep-products-grid .apep-product-body{padding:12px 13px 14px!important}#apep-products-grid .apep-product-title{font-size:16px!important;min-height:0}#apep-products-grid .apep-product-description-full,#apep-products-grid .apep-product-desc{max-height:118px}}
-  `;
-  document.head.appendChild(style);
-}
-
-function removeLegacyIncludes(card){
-  if(!card) return;
-  card.querySelectorAll('.apep-product-includes').forEach((node)=>node.remove());
-}
-
-function addReadMore(card){
-  if(!card||card.querySelector('.apep-read-more-wrap')) return;
-  const desc=card.querySelector('.apep-product-description-full,.apep-product-desc');
-  if(!desc) return;
-  const wrapper=document.createElement('div');
-  wrapper.className='apep-read-more-wrap';
-  const button=document.createElement('button');
-  button.type='button';
-  button.className='apep-read-more';
-  button.textContent='Click to Read More';
-  button.setAttribute('aria-expanded','false');
-  button.addEventListener('click',()=>{
-    const expanded=desc.classList.toggle('is-expanded');
-    button.setAttribute('aria-expanded',String(expanded));
-    button.textContent=expanded?'Click to Show Less':'Click to Read More';
-  });
-  desc.after(wrapper);
-  wrapper.appendChild(button);
-}
-
-function normaliseCard(card){
-  if(!card) return;
-  removeLegacyIncludes(card);
-  addReadMore(card);
-}
-
-function initialiseStoreCatalogue(){
-  const store=document.querySelector(STORE_SELECTOR);
-  const grid=document.getElementById('apep-products-grid');
-  if(!store||!grid) return;
-  injectStoreCatalogueStyles();
-  grid.querySelectorAll('.apep-product-card').forEach(normaliseCard);
-  const observer=new MutationObserver(()=>grid.querySelectorAll('.apep-product-card').forEach(normaliseCard));
-  observer.observe(grid,{childList:true,subtree:true});
-}
-
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initialiseStoreCatalogue,{once:true});
-else initialiseStoreCatalogue();
+const PRODUCTS=[
+{id:'84f8d305-822d-4f90-a047-33f1dc724209',slug:'international-client-acquisition-playbook-for-freelancers',title:'The International Client Acquisition Playbook for Freelancers',description:'A practical system for targeting better international clients, building a focused offer, finding qualified prospects, personalising outreach, improving discovery calls and proposals, building referrals, and running a measurable 30-day acquisition sprint.',price:5500,usd:7,cover:'84f8d305-822d-4f90-a047-33f1dc724209/cover.jpg'},
+{id:'702cbd4a-aedc-4974-aa46-e9bde72e84ea',slug:'ai-powered-freelance-business-growth-system',title:'The AI-Powered Freelance Business Growth System',description:'A practical operating system for freelancers covering positioning, pricing, marketing, pipeline, delivery, client retention, capacity and a 90-day growth plan, with AI used as leverage rather than a substitute for strategy.',price:5500,usd:7,cover:'702cbd4a-aedc-4974-aa46-e9bde72e84ea/cover.jpg'},
+{id:'285f9532-a52d-42fc-b8ad-68a2940847ac',slug:'premium-positioning-and-brand-story-kit-for-freelancers',title:'The Premium Positioning & Brand Story Kit for Freelancers',description:'An eight-workshop workbook for defining your ideal client, clarifying differentiators, building a positioning statement, developing your professional story and turning experience into credible brand messaging.',price:19900,usd:14.99,cover:'285f9532-a52d-42fc-b8ad-68a2940847ac/cover.jpg'},
+{id:'b66a16dc-1530-4e42-b866-a58430380474',slug:'premium-ai-workflow-playbook-for-freelancers',title:'The Premium AI Workflow Playbook for Freelancers',description:'Eight repeatable AI workflows for research, drafting, quality control, brand voice, client communication, onboarding and content repurposing, designed for faster and more consistent freelance delivery.',price:7000,usd:9,cover:'b66a16dc-1530-4e42-b866-a58430380474/product-covers.jpg'},
+{id:'a94414b7-e643-4261-a867-60de25a9cff2',slug:'premium-proposal-and-pricing-templates',title:'Premium Proposal & Pricing Templates',description:'An 11-page client-ready toolkit with eight professional proposal, pricing, scope-management and payment documents to help freelancers present confidently, protect margins and handle commercial conversations professionally.',price:7000,usd:9,cover:'f4a7e3d7-1fda-4a4a-a4fb-8a31a4fa42e0/Cover.jpg'},
+{id:'8fde8cd5-7773-4dee-9d34-3803c7a61fd0',slug:'ai-prompt-vault-for-freelancers',title:'AI Prompt Vault for Freelancers',description:'50 practical fill-in-the-blank AI prompts covering client acquisition, pricing, proposals, communication, delivery, client relationships and professional visibility.',price:7000,usd:9,cover:'8fde8cd5-7773-4dee-9d34-3803c7a61fd0/cover.jpg'}
+];
+const sb=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey);
+const money=n=>'₦'+Number(n).toLocaleString('en-NG');
+const cover=p=>`${SUPABASE_CONFIG.url}/storage/v1/object/public/product-covers/${p}`;
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function login(slug){const r=encodeURIComponent(location.pathname+'?product='+slug+'#apep-learning-store');location.href=`../auth/login.html?redirect=${r}`;}
+function addStyles(){if(document.getElementById('apep-store-resilient-styles'))return;const s=document.createElement('style');s.id='apep-store-resilient-styles';s.textContent=`#apep-products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}.apep-product-card{display:flex;flex-direction:column;height:100%;border:1px solid #e4e4e4;border-radius:14px;overflow:hidden;background:#fff}.apep-product-cover,.apep-product-cover-fallback{width:100%;aspect-ratio:3/4;object-fit:cover;background:#2b3a55}.apep-product-cover-fallback{box-sizing:border-box;padding:28px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(135deg,#0a192f,#2b3a55)}.apep-product-cover-fallback strong{font-size:11px;letter-spacing:.16em;color:#f4d58d}.apep-product-cover-fallback span{font-size:25px;line-height:1.08;font-weight:800}.apep-product-body{padding:20px;display:flex;flex-direction:column;gap:10px;flex:1}.apep-product-desc{line-height:1.55;color:#555}.apep-product-price{margin-top:auto;font-size:22px;font-weight:800;color:#2b3a55}.apep-buy-row{display:flex;flex-direction:column;gap:9px}.apep-product-note{font-size:11px;color:#777;margin:0}.apep-btn-paystack{background:#2b3a55;color:#fff;border:0;border-radius:8px;padding:12px 16px;font-weight:700;cursor:pointer}.apep-paypal-container{min-height:45px}@media(max-width:620px){#apep-products-grid{grid-template-columns:1fr;gap:16px}}`;document.head.appendChild(s);}
+async function paystack(p,b){const {data:{session}}=await sb.auth.getSession();if(!session){login(p.slug);return}b.disabled=true;b.textContent='Redirecting to Paystack…';const {data,error}=await sb.functions.invoke('initialize-paystack-product-payment',{body:{product_id:p.id}});if(error||!data?.authorization_url){b.disabled=false;b.textContent=`Pay ${money(p.price)} with Paystack`;alert('We could not start the Paystack checkout. Please try again.');return}location.href=data.authorization_url;}
+function paypal(p,c){if(!window.paypal)return;window.paypal.Buttons({style:{layout:'horizontal',height:45,tagline:false},createOrder:async(d,a)=>{const {data:{session}}=await sb.auth.getSession();if(!session){login(p.slug);return}return a.order.create({purchase_units:[{custom_id:`${session.user.id}:${p.id}`,amount:{value:String(p.usd),currency_code:'USD'},description:p.title}]})},onApprove:async(d,a)=>{await a.order.capture();const {data,error}=await sb.functions.invoke('verify-paypal-product-payment',{body:{order_id:d.orderID,product_id:p.id}});if(error||!data?.success){alert(`We couldn't confirm your PayPal payment. Order ID: ${d.orderID}`);return}location.reload()}}).render(c)}
+function card(p){const e=document.createElement('article');e.className='apep-product-card';e.innerHTML=`<img class="apep-product-cover" src="${cover(p.cover)}" alt="${esc(p.title)}"><div class="apep-product-body"><h3 class="apep-product-title">${esc(p.title)}</h3><p class="apep-product-desc">${esc(p.description)}</p><div class="apep-product-price">${money(p.price)} <span class="usd">or $${p.usd} via PayPal</span></div><p class="apep-product-note">Secure payment • Instant digital access after entitlement confirmation.</p><div class="apep-buy-row"><button class="apep-btn-paystack" type="button">Pay ${money(p.price)} with Paystack</button><div class="apep-paypal-container"></div></div></div>`;const img=e.querySelector('img');img.addEventListener('error',()=>{const f=document.createElement('div');f.className='apep-product-cover-fallback';f.innerHTML=`<strong>AI PROFIT ADVANTAGE</strong><span>${esc(p.title)}</span><small>Practical AI • Strategic Growth • Lasting Advantage</small>`;img.replaceWith(f)},{once:true});e.querySelector('.apep-btn-paystack').onclick=()=>paystack(p,e.querySelector('.apep-btn-paystack'));paypal(p,e.querySelector('.apep-paypal-container'));return e;}
+function render(grid){if(grid.querySelector('.apep-product-card'))return;grid.replaceChildren(...PRODUCTS.map(card));}
+function initialise(){const grid=document.querySelector('#apep-products-grid');if(!grid||!document.querySelector('#apep-learning-store'))return;addStyles();render(grid);const obs=new MutationObserver(()=>{const cards=grid.querySelectorAll('.apep-product-card').length;const t=grid.textContent.trim();if(!cards||(cards===1&&/loading products|couldn.t load products|new products are on the way/i.test(t)))render(grid);});obs.observe(grid,{childList:true,subtree:true});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialise,{once:true});else initialise();
