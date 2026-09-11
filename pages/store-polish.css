@@ -24,8 +24,10 @@
 .apep-paypal-container iframe{max-width:100%!important}
 .apep-paypal-unavailable{font-size:11px!important;padding:8px!important;line-height:1.35}
 .apep-store-free-resources{margin-top:28px!important;padding:18px 20px!important}
-.apep-store-free-resources strong{font-size:.94rem}
-.apep-store-free-resources span{font-size:.84rem!important;line-height:1.45}
+.apep-store-free-resources strong{font-size:0!important}
+.apep-store-free-resources strong::after{content:'Start with something useful.';font-size:.94rem}
+.apep-store-free-resources span{font-size:0!important}
+.apep-store-free-resources span::after{content:'Explore practical free resources, insights and tools you can apply to your work, business or professional development today.';font-size:.84rem!important;line-height:1.45}
 .apep-store-free-resources .button{color:#2B3A55!important;border-color:#2B3A55!important;background:#fff!important;white-space:nowrap}
 .apep-store-free-resources .button:hover{background:#f3f7ff!important}
 .assist-section{padding:60px 0!important}
@@ -38,9 +40,7 @@
 .assist-form{gap:14px!important}
 .assist-form textarea{min-height:105px!important}
 .assist-map iframe{height:240px!important}
-@media(max-width:950px){
-  .apep-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
+@media(max-width:950px){.apep-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:620px){
   .apep-store-section{padding-left:16px!important;padding-right:16px!important}
   .apep-products-grid{grid-template-columns:1fr!important}
