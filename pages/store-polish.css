@@ -1,0 +1,53 @@
+/* APEP Store visual refinement — presentation only. Does not alter product data or checkout logic. */
+.apep-store-categories{padding-top:18px!important;padding-bottom:42px!important}
+.apep-store-category-heading{max-width:820px;line-height:1.18!important;margin-bottom:20px!important}
+.apep-category-card{min-height:112px;padding:20px!important;display:flex;flex-direction:column;justify-content:center;box-shadow:0 5px 18px rgba(19,44,90,.045)}
+.apep-category-card strong{font-size:.96rem;line-height:1.25}
+.apep-category-card span{font-size:.86rem!important;line-height:1.5!important}
+.store-hero-support{color:#d9e6ff!important;font-size:.94rem}
+.store-hero-actions{justify-content:center}
+.store-hero-actions .button{min-width:154px}
+.apep-store-section{padding-top:46px!important}
+.apep-store-heading{line-height:1.18!important}
+.apep-store-subheading{font-size:.96rem;color:#61708a;line-height:1.6!important}
+.apep-products-grid{gap:20px!important}
+.apep-product-card{border-radius:16px!important;box-shadow:0 7px 24px rgba(19,44,90,.075)!important}
+.apep-product-cover{width:142px!important;height:190px!important;margin:20px auto 0!important;border-radius:9px!important}
+.apep-product-body{padding:17px 18px 18px!important;gap:8px!important}
+.apep-product-title{font-size:16px!important;line-height:1.32!important;min-height:42px}
+.apep-product-desc{font-size:12.8px!important;line-height:1.5!important;-webkit-line-clamp:6!important}
+.apep-product-price{font-size:18px!important;padding-top:9px!important;margin-top:6px!important}
+.apep-product-price .usd{font-size:11.5px!important}
+.apep-buy-row{gap:8px!important;align-items:stretch!important}
+.apep-btn-paystack,.apep-download-btn{flex:1 1 150px;width:auto!important;min-width:0!important;height:38px!important;min-height:38px!important;padding:8px 10px!important;font-size:12px!important}
+.apep-paypal-container{flex:1 1 150px;width:auto!important;min-width:0!important;height:38px!important;min-height:38px!important}
+.apep-paypal-container iframe{max-width:100%!important}
+.apep-paypal-unavailable{font-size:11px!important;padding:8px!important;line-height:1.35}
+.apep-store-free-resources{margin-top:28px!important;padding:18px 20px!important}
+.apep-store-free-resources strong{font-size:.94rem}
+.apep-store-free-resources span{font-size:.84rem!important;line-height:1.45}
+.apep-store-free-resources .button{color:#2B3A55!important;border-color:#2B3A55!important;background:#fff!important;white-space:nowrap}
+.apep-store-free-resources .button:hover{background:#f3f7ff!important}
+.assist-section{padding:60px 0!important}
+.assist-card{padding:38px!important;box-shadow:0 16px 42px rgba(18,42,85,.09)!important}
+.assist-card h2{line-height:1.16!important}
+.assist-card .lead{color:#61708a;line-height:1.6}
+.assist-provider-cta{background:#faf8f2!important}
+.assist-option{min-height:112px;padding:18px!important}
+.assist-option span{line-height:1.45}
+.assist-form{gap:14px!important}
+.assist-form textarea{min-height:105px!important}
+.assist-map iframe{height:240px!important}
+@media(max-width:950px){
+  .apep-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:620px){
+  .apep-store-section{padding-left:16px!important;padding-right:16px!important}
+  .apep-products-grid{grid-template-columns:1fr!important}
+  .apep-product-cover{width:132px!important;height:176px!important}
+  .apep-product-title{min-height:0}
+  .apep-buy-row{flex-direction:column!important}
+  .apep-paypal-container{width:100%!important;flex-basis:auto!important}
+  .apep-btn-paystack,.apep-download-btn{width:100%!important;flex-basis:auto!important}
+  .assist-card{padding:24px!important}
+}
