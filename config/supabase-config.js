@@ -19,10 +19,10 @@ if (typeof window !== 'undefined' && /\/pages\/store\.html$/i.test(window.locati
     polishLink.href = polishHref;
     document.head.appendChild(polishLink);
   }
-  import('../pages/store-products-fallback.js').catch((error) => {
+  import('../pages/store-products-fallback.js?v=20260911-4').catch((error) => {
     console.error('APEP Store fallback loader could not start:', error);
   });
-  import('../pages/store-copy-refinement.js?v=20260911-3').catch((error) => {
+  import('../pages/store-copy-refinement.js?v=20260911-4').catch((error) => {
     console.error('APEP Store copy refinement could not start:', error);
   });
 }
