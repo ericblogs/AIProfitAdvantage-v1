@@ -12,9 +12,13 @@ export const SUPABASE_CONFIG = Object.freeze({
 
 // Store-page resilience and presentation improvements are additive only.
 if (typeof window !== 'undefined' && /\/pages\/store\.html$/i.test(window.location.pathname)) {
-  import('../pages/store-polish.css').catch((error) => {
-    console.error('APEP Store visual refinement could not start:', error);
-  });
+  const polishHref = new URL('../pages/store-polish.css', import.meta.url).href;
+  if (!document.querySelector(`link[href="${polishHref}"]`)) {
+    const polishLink = document.createElement('link');
+    polishLink.rel = 'stylesheet';
+    polishLink.href = polishHref;
+    document.head.appendChild(polishLink);
+  }
   import('../pages/store-products-fallback.js').catch((error) => {
     console.error('APEP Store fallback loader could not start:', error);
   });
