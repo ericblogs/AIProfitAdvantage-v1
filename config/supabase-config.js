@@ -10,9 +10,11 @@ export const SUPABASE_CONFIG = Object.freeze({
   publishableKey: 'sb_publishable_OaCYNEZJpRPz-6oe15pKvA_jcNPQM-R'
 });
 
-// Store-page resilience: if the legacy inline product loader is interrupted by
-// a browser/CDN/runtime error, load the independent catalogue fallback.
+// Store-page resilience and presentation improvements are additive only.
 if (typeof window !== 'undefined' && /\/pages\/store\.html$/i.test(window.location.pathname)) {
+  import('../pages/store-polish.css').catch((error) => {
+    console.error('APEP Store visual refinement could not start:', error);
+  });
   import('../pages/store-products-fallback.js').catch((error) => {
     console.error('APEP Store fallback loader could not start:', error);
   });
