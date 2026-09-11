@@ -1,6 +1,6 @@
 /* APEP Store copy refinement — presentation text only. */
 (function () {
-  const ready = () => {
+  const apply = () => {
     const panel = document.querySelector('.apep-store-free-resources');
     if (!panel) return;
 
@@ -8,14 +8,22 @@
     const message = panel.querySelector('span');
     const link = panel.querySelector('a');
 
-    if (heading) heading.textContent = 'Keep building with APEP.';
-    if (message) message.textContent = 'Explore free resources and insights that complement our digital products and help you put what you learn into practice.';
+    if (heading) heading.textContent = 'Extend your APEP toolkit.';
+    if (message) message.textContent = 'Explore free insights and resources that complement the digital products in this Store and help you get more from what you learn.';
     if (link) link.textContent = 'Explore Free Resources →';
   };
 
+  const start = () => {
+    apply();
+    const panel = document.querySelector('.apep-store-free-resources');
+    if (panel) {
+      new MutationObserver(apply).observe(panel, { childList: true, subtree: true, characterData: true });
+    }
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ready, { once: true });
+    document.addEventListener('DOMContentLoaded', start, { once: true });
   } else {
-    ready();
+    start();
   }
 })();
