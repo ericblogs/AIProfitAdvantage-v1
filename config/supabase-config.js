@@ -22,4 +22,7 @@ if (typeof window !== 'undefined' && /\/pages\/store\.html$/i.test(window.locati
   import('../pages/store-products-fallback.js').catch((error) => {
     console.error('APEP Store fallback loader could not start:', error);
   });
+  import('../pages/store-copy-refinement.js').catch((error) => {
+    console.error('APEP Store copy refinement could not start:', error);
+  });
 }
