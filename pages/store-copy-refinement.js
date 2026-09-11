@@ -8,8 +8,8 @@
     const message = panel.querySelector('span');
     const link = panel.querySelector('a');
 
-    if (heading) heading.textContent = 'Start with something useful.';
-    if (message) message.textContent = 'Explore practical free resources, insights and tools you can apply to your work, business or professional development today.';
+    if (heading) heading.textContent = 'Keep building with APEP.';
+    if (message) message.textContent = 'Explore free resources and insights that complement our digital products and help you put what you learn into practice.';
     if (link) link.textContent = 'Explore Free Resources →';
   };
 
