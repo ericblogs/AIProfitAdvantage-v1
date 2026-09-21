@@ -1,0 +1,3 @@
+Store free-resources deployment synchronization marker.
+Purpose: force the existing GitHub Pages production source to rebuild from main after the approved Store statement replacement.
+Scope: Store page free-resources statement only.
