@@ -1,4 +1,4 @@
-import { SUPABASE_CONFIG } from '../../config/supabase-config.js';
+const SUPABASE_CONFIG=Object.freeze({url:'https://ccxxokxkxhakwwzqwqgn.supabase.co',publishableKey:'sb_publishable_OaCYNEZJpRPz-6oe15pKvA_jcNPQM-R'});
 
 const PRODUCTS=[
 {id:'84f8d305-822d-4f90-a047-33f1dc724209',slug:'international-client-acquisition-playbook-for-freelancers',title:'The International Client Acquisition Playbook for Freelancers',description:'A practical system for finding and winning better international freelance clients through focused offers, prospecting, outreach and proposals.',shortDescription:'Win better international freelance clients.',price:5500,usd:7,cover:'84f8d305-822d-4f90-a047-33f1dc724209/cover.jpg'},
