@@ -1,0 +1,1 @@
+document.getElementById('system-status').textContent='Ready';
