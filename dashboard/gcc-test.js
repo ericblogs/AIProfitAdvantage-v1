@@ -1,1 +1,0 @@
-console.log('APEP Growth Control Centre');
