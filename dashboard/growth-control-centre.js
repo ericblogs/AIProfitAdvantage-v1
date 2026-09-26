@@ -42,9 +42,29 @@ async function load(){
     $('system-status').textContent='Loading…';
     $('gcc-alert').hidden=true;
 
-    const memberships=await api('business_members','select=business_id,role,active&active=eq.true&limit=1');
+    let memberships=await api('business_members','select=business_id,role,active&active=eq.true&limit=1');
     if(!memberships.length){
-      throw Error('No active Growth Control Centre membership is available for this account. Sign in with the authorised APEP account or provision the account in growth.business_members.');
+      const token=getToken();
+      const activation=await fetch(SUPABASE_CONFIG.url+'/functions/v1/activate-growth-owner',{
+        method:'POST',
+        headers:{
+          apikey:SUPABASE_CONFIG.publishableKey,
+          Authorization:'Bearer '+token,
+          'Content-Type':'application/json'
+        }
+      });
+      let activationBody={};
+      try{activationBody=await activation.json();}catch{}
+      if(activation.ok && activationBody.activated){
+        memberships=await api('business_members','select=business_id,role,active&active=eq.true&limit=1');
+      }else if(activation.status===403){
+        throw Error(activationBody.error||'This account is not authorised for Growth Control Centre owner activation.');
+      }else{
+        throw Error(activationBody.error||'Growth Control Centre owner activation could not be completed.');
+      }
+    }
+    if(!memberships.length){
+      throw Error('No active Growth Control Centre membership is available for this account.');
     }
 
     const business=(await api('v_current_business_state','select=*&limit=1'))[0];
