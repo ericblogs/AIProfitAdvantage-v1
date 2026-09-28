@@ -1,47 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
   <url>
-    <loc>https://www.aiprofitadvantage.online/</loc>
+    <loc>https://aiprofitadvantage.online/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-
   <url>
-    <loc>https://www.aiprofitadvantage.online/pages/about.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://www.aiprofitadvantage.online/pages/services.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://www.aiprofitadvantage.online/pages/contact.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://www.aiprofitadvantage.online/auth/login.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://www.aiprofitadvantage.online/auth/register.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://www.aiprofitadvantage.online/auth/forgot-password.html</loc>
+    <loc>https://aiprofitadvantage.online/pages/about.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/services.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/contact.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/blog.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/resources.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/store.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/freelance-client-management-system.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/manage-freelance-clients-without-losing-track.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/freelance-client-onboarding.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/freelance-client-communication-templates.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/prevent-freelance-scope-creep.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/freelance-payment-tracking.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/freelance-project-delivery-deadlines.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aiprofitadvantage.online/pages/articles/freelance-client-retention.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
