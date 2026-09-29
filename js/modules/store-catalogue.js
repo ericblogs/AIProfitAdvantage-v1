@@ -70,9 +70,14 @@ async function completePayPalReturn(){
       return;
     }
     localStorage.removeItem('apep_pending_paypal');
-    paypalReturnStatus('Payment confirmed. Your APEP product entitlement has been granted.','success');
+    paypalReturnStatus('Payment confirmed. Your APEP product entitlement has been granted. Your purchased product will now show a Download your product button below.','success');
     history.replaceState({},document.title,location.pathname+'#apep-learning-store');
-    setTimeout(()=>location.reload(),1200);
+    const grid=document.querySelector('#apep-products-grid');
+    if(grid){
+      await hydrateEntitlements(grid);
+      const purchased=grid.querySelector('.apep-download-btn');
+      if(purchased)purchased.scrollIntoView({behavior:'smooth',block:'center'});
+    }
   }catch(err){
     console.error('APEP PayPal return error',err);
     paypalReturnStatus('We could not confirm the PayPal payment. Order ID: '+pending.order_id+' • Please keep this order ID for support.','error');
