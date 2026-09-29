@@ -64,7 +64,7 @@ async function completePayPalReturn(){
     const client=await getSupabase();
     const {data,error}=await client.functions.invoke('verify-paypal-product-payment',{body:{order_id:pending.order_id,product_id:pending.product_id}});
     if(error||!data?.success){
-      const code=data?.error||error?.message||'verification_failed';
+      let code=data?.error||''; if(!code&&error?.context){try{const body=await error.context.json();code=body?.error||body?.message||'';}catch{}} code=code||error?.message||'verification_failed';
       console.error('APEP PayPal return verification failed',error||data);
       paypalReturnStatus('PayPal returned successfully, but APEP could not confirm the payment yet. Order ID: '+pending.order_id+' • Verification: '+code,'error');
       return;
