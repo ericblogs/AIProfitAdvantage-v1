@@ -35,28 +35,47 @@ async function startPayPalCheckout(p){
     alert('We could not start PayPal checkout. Please try again.');
   }
 }
+function paypalReturnStatus(message,type='info'){
+  let box=document.getElementById('apep-paypal-return-status');
+  if(!box){
+    box=document.createElement('div');
+    box.id='apep-paypal-return-status';
+    box.setAttribute('role','status');
+    box.style.cssText='position:fixed;z-index:99999;top:18px;left:50%;transform:translateX(-50%);width:min(92vw,620px);box-sizing:border-box;padding:16px 18px;border-radius:10px;background:#fff;border:1px solid #d9dee8;box-shadow:0 8px 30px rgba(0,0,0,.14);font:600 14px/1.5 Arial,sans-serif;color:#263247;';
+    document.body.appendChild(box);
+  }
+  box.textContent=message;
+  box.style.borderColor=type==='success'?'#2d8a57':type==='error'?'#b44b4b':'#d9dee8';
+}
 async function completePayPalReturn(){
   const params=new URLSearchParams(location.search);
-  if(params.get('paypal_return')!=='1') return;
   const raw=localStorage.getItem('apep_pending_paypal');
-  if(!raw) return;
+  if(params.get('paypal_cancel')==='1'){
+    localStorage.removeItem('apep_pending_paypal');
+    paypalReturnStatus('PayPal checkout was cancelled. No payment was confirmed.','info');
+    return;
+  }
+  if(!raw)return;
   let pending;
   try{pending=JSON.parse(raw)}catch{localStorage.removeItem('apep_pending_paypal');return;}
-  if(!pending?.order_id||!pending?.product_id) return;
+  if(!pending?.order_id||!pending?.product_id)return;
+  paypalReturnStatus('PayPal returned you to APEP. Verifying your payment…');
   try{
     const client=await getSupabase();
     const {data,error}=await client.functions.invoke('verify-paypal-product-payment',{body:{order_id:pending.order_id,product_id:pending.product_id}});
     if(error||!data?.success){
+      const code=data?.error||error?.message||'verification_failed';
       console.error('APEP PayPal return verification failed',error||data);
-      alert('PayPal returned you to APEP, but we could not yet confirm the payment. Please contact support with Order ID: '+pending.order_id);
+      paypalReturnStatus('PayPal returned successfully, but APEP could not confirm the payment yet. Order ID: '+pending.order_id+' • Verification: '+code,'error');
       return;
     }
     localStorage.removeItem('apep_pending_paypal');
+    paypalReturnStatus('Payment confirmed. Your APEP product entitlement has been granted.','success');
     history.replaceState({},document.title,location.pathname+'#apep-learning-store');
-    location.reload();
+    setTimeout(()=>location.reload(),1200);
   }catch(err){
     console.error('APEP PayPal return error',err);
-    alert('We could not confirm the PayPal payment yet. Please contact support with Order ID: '+pending.order_id);
+    paypalReturnStatus('We could not confirm the PayPal payment. Order ID: '+pending.order_id+' • Please keep this order ID for support.','error');
   }
 }
 function wirePayPalFallback(p,c){
