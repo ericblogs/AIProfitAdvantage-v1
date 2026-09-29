@@ -83,5 +83,33 @@ function wireReadMore(grid){return grid;}
 function render(grid){if(grid.querySelector('.apep-product-card'))return;grid.replaceChildren(...PRODUCTS.map(card));wireReadMore(grid);}
 async function hydratePublishedProduct9(){try{const client=await getSupabase();const {data,error}=await client.from('digital_products').select('id,slug,title,short_description,description,price,usd_price,cover_image_path,is_published').eq('slug','freelancers-project-management-delivery-playbook').eq('is_published',true).maybeSingle();if(error||!data)return;if(PRODUCTS.some(p=>p.id===data.id))return;PRODUCTS.push({id:data.id,slug:data.slug,title:data.title,description:data.description,shortDescription:data.short_description,price:Number(data.price),usd:Number(data.usd_price),cover:data.cover_image_path});}catch(error){console.warn('APEP Store Product 9 hydration skipped:',error);}}
 function needsRepair(grid){const cards=[...grid.querySelectorAll('.apep-product-card')];if(!cards.length)return true;return cards.some(card=>{const img=card.querySelector('.apep-product-cover');const desc=card.querySelector('.apep-product-desc');const title=card.querySelector('.apep-product-title');const readMore=card.querySelector('.apep-read-more');return !title||!title.textContent.trim()||!desc||!desc.textContent.trim()||!readMore||!img||!img.getAttribute('src');});}
-async function initialise(){const grid=document.querySelector('#apep-products-grid');if(!grid||!document.querySelector('#apep-learning-store'))return;addStyles();await hydratePublishedProduct9();await hydrateProductDescriptions();render(grid);await hydrateEntitlements(grid);setTimeout(async()=>{if(needsRepair(grid)){grid.replaceChildren(...PRODUCTS.map(card));wireReadMore(grid);await hydrateEntitlements(grid);}},1200);}
+async function handlePayPalReturn(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('paypal_cancel')==='1'){
+    sessionStorage.removeItem('apep_paypal_pending');
+    history.replaceState({},document.title,location.pathname);
+    return;
+  }
+  if(params.get('paypal_return')!=='1')return;
+  const orderId=params.get('token');
+  let pending=null;
+  try{pending=JSON.parse(sessionStorage.getItem('apep_paypal_pending')||'null')}catch{}
+  if(!orderId||!pending?.product_id)return;
+  const grid=document.querySelector('#apep-products-grid');
+  if(grid)grid.innerHTML='<p class="apep-products-loading">Confirming your PayPal payment…</p>';
+  try{
+    const client=await getSupabase();
+    const {data,error}=await client.functions.invoke('verify-paypal-product-payment',{body:{order_id:orderId,product_id:pending.product_id}});
+    if(error||!data?.success)throw new Error(error?.message||data?.error||'paypal_payment_verification_failed');
+    sessionStorage.removeItem('apep_paypal_pending');
+    history.replaceState({},document.title,location.pathname);
+    location.reload();
+  }catch(err){
+    console.error('APEP PayPal return verification error',err);
+    sessionStorage.removeItem('apep_paypal_pending');
+    history.replaceState({},document.title,location.pathname);
+    if(grid)grid.innerHTML='<p class="apep-product-status error">PayPal payment was not confirmed. Please contact support if you were charged.</p>';
+  }
+}
+async function initialise(){const grid=document.querySelector('#apep-products-grid');if(!grid||!document.querySelector('#apep-learning-store'))return;addStyles();await handlePayPalReturn();await hydratePublishedProduct9();await hydrateProductDescriptions();render(grid);await hydrateEntitlements(grid);setTimeout(async()=>{if(needsRepair(grid)){grid.replaceChildren(...PRODUCTS.map(card));wireReadMore(grid);await hydrateEntitlements(grid);}},1200);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialise,{once:true});else initialise();
