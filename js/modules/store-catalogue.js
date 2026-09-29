@@ -22,10 +22,60 @@ function addStyles(){if(document.getElementById('apep-store-resilient-styles'))r
 
 async function paystack(p,b){const client=await getSupabase();const {data:{session}}=await client.auth.getSession();if(!session){login(p.slug);return}b.disabled=true;b.textContent='Redirecting to Paystack…';const {data,error}=await client.functions.invoke('initialize-paystack-product-payment',{body:{product_id:p.id}});if(error||!data?.authorization_url){b.disabled=false;b.textContent=`Pay ${money(p.price)} with Paystack`;alert('We could not start the Paystack checkout. Please try again.');return}location.href=data.authorization_url;}
 let paypalPromise=null;
-async function loadPayPal(){if(window.paypal)return window.paypal;if(paypalPromise)return paypalPromise;paypalPromise=(async()=>{const client=await getSupabase();const {data,error}=await client.functions.invoke('get-paypal-client-id',{body:{}});if(error||!data?.client_id)throw new Error(error?.message||'paypal_client_id_unavailable');const s=document.createElement('script');s.src='https://www.paypal.com/sdk/js?client-id='+encodeURIComponent(data.client_id)+'&currency=USD&components=buttons';s.async=true;return await new Promise((resolve,reject)=>{s.onload=()=>window.paypal?resolve(window.paypal):reject(new Error('paypal_sdk_global_missing'));s.onerror=()=>reject(new Error('paypal_sdk_load_failed'));document.head.appendChild(s)})})();try{return await paypalPromise}catch(e){paypalPromise=null;throw e}}
-async function paypal(p,c){if(c.dataset.paypalRendering==='true'||c.dataset.paypalRendered==='true')return;c.dataset.paypalRendering='true';try{const client=await getSupabase();const pp=await loadPayPal();if(!pp||!pp.Buttons)throw new Error('PayPal SDK unavailable');c.replaceChildren();const buttons=pp.Buttons({style:{layout:'vertical',height:44,tagline:false,shape:'rect'},createOrder:async()=>{const {data:{session}}=await client.auth.getSession();if(!session){login(p.slug);throw new Error('login_required')}const {data,error}=await client.functions.invoke('initialize-paypal-product-payment',{body:{product_id:p.id}});if(error||!data?.order_id)throw new Error(error?.message||'paypal_order_initialization_failed');return data.order_id},onApprove:async(d,a)=>{try{await a.order.capture();const {data,error}=await client.functions.invoke('verify-paypal-product-payment',{body:{order_id:d.orderID,product_id:p.id}});if(error||!data?.success)throw new Error(error?.message||'paypal_payment_verification_failed');location.reload()}catch(err){console.error('APEP PayPal approval error',err);showPayPalFallback(p,c,'PayPal payment could not be confirmed. Please try again.')}},onCancel:()=>{showPayPalFallback(p,c,'PayPal checkout was cancelled.')},onError:(err)=>{console.error('APEP PayPal error',err);showPayPalFallback(p,c,'PayPal is temporarily unavailable. Please try again.')}});await buttons.render(c);c.dataset.paypalRendered='true';c.dataset.paypalRendering='false'}catch(err){console.error('APEP PayPal SDK error',err);c.dataset.paypalRendering='false';showPayPalFallback(p,c,'PayPal could not be loaded. Please try again.')}}
-function showPayPalFallback(p,c,message){c.dataset.paypalRendering='false';c.dataset.paypalRendered='false';c.innerHTML='<span class="apep-paypal-label">Pay securely with PayPal</span><button type="button" class="apep-btn-paypal-fallback">Pay with PayPal</button>'+(message?'<small class="apep-paypal-error">'+esc(message)+'</small>':'');const b=c.querySelector('.apep-btn-paypal-fallback');if(b)b.onclick=()=>paypal(p,c)}
-function displayLongDescription(product){const full=String(product.description||product.shortDescription||'');const title=String(product.title||'').trim();const clean=title&&full.trimStart().toLowerCase().startsWith(title.toLowerCase())?full.trimStart().slice(title.length).replace(/^\s*\n+/,'').trim():full;return clean}function formatDescription(text){const safe=esc(text);return safe.replace(/^\*\*(.+?)\*\*$/gm,'<strong>$1</strong>').replace(/^\*\*(.+?)\*\*(?=\s*$)/gm,'<strong>$1</strong>').replace(/^(THE SYSTEM COVERS|AI-ASSISTED CLIENT MANAGEMENT|WHAT YOU GET|14-DAY IMPLEMENTATION|WHO IT IS FOR|WHAT THIS IS NOT)$/gm,'<strong>$1</strong>').replace(/^(\d{2} — [A-Z][A-Z &]+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>')}function toggleReadMore(button,product){const desc=button.parentElement?.querySelector('.apep-product-desc');if(!desc)return;const expanded=button.getAttribute('aria-expanded')==='true';if(expanded){desc.innerHTML=formatDescription(product.shortDescription||product.description||'');desc.classList.remove('is-expanded');button.setAttribute('aria-expanded','false');button.textContent='Click to Read More'}else{desc.innerHTML=formatDescription(displayLongDescription(product));desc.classList.add('is-expanded');button.setAttribute('aria-expanded','true');button.textContent='Click to Read Less'}}
+async function loadPayPal(){
+  if(window.paypal)return window.paypal;
+  if(paypalPromise)return paypalPromise;
+  paypalPromise=(async()=>{
+    const client=await getSupabase();
+    const {data,error}=await client.functions.invoke('get-paypal-client-id',{body:{}});
+    if(error||!data?.client_id)throw new Error(error?.message||'paypal_client_id_unavailable');
+    return {
+      Buttons:(opts)=>({
+        render:async(container)=>{
+          container.innerHTML='<span class="apep-paypal-label">Pay securely with PayPal</span><button type="button" class="apep-btn-paypal-fallback">Pay with PayPal</button>';
+          const button=container.querySelector('.apep-btn-paypal-fallback');
+          button.onclick=async()=>{
+            button.disabled=true;button.textContent='Connecting to PayPal…';
+            try{
+              const {data:sessionData}=await client.auth.getSession();
+              if(!sessionData?.session){login(opts?.productSlug||'');return}
+              const {data:order,error:orderError}=await client.functions.invoke('initialize-paypal-product-payment',{body:{product_id:opts?.productId}});
+              if(orderError||!order?.approve_url)throw new Error(orderError?.message||order?.error||'paypal_checkout_initialization_failed');
+              sessionStorage.setItem('apep_paypal_pending',JSON.stringify({product_id:opts.productId}));
+              location.href=order.approve_url;
+            }catch(err){
+              console.error('APEP PayPal redirect error',err);
+              button.disabled=false;button.textContent='Pay with PayPal';
+              showPayPalFallback({id:opts?.productId,slug:opts?.productSlug},container,'PayPal checkout could not be started. Please try again.');
+            }
+          };
+        }
+      })
+    };
+  })();
+  try{return await paypalPromise}catch(e){paypalPromise=null;throw e}
+}
+async function paypal(p,c){
+  if(c.dataset.paypalRendering==='true'||c.dataset.paypalRendered==='true')return;
+  c.dataset.paypalRendering='true';
+  try{
+    const client=await getSupabase();
+    const pp=await loadPayPal();
+    if(!pp?.Buttons)throw new Error('PayPal checkout unavailable');
+    const buttons=pp.Buttons({productId:p.id,productSlug:p.slug});
+    await buttons.render(c);
+    c.dataset.paypalRendered='true';
+  }catch(err){
+    console.error('APEP PayPal checkout initialization error',err);
+    showPayPalFallback(p,c,'PayPal checkout could not be started. Please try again.');
+  }finally{c.dataset.paypalRendering='false'}
+}
+function showPayPalFallback(p,c,message){
+  c.dataset.paypalRendering='false';c.dataset.paypalRendered='false';
+  c.innerHTML='<span class="apep-paypal-label">Pay securely with PayPal</span><button type="button" class="apep-btn-paypal-fallback">Pay with PayPal</button>'+(message?'<small class="apep-paypal-error">'+esc(message)+'</small>':'');
+  const b=c.querySelector('.apep-btn-paypal-fallback');
+  if(b)b.onclick=()=>paypal(p,c);
+}
 function card(p){const e=document.createElement('article');e.className='apep-product-card';e.dataset.productId=p.id;const excerpt=String(p.description||'');e.innerHTML=`<img class="apep-product-cover" src="${cover(p.cover)}" alt="${esc(p.title)}"><div class="apep-product-body"><h3 class="apep-product-title">${esc(p.title)}</h3><div class="apep-product-description"><p class="apep-product-desc apep-product-desc-short">${esc(p.shortDescription||excerpt)}</p><button class="apep-read-more" type="button" aria-expanded="false">Click to Read More</button></div><div class="apep-product-price">${money(p.price)}${p.usd!=null?` <span class="usd">or $${p.usd} via PayPal</span>`:''}</div><p class="apep-product-note">Secure payment • Instant digital access after entitlement confirmation.</p><div class="apep-buy-row"><button class="apep-btn-paystack" type="button">Pay ${money(p.price)} with Paystack</button><div class="apep-paypal-container"><span class="apep-paypal-label">Pay securely with PayPal</span><button type="button" class="apep-btn-paypal-fallback">Pay with PayPal</button></div></div>${shareButtons(p)}</div>`;const img=e.querySelector('img');img.addEventListener('error',()=>{const f=document.createElement('div');f.className='apep-product-cover-fallback';f.innerHTML=`<strong>AI PROFIT ADVANTAGE</strong><span>${esc(p.title)}</span><small>Practical AI • Strategic Growth • Lasting Advantage</small>`;img.replaceWith(f)},{once:true});e.querySelector('.apep-btn-paystack').onclick=()=>paystack(p,e.querySelector('.apep-btn-paystack'));const readMore=e.querySelector('.apep-read-more');readMore.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();toggleReadMore(readMore,p)});const paypalContainer=e.querySelector('.apep-paypal-container');paypalContainer.innerHTML='<span class="apep-paypal-label">Loading PayPal…</span>';paypal(p,paypalContainer);return e;}
 async function hydrateProductDescriptions(){try{const client=await getSupabase();const {data,error}=await client.from('digital_products').select('slug,description');if(error||!Array.isArray(data))return;const descriptions=new Map(data.map(row=>[row.slug,row.description]).filter(([slug,description])=>slug&&description));PRODUCTS.forEach(product=>{const description=descriptions.get(product.slug);if(description)product.description=description;});}catch(error){console.warn('APEP Store description hydration failed:',error);}}
 async function hydrateEntitlements(grid){try{const client=await getSupabase();const {data:{session}}=await client.auth.getSession();if(!session)return;const ids=PRODUCTS.map(p=>p.id);const {data,error}=await client.from('digital_product_entitlements').select('product_id,status').eq('user_id',session.user.id).eq('status','active').in('product_id',ids);if(error||!Array.isArray(data))return;const active=new Set(data.map(row=>row.product_id));grid.querySelectorAll('.apep-product-card').forEach(card=>{const productId=card.dataset.productId;if(!active.has(productId))return;const buyRow=card.querySelector('.apep-buy-row');if(!buyRow)return;const button=document.createElement('button');button.type='button';button.className='apep-download-btn';button.textContent='Download your product';button.addEventListener('click',async()=>{button.disabled=true;button.textContent='Preparing download…';const {data:result,error:downloadError}=await client.functions.invoke('get-digital-product-download-url',{body:{product_id:productId}});if(downloadError||!result?.url){button.disabled=false;button.textContent='Download your product';alert("Couldn't generate your download link. Please try again or contact support.");return}window.open(result.url,'_blank','noopener');button.disabled=false;button.textContent='Download your product';});buyRow.replaceChildren(button);});}catch(error){console.warn('APEP Store entitlement hydration failed:',error);}}
