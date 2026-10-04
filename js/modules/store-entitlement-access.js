@@ -24,6 +24,14 @@ async function waitForGrid(){
   }
   return null;
 }
+async function waitForSession(client){
+  for(let i=0;i<12;i++){
+    const {data}=await client.auth.getSession();
+    if(data?.session)return data.session;
+    await new Promise(resolve=>setTimeout(resolve,300));
+  }
+  return null;
+}
 function wireDownload(button,client,productId){
   button.addEventListener('click',async()=>{
     button.disabled=true;
@@ -46,6 +54,8 @@ async function renderEntitledDownloads(){
     if(!grid)return;
     addAccessStyles();
     const client=await getClient();
+    const session=await waitForSession(client);
+    if(!session)return;
     const {data,error}=await client.functions.invoke('get-digital-product-entitlements',{body:{}});
     if(error||!Array.isArray(data?.entitlements)){
       console.warn('APEP independent entitlement access lookup failed:',error||data);
