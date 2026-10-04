@@ -17,9 +17,9 @@ async function load(){
       return;
     }
     const [overview,products,optimisation,experiments]=await Promise.all([
-      client.from('apep_customer_lifecycle_overview').select('*').single(),
+      client.from('apep_customer_lifecycle_overview').select('*').maybeSingle(),
       client.from('apep_customer_lifecycle_product_summary').select('*'),
-      client.from('apep_optimisation_summary').select('*').single(),
+      client.from('apep_optimisation_summary').select('*').maybeSingle(),
       client.from('apep_lifecycle_experiments').select('experiment_key,surface,status,primary_metric,hypothesis').order('created_at',{ascending:true})
     ]);
     if(overview.error)throw overview.error;
