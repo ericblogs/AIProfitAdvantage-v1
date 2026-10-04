@@ -1,4 +1,4 @@
-import { getSupabase } from '../modules/supabase-client.js';
+import { getSupabase } from './supabase-client.js';
 
 const $=s=>document.querySelector(s);
 const fmt=n=>new Intl.NumberFormat('en-GB').format(Number(n||0));
