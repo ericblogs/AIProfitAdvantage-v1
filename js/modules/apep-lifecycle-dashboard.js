@@ -1,51 +1,62 @@
-import { getSupabase } from './supabase-client.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { SUPABASE_CONFIG } from '../../config/supabase-config.js';
 
 const $=s=>document.querySelector(s);
 const fmt=n=>new Intl.NumberFormat('en-GB').format(Number(n||0));
 const pct=n=>Number(n||0).toFixed(1)+'%';
 
+const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{
+  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+});
+
 async function load(){
   const status=$('#status');
   const dashboard=$('#dashboard');
+  status.textContent='Checking administrator access…';
+  status.className='apep-status';
+  dashboard.hidden=true;
   try{
-    const client=await getSupabase();
-    const {data:adminData,error:adminError}=await client.rpc('is_current_user_admin');
-    if(adminError||adminData!==true){
-      status.textContent='Administrator access is required to view this dashboard.';
+    const {data:sessionData,error:sessionError}=await supabase.auth.getSession();
+    if(sessionError) throw sessionError;
+    if(!sessionData.session){
+      status.textContent='Please sign in to your APEP administrator account before opening this dashboard.';
       status.className='apep-status apep-error';
-      dashboard.hidden=true;
       return;
     }
+
+    const {data:adminData,error:adminError}=await supabase.rpc('is_current_user_admin');
+    if(adminError) throw new Error('Administrator check failed: '+adminError.message);
+    if(adminData!==true){
+      status.textContent='Administrator access is required to view this dashboard.';
+      status.className='apep-status apep-error';
+      return;
+    }
+
     const [overview,products,optimisation,experiments]=await Promise.all([
-      client.from('apep_customer_lifecycle_overview').select('*').maybeSingle(),
-      client.from('apep_customer_lifecycle_product_summary').select('*'),
-      client.from('apep_optimisation_summary').select('*').maybeSingle(),
-      client.from('apep_lifecycle_experiments').select('experiment_key,surface,status,primary_metric,hypothesis').order('created_at',{ascending:true})
+      supabase.from('apep_customer_lifecycle_overview').select('*').maybeSingle(),
+      supabase.from('apep_customer_lifecycle_product_summary').select('*'),
+      supabase.from('apep_optimisation_summary').select('*').maybeSingle(),
+      supabase.from('apep_lifecycle_experiments').select('experiment_key,surface,status,primary_metric,hypothesis').order('created_at',{ascending:true})
     ]);
-    if(overview.error)throw overview.error;
-    if(products.error)throw products.error;
-    if(optimisation.error)throw optimisation.error;
-    if(experiments.error)throw experiments.error;
+
+    for(const [name,result] of [['overview',overview],['product summary',products],['optimisation summary',optimisation],['experiments',experiments]]){
+      if(result.error) throw new Error(name+' query failed: '+result.error.message);
+    }
 
     const o=overview.data||{};
     const z=optimisation.data||{};
-    const metricItems=[
-      ['Customers',o.customers],
-      ['Engaged customers',o.engaged_customers],
-      ['Needs identified',o.need_identified_customers],
-      ['Repeat customers',o.repeat_customers]
-    ];
-    $('#metrics').innerHTML=metricItems.map(([label,value])=>'<div class="apep-metric"><small>'+label+'</small><strong>'+fmt(value)+'</strong></div>').join('');
+    $('#metrics').innerHTML=[
+      ['Customers',o.customers],['Engaged customers',o.engaged_customers],
+      ['Needs identified',o.need_identified_customers],['Repeat customers',o.repeat_customers]
+    ].map(([label,value])=>'<div class="apep-metric"><small>'+label+'</small><strong>'+fmt(value)+'</strong></div>').join('');
 
     $('#funnel').innerHTML=[
-      ['Customers',o.customers],
-      ['Engaged',o.engaged_customers],
-      ['Need identified',o.need_identified_customers],
-      ['Recommendation clicked',o.recommendation_clickers],
+      ['Customers',o.customers],['Engaged',o.engaged_customers],
+      ['Need identified',o.need_identified_customers],['Recommendation clicked',o.recommendation_clickers],
       ['Repeat customer',o.repeat_customers]
     ].map(([label,value])=>'<div><b>'+fmt(value)+'</b><span>'+label+'</span></div>').join('');
 
-    const optimisationRows=[
+    $('#optimisation').innerHTML=[
       ['Recommendations shown',z.recommendations_shown,'Exposure volume'],
       ['Recommendation action rate',pct(z.recommendation_action_rate),'Clicked or converted after being shown'],
       ['Recommendation conversion rate',pct(z.recommendation_conversion_rate),'Converted recommendations divided by shown'],
@@ -54,8 +65,7 @@ async function load(){
       ['Follow-ups sent',z.followups_sent,'Messages accepted by the dispatch system'],
       ['Follow-ups failed',z.followups_failed,'Queue items currently marked failed'],
       ['Follow-ups queued',z.followups_queued,'Messages awaiting dispatch']
-    ];
-    $('#optimisation').innerHTML=optimisationRows.map(([label,value,note])=>'<tr><td><strong>'+label+'</strong></td><td>'+value+'</td><td class="apep-small">'+note+'</td></tr>').join('');
+    ].map(([label,value,note])=>'<tr><td><strong>'+label+'</strong></td><td>'+value+'</td><td class="apep-small">'+note+'</td></tr>').join('');
 
     $('#experiments').innerHTML=(experiments.data||[]).map(e=>'<tr><td><strong>'+escapeHtml(e.experiment_key)+'</strong></td><td>'+escapeHtml(e.surface)+'</td><td class="apep-experiment-status">'+escapeHtml(e.status)+'</td><td>'+escapeHtml(e.primary_metric)+'</td><td>'+escapeHtml(e.hypothesis)+'</td></tr>').join('');
 
@@ -65,8 +75,8 @@ async function load(){
     status.className='apep-status';
     dashboard.hidden=false;
   }catch(error){
-    console.error(error);
-    status.textContent='The analytics dashboard could not be loaded. No customer data was changed.';
+    console.error('APEP lifecycle dashboard:',error);
+    status.textContent='Dashboard error: '+(error?.message||'The analytics service returned an unexpected error.')+' No customer data was changed.';
     status.className='apep-status apep-error';
     dashboard.hidden=true;
   }
