@@ -1,0 +1,8 @@
+const REF_KEY="apep:referral:code:v1";const TOKEN_KEY="apep:referral:visitor:v1";const FUNCTION_URL="https://ccxxokxkxhakwwzqwqgn.supabase.co/functions/v1/apep-record-referral-visit";
+function token(){let t=localStorage.getItem(TOKEN_KEY);if(!t){const a=crypto?.randomUUID?.();t=a||("v_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));localStorage.setItem(TOKEN_KEY,t)}return t}
+function valid(c){return /^APEP-[A-Z0-9]{6}$/i.test(String(c||"").trim())}
+export function getReferralCode(){return localStorage.getItem(REF_KEY)||""}
+export function getReferralVisitorToken(){return localStorage.getItem(TOKEN_KEY)||""}
+async function record(code){if(!valid(code))return;const c=code.trim().toUpperCase();localStorage.setItem(REF_KEY,c);const visitor=token();try{const r=await fetch(FUNCTION_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({referral_code:c,visitor_token:visitor,landing_path:location.pathname+location.search})});const data=await r.json().catch(()=>null);if(data?.success)localStorage.setItem("apep:referral:attribution:v1",String(data.attribution_id||""));return data}catch(error){console.warn("APEP referral attribution unavailable:",error);return null}}
+function init(){try{const params=new URLSearchParams(location.search);const incoming=params.get("ref");if(valid(incoming))record(incoming);else{const saved=getReferralCode();if(valid(saved)&&location.pathname.includes("/pages/referral.html"))record(saved)}}catch(error){console.warn("APEP referral capture failed:",error)}}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
