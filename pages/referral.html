@@ -240,12 +240,30 @@ const apep=document.getElementById('commission-apep');
 const resultLabel=document.getElementById('commission-result-label');
 const totalSalesLabel=document.getElementById('commission-total-sales-label');
 function updateCommission(){
-  const p=Math.max(0,Number(price.value)||0);
+  const inputAmount=Math.max(0,Number(price.value)||0);
   const r=Math.min(100,Math.max(0,Number(rate.value)||0))/100;
   const s=Math.max(0,Math.floor(Number(sales.value)||0));
   const code=currency.value==='USD'?'USD':'NGN';
   const locale=code==='USD'?'en-US':'en-NG';
-  const symbol=code==='USD'?'
+  const symbol=code==='USD'?'$':'₦';
+  const money=new Intl.NumberFormat(locale,{style:'currency',currency:code,maximumFractionDigits:2});
+  const convertedPrice=code==='USD' ? inputAmount/fxRate : inputAmount;
+  const commission=convertedPrice*r;
+  const gross=convertedPrice*s;
+  const referralShare=commission*s;
+  priceLabel.textContent='Eligible purchase price (₦)';
+  resultLabel.textContent='40% referral commission per eligible purchase ('+code+')';
+  totalSalesLabel.textContent='Total referred sales ('+code+')';
+  per.textContent=money.format(commission);
+  totalSales.textContent=money.format(gross);
+  total.textContent=money.format(referralShare);
+  apep.textContent=money.format(gross-referralShare);
+  fxBox.innerHTML=code==='USD'
+    ? 'Conversion: <strong>₦'+fxRate.toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})+' = $1.00</strong>. Your ₦'+inputAmount.toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})+' purchase price converts to <strong>'+money.format(convertedPrice)+'</strong>, so the 40% commission is <strong>'+money.format(commission)+'</strong> per eligible purchase.'
+    : 'Reference conversion: <strong>$1.00 = ₦'+fxRate.toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})+'</strong>.';
+}
+[price,rate,sales,currency].forEach(input=>input.addEventListener('input',updateCommission));
+[price,rate,sales,currency].forEach(input=>input.addEventListener('change',updateCommission));
 updateCommission();
 </script>
 </body>
