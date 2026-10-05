@@ -134,10 +134,10 @@
 <div class="commission-field"><label for="commission-currency">Currency</label><select id="commission-currency" aria-label="Currency"><option value="NGN">₦ NGN — Nigerian Naira</option><option value="USD">$ USD — US Dollar</option></select></div>
 </div>
 <div id="commission-fx-rate" style="margin-top:14px;padding:10px 12px;border:1px solid #dce7f5;border-radius:8px;background:#f8fafc;color:#59687d;font-size:12px;line-height:1.55">Reference FX rate: <strong>US$1 = ₦1,331.10</strong>. Rate shown for illustration and may differ from the payment processor rate.</div>\n<div class="commission-result" aria-live="polite">
-<span class="label">40% referral commission per eligible purchase</span>
+<span class="label" id="commission-result-label">40% referral commission per eligible purchase</span>
 <strong id="commission-per-sale">₦5,000</strong>
 <div class="commission-breakdown">
-<div class="commission-line"><span>Total referred sales</span><strong id="commission-total-sales">₦125,000</strong></div>
+<div class="commission-line"><span id="commission-total-sales-label">Total referred sales</span><strong id="commission-total-sales">₦125,000</strong></div>
 <div class="commission-line"><span>Referral commission at 40%</span><strong id="commission-total">₦25,000</strong></div>
 <div class="commission-line"><span>APEP share before costs</span><strong id="commission-apep">₦100,000</strong></div>
 </div>
@@ -237,6 +237,8 @@ const per=document.getElementById('commission-per-sale');
 const totalSales=document.getElementById('commission-total-sales');
 const total=document.getElementById('commission-total');
 const apep=document.getElementById('commission-apep');
+const resultLabel=document.getElementById('commission-result-label');
+const totalSalesLabel=document.getElementById('commission-total-sales-label');
 function updateCommission(){
   const p=Math.max(0,Number(price.value)||0);
   const r=Math.min(100,Math.max(0,Number(rate.value)||0))/100;
@@ -253,6 +255,8 @@ updateCommission();
   const gross=p*s;
   const referralShare=commission*s;
   priceLabel.textContent='Eligible purchase price ('+symbol+')';
+  resultLabel.textContent='40% referral commission per eligible purchase ('+code+')';
+  totalSalesLabel.textContent='Total referred sales ('+code+')';
   per.textContent=money.format(commission);
   totalSales.textContent=money.format(gross);
   total.textContent=money.format(referralShare);
