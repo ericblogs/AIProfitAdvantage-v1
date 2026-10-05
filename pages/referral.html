@@ -128,10 +128,10 @@
 <h3>Referral commission calculator</h3>
 <p>Change the inputs to test your own scenario. The calculation assumes commission is a percentage of the eligible purchase amount.</p>
 <div class="commission-fields">
-<div class="commission-field"><label for="commission-price">Eligible purchase price (₦)</label><input id="commission-price" type="number" min="0" step="100" value="25000" inputmode="decimal"></div>
+<div class="commission-field"><label for="commission-price" id="commission-price-label">Eligible purchase price (₦)</label><input id="commission-price" type="number" min="0" step="100" value="25000" inputmode="decimal"></div>
 <div class="commission-field"><label for="commission-rate">Commission rate (%)</label><input id="commission-rate" type="number" min="40" max="40" step="1" value="40" inputmode="decimal" readonly></div>
 <div class="commission-field"><label for="commission-sales">Successful referred purchases</label><input id="commission-sales" type="number" min="0" step="1" value="5" inputmode="numeric"></div>
-<div class="commission-field"><label for="commission-currency">Currency</label><input id="commission-currency" type="text" value="NGN" aria-label="Currency" readonly></div>
+<div class="commission-field"><label for="commission-currency">Currency</label><select id="commission-currency" aria-label="Currency"><option value="NGN">₦ NGN — Nigerian Naira</option><option value="USD">$ USD — US Dollar</option></select></div>
 </div>
 <div class="commission-result" aria-live="polite">
 <span class="label">40% referral commission per eligible purchase</span>
@@ -226,10 +226,11 @@
 import { getReferralCode } from '../js/modules/apep-referral-attribution.js';
 const code=getReferralCode();const el=document.getElementById('apep-referral-code');
 if(code&&el){el.hidden=false;el.textContent='Referral: '+code}
-const money=new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0});
 const price=document.getElementById('commission-price');
 const rate=document.getElementById('commission-rate');
 const sales=document.getElementById('commission-sales');
+const currency=document.getElementById('commission-currency');
+const priceLabel=document.getElementById('commission-price-label');
 const per=document.getElementById('commission-per-sale');
 const totalSales=document.getElementById('commission-total-sales');
 const total=document.getElementById('commission-total');
@@ -238,15 +239,25 @@ function updateCommission(){
   const p=Math.max(0,Number(price.value)||0);
   const r=Math.min(100,Math.max(0,Number(rate.value)||0))/100;
   const s=Math.max(0,Math.floor(Number(sales.value)||0));
+  const code=currency.value==='USD'?'USD':'NGN';
+  const locale=code==='USD'?'en-US':'en-NG';
+  const symbol=code==='USD'?'
+updateCommission();
+</script>
+</body>
+</html>:'₦';
+  const money=new Intl.NumberFormat(locale,{style:'currency',currency:code,maximumFractionDigits:2});
   const commission=p*r;
   const gross=p*s;
   const referralShare=commission*s;
+  priceLabel.textContent='Eligible purchase price ('+symbol+')';
   per.textContent=money.format(commission);
   totalSales.textContent=money.format(gross);
   total.textContent=money.format(referralShare);
   apep.textContent=money.format(gross-referralShare);
 }
-[price,rate,sales].forEach(input=>input.addEventListener('input',updateCommission));
+[price,rate,sales,currency].forEach(input=>input.addEventListener('input',updateCommission));
+[price,rate,sales,currency].forEach(input=>input.addEventListener('change',updateCommission));
 updateCommission();
 </script>
 </body>
