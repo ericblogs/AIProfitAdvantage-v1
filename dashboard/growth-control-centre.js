@@ -34,7 +34,7 @@ async function loadGrowthData(){
   try{body=await r.json();}catch{}
 
   if(!r.ok){
-    throw Error(body.error||('Growth data unavailable ('+r.status+').'));
+    throw Error((body.error||('Growth data unavailable ('+r.status+'.)'))+(body.detail?' — '+body.detail:''));
   }
   return body;
 }
