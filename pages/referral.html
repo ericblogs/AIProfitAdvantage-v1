@@ -266,23 +266,6 @@ function updateCommission(){
 [price,rate,sales,currency].forEach(input=>input.addEventListener('change',updateCommission));
 updateCommission();
 </script>
-</body>
-</html>:'₦';
-  const money=new Intl.NumberFormat(locale,{style:'currency',currency:code,maximumFractionDigits:2});
-  const commission=p*r;
-  const gross=p*s;
-  const referralShare=commission*s;
-  priceLabel.textContent='Eligible purchase price ('+symbol+')';
-  resultLabel.textContent='40% referral commission per eligible purchase ('+code+')';
-  totalSalesLabel.textContent='Total referred sales ('+code+')';
-  per.textContent=money.format(commission);
-  totalSales.textContent=money.format(gross);
-  total.textContent=money.format(referralShare);
-  apep.textContent=money.format(gross-referralShare);
-}
-[price,rate,sales,currency].forEach(input=>input.addEventListener('input',updateCommission));
-[price,rate,sales,currency].forEach(input=>input.addEventListener('change',updateCommission));
-updateCommission();
-</script>
+
 </body>
 </html>
