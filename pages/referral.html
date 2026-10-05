@@ -133,7 +133,7 @@
 <div class="commission-field"><label for="commission-sales">Successful referred purchases</label><input id="commission-sales" type="number" min="0" step="1" value="5" inputmode="numeric"></div>
 <div class="commission-field"><label for="commission-currency">Currency</label><select id="commission-currency" aria-label="Currency"><option value="NGN">₦ NGN — Nigerian Naira</option><option value="USD">$ USD — US Dollar</option></select></div>
 </div>
-<div class="commission-result" aria-live="polite">
+<div id="commission-fx-rate" style="margin-top:14px;padding:10px 12px;border:1px solid #dce7f5;border-radius:8px;background:#f8fafc;color:#59687d;font-size:12px;line-height:1.55">Reference FX rate: <strong>US$1 = ₦1,331.10</strong>. Rate shown for illustration and may differ from the payment processor rate.</div>\n<div class="commission-result" aria-live="polite">
 <span class="label">40% referral commission per eligible purchase</span>
 <strong id="commission-per-sale">₦5,000</strong>
 <div class="commission-breakdown">
@@ -231,6 +231,8 @@ const rate=document.getElementById('commission-rate');
 const sales=document.getElementById('commission-sales');
 const currency=document.getElementById('commission-currency');
 const priceLabel=document.getElementById('commission-price-label');
+const fxRate=1331.10;
+const fxBox=document.getElementById('commission-fx-rate');
 const per=document.getElementById('commission-per-sale');
 const totalSales=document.getElementById('commission-total-sales');
 const total=document.getElementById('commission-total');
