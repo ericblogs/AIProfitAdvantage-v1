@@ -36,6 +36,39 @@ function trackPageView(){
   send('page_view');
 }
 
+function productContext(card){
+  if(!card)return null;
+  return {product_id:card.dataset.productId||null,product_title:(card.querySelector('.apep-product-title')?.textContent||'').trim().slice(0,200)};
+}
+
+function oncePerSession(key,eventType,extra={}){
+  try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');}catch{}
+  send(eventType,extra);
+}
+
+function trackCommerceInteractions(){
+  document.addEventListener('click',(event)=>{
+    const target=event.target.closest?.('a,button');
+    if(!target)return;
+    const card=target.closest?.('.apep-product-card');
+    if(!card)return;
+    const context=productContext(card);
+    if(!context?.product_id)return;
+    if(target.matches('.apep-btn-paystack,.apep-btn-paypal-fallback')){
+      const method=target.matches('.apep-btn-paystack')?'paystack':'paypal';
+      oncePerSession(`apep:growth:checkout:${context.product_id}:${method}`,'checkout_start',{cta_label:target.textContent.trim().slice(0,160),metadata:{...context,payment_method:method}});
+      return;
+    }
+    if(target.matches('.apep-download-btn')){
+      oncePerSession(`apep:growth:download:${context.product_id}`,'product_download',{cta_label:'Download your product',metadata:context});
+      return;
+    }
+    if(target.matches('.apep-read-more,.apep-product-cover,.apep-product-title,.apep-share-btn')){
+      oncePerSession(`apep:growth:interest:${context.product_id}`,'product_interest',{cta_label:target.textContent.trim().slice(0,160)||'Product interaction',metadata:context});
+    }
+  },{passive:true});
+}
+
 function trackClicks(){
   document.addEventListener('click',(event)=>{
     const link=event.target.closest?.('a,button');
@@ -43,7 +76,7 @@ function trackClicks(){
     const label=(link.textContent||link.getAttribute('aria-label')||'').trim().replace(/\s+/g,' ').slice(0,160);
     const href=link.getAttribute('href')||'';
     if(!label)return;
-    const meaningful=link.matches('.nav-cta,.button,.apep-download-btn,[href*="whatsapp"],[href^="mailto:"],[href^="tel:"],[href*="store"],[href*="referral"]');
+    const meaningful=link.matches('.nav-cta,.button,[href*="whatsapp"],[href^="mailto:"],[href^="tel:"],[href*="store"],[href*="referral"]');
     if(!meaningful)return;
     send('cta_click',{cta_label:label,metadata:{href}});
   },{passive:true});
@@ -64,6 +97,7 @@ function init(){
   if(window.location.pathname.includes('/dashboard/'))return;
   trackPageView();
   trackClicks();
+  trackCommerceInteractions();
   trackForms();
 }
 
