@@ -1,5 +1,6 @@
 const ENDPOINT='https://ccxxokxkxhakwwzqwqgn.supabase.co/functions/v1/apep-growth-acquisition-event';
 const SESSION_KEY='apep:growth:session:v1';
+const ATTRIBUTION_KEY='apep:growth:attribution:v1';
 const SENT_PREFIX='apep:growth:page:v1:';
 
 function sessionKey(){
@@ -20,8 +21,50 @@ function params(){
   }catch{return {utm_source:null,utm_medium:null,utm_campaign:null};}
 }
 
+function currentAttribution(){
+  const current=params();
+  const referrer=document.referrer||null;
+  try{
+    const saved=sessionStorage.getItem(ATTRIBUTION_KEY);
+    const prior=saved?JSON.parse(saved):null;
+    const hasUtm=current.utm_source||current.utm_medium||current.utm_campaign;
+    if(hasUtm){
+      const attribution={source:current.utm_source||current.utm_medium||'campaign',referrer,utm_source:current.utm_source,utm_medium:current.utm_medium,utm_campaign:current.utm_campaign};
+      sessionStorage.setItem(ATTRIBUTION_KEY,JSON.stringify(attribution));
+      return attribution;
+    }
+    if(prior)return prior;
+    let source='direct';
+    if(referrer){
+      try{
+        const refHost=new URL(referrer).hostname.toLowerCase();
+        const currentHost=window.location.hostname.toLowerCase();
+        if(refHost===currentHost||refHost.endsWith('.'+currentHost))source='internal';
+        else if(/(^|\.)google\.|(^|\.)bing\.|(^|\.)yahoo\.|(^|\.)duckduckgo\.|(^|\.)ecosia\./.test(refHost))source='organic_search';
+        else source='referral';
+      }catch{source='referral';}
+    }
+    const attribution={source,referrer,utm_source:null,utm_medium:null,utm_campaign:null};
+    sessionStorage.setItem(ATTRIBUTION_KEY,JSON.stringify(attribution));
+    return attribution;
+  }catch{
+    return {source:null,referrer,utm_source:current.utm_source,utm_medium:current.utm_medium,utm_campaign:current.utm_campaign};
+  }
+}
+
 function send(eventType,extra={}){
-  const payload={event_type:eventType,page_path:window.location.pathname,referrer:document.referrer||null,session_key:sessionKey(),...params(),...extra};
+  const attribution=currentAttribution();
+  const payload={
+    event_type:eventType,
+    page_path:window.location.pathname,
+    source:attribution.source,
+    referrer:attribution.referrer,
+    session_key:sessionKey(),
+    utm_source:attribution.utm_source,
+    utm_medium:attribution.utm_medium,
+    utm_campaign:attribution.utm_campaign,
+    ...extra
+  };
   try{
     fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true,mode:'cors'}).catch(()=>{});
   }catch{}
