@@ -4,6 +4,7 @@ import { SUPABASE_CONFIG } from '../config/supabase-config.js';
 const supabase=createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=(id)=>document.getElementById(id);
 let userId=null;
+let generationCount=0;
 
 function escapeHtml(value){return String(value).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function formatDate(value){try{return new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}catch{return value||'';}}
@@ -20,6 +21,11 @@ async function loadConversations(){
   $('conversation-count').textContent=data?.length||0;$('usage-conversations').textContent=data?.length||0;
   if(!data?.length){$('conversation-list').innerHTML='<p class="ai-empty">No conversations yet. Start with an objective above.</p>';return;}
   $('conversation-list').innerHTML=data.map(c=>`<div class="conversation-item"><div><button type="button" data-open-conversation="${escapeHtml(c.id)}">${escapeHtml(c.title)}</button><span class="conversation-meta">${escapeHtml(formatDate(c.updated_at))} · ${escapeHtml(c.status)}</span></div></div>`).join('');
+}
+
+async function loadUsage(){
+  const {count,error}=await supabase.from('apep_ai_usage_events').select('id',{count:'exact',head:true}).eq('user_id',userId).eq('event_type','generation');
+  if(!error){generationCount=count||0;$('usage-generations').textContent=generationCount;}
 }
 
 async function loadContext(){
@@ -47,7 +53,7 @@ $('ai-composer').addEventListener('submit',async(event)=>{
   }else{
     $('ai-provider-status').textContent='The workspace was created. AI generation is awaiting provider configuration.';
   }
-  await loadConversations();
+  await Promise.all([loadConversations(),loadUsage()]);
 });
 $('context-form').addEventListener('submit',async(event)=>{
   event.preventDefault();
@@ -62,7 +68,7 @@ $('context-list').addEventListener('click',async(event)=>{
   button.disabled=true;await supabase.from('apep_ai_user_context').delete().eq('id',button.dataset.deleteContext);await loadContext();
 });
 
-(async()=>{const session=await requireSession();if(!session)return;await Promise.all([loadConversations(),loadContext()]);})();
+(async()=>{const session=await requireSession();if(!session)return;await Promise.all([loadConversations(),loadContext(),loadUsage()]);})();
 async function openConversation(id){
   const {data:conversation}=await supabase.from('apep_ai_conversations').select('id,title').eq('id',id).single();
   const {data:messages,error}=await supabase.from('apep_ai_messages').select('role,content,created_at').eq('conversation_id',id).order('created_at',{ascending:true});
