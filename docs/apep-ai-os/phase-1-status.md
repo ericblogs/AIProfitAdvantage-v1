@@ -30,11 +30,11 @@
 * Supabase security advisor was re-run after the Phase 1 schema. Its reported findings are pre-existing infrastructure findings and do not identify the new AI tables as an issue.
 * Existing security findings were intentionally not modified because they are outside Phase 1 scope.
 
-## Current limitation
+## Current verification state
 
-Live AI generation is intentionally gated until the APEP AI provider is configured server-side. The function returns a controlled `provider_not_configured` response rather than exposing credentials or silently falling back to an ungoverned client-side provider.
+The selected provider is configured server-side through protected Edge Function secrets. The active `apep-ai-generate` function uses the OpenAI Responses API by default and does not expose provider credentials to browser code.
 
-A provider must expose an OpenAI-compatible `POST /chat/completions` interface, or the adapter must be extended for the selected provider.
+The remaining production gate is an authenticated end-to-end application test, followed by verification of persisted messages, usage and audit events and regression checks for existing Store, authentication, payment and entitlement paths.
 
 ## Phase 1 completion gate
 
@@ -42,12 +42,11 @@ Phase 1 is **not yet production-complete**.
 
 Remaining gates:
 
-1. Configure the selected AI provider and model in protected Edge Function secrets.
-2. Run an authenticated end-to-end generation test.
-3. Verify user-message persistence, assistant-message persistence, usage logging and audit logging from a real session.
-4. Regression-test the existing Store, payments, authentication and entitlements.
-5. Verify the deployed public workspace on desktop and mobile.
-6. Review and merge the Phase 1 PR only after the above pass.
+1. Run an authenticated end-to-end generation test.
+2. Verify user-message persistence, assistant-message persistence, usage logging and audit logging from a real session.
+3. Regression-test the existing Store, payments, authentication and entitlements.
+4. Verify the deployed public workspace on desktop and mobile.
+5. Review and merge the Phase 1 PR only after the above pass.
 
 ## Architectural decision
 
