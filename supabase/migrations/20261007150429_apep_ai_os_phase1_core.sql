@@ -136,6 +136,7 @@ create policy "apep_ai_messages_owner_insert"
   to authenticated
   with check (
     user_id = auth.uid()
+    and role = 'user'
     and exists (
       select 1 from public.apep_ai_conversations c
       where c.id = conversation_id
@@ -143,19 +144,8 @@ create policy "apep_ai_messages_owner_insert"
     )
   );
 
-drop policy if exists "apep_ai_messages_owner_update" on public.apep_ai_messages;
-create policy "apep_ai_messages_owner_update"
-  on public.apep_ai_messages for update
-  to authenticated
-  using (user_id = auth.uid())
-  with check (user_id = auth.uid());
-
-drop policy if exists "apep_ai_messages_owner_delete" on public.apep_ai_messages;
-create policy "apep_ai_messages_owner_delete"
-  on public.apep_ai_messages for delete
-  to authenticated
-  using (user_id = auth.uid());
-
+-- Message updates/deletes are server-side only so authenticated clients cannot alter
+-- assistant/system output or erase the conversation audit trail.
 drop policy if exists "apep_ai_context_owner_select" on public.apep_ai_user_context;
 create policy "apep_ai_context_owner_select"
   on public.apep_ai_user_context for select
@@ -218,5 +208,5 @@ create policy "apep_ai_audit_owner_select"
   to authenticated
   using (user_id = auth.uid());
 
--- Usage and audit events deliberately have no ordinary client INSERT/UPDATE/DELETE policies.
--- They should be written by trusted server-side infrastructure.
+-- Usage, audit and non-user message mutations deliberately have no ordinary client
+-- INSERT/UPDATE/DELETE policies. They should be written by trusted server-side infrastructure.
