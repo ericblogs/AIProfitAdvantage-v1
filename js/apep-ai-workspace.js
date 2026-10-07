@@ -33,16 +33,22 @@ $('ai-composer').addEventListener('submit',async(event)=>{
   event.preventDefault();
   const input=$('ai-objective');const objective=input.value.trim();if(!objective)return;
   const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;
+  $('ai-provider-status').textContent='Creating your private APEP workspace…';
   const title=objective.length>72?objective.slice(0,69)+'…':objective;
   const {data:conversation,error:conversationError}=await supabase.from('apep_ai_conversations').insert({user_id:userId,title}).select('id').single();
   if(conversationError){$('ai-provider-status').textContent='We could not create the workspace. Please try again.';button.disabled=false;return;}
-  const {error:messageError}=await supabase.from('apep_ai_messages').insert({conversation_id:conversation.id,user_id:userId,role:'user',content:objective});
-  if(messageError){$('ai-provider-status').textContent='The workspace was created, but the first message could not be saved.';button.disabled=false;return;}
-  await supabase.from('apep_ai_conversations').update({last_message_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',conversation.id);
-  input.value='';button.disabled=false;$('ai-provider-status').textContent='Workspace created. Live AI generation will be enabled through the protected server-side provider layer.';
+  $('ai-provider-status').textContent='Sending your objective securely to APEP AI…';
+  const {data,error}=await supabase.functions.invoke('apep-ai-generate',{body:{conversation_id:conversation.id,message:objective}});
+  input.value='';button.disabled=false;
+  if(error){
+    $('ai-provider-status').textContent='The workspace is ready, but AI generation is not available yet. '+(error.message||'Please try again later.');
+  }else if(data?.message){
+    $('ai-provider-status').textContent='APEP AI responded. Open the conversation to continue.';
+  }else{
+    $('ai-provider-status').textContent='The workspace was created. AI generation is awaiting provider configuration.';
+  }
   await loadConversations();
 });
-
 $('context-form').addEventListener('submit',async(event)=>{
   event.preventDefault();
   const type=$('context-type').value,value=$('context-value').value.trim();if(!value)return;
