@@ -63,3 +63,15 @@ $('context-list').addEventListener('click',async(event)=>{
 });
 
 (async()=>{const session=await requireSession();if(!session)return;await Promise.all([loadConversations(),loadContext()]);})();
+async function openConversation(id){
+  const {data:conversation}=await supabase.from('apep_ai_conversations').select('id,title').eq('id',id).single();
+  const {data:messages,error}=await supabase.from('apep_ai_messages').select('role,content,created_at').eq('conversation_id',id).order('created_at',{ascending:true});
+  if(error||!conversation){return;}
+  $('conversation-view').hidden=false;$('conversation-view-title').textContent=conversation.title;
+  $('conversation-messages').innerHTML=messages?.length?messages.map(m=>`<div class="message-bubble ${m.role==='user'?'message-user':'message-assistant'}"><span class="message-role">${escapeHtml(m.role)}</span>${escapeHtml(m.content)}</div>`).join(''):'<p class="ai-empty">No messages yet.</p>';
+  $('conversation-view').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('conversation-list').addEventListener('click',(event)=>{
+  const button=event.target.closest('[data-open-conversation]');if(button)openConversation(button.dataset.openConversation);
+});
+$('close-conversation').addEventListener('click',()=>{$('conversation-view').hidden=true;});
