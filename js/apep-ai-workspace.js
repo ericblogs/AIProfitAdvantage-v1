@@ -39,21 +39,27 @@ $('ai-composer').addEventListener('submit',async(event)=>{
   event.preventDefault();
   const input=$('ai-objective');const objective=input.value.trim();if(!objective)return;
   const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;
-  $('ai-provider-status').textContent='Creating your private APEP workspace…';
-  const title=objective.length>72?objective.slice(0,69)+'…':objective;
-  const {data:conversation,error:conversationError}=await supabase.from('apep_ai_conversations').insert({user_id:userId,title}).select('id').single();
-  if(conversationError){$('ai-provider-status').textContent='We could not create the workspace. Please try again.';button.disabled=false;return;}
-  $('ai-provider-status').textContent='Sending your objective securely to APEP AI…';
-  const {data,error}=await supabase.functions.invoke('apep-ai-generate',{body:{conversation_id:conversation.id,message:objective}});
-  input.value='';button.disabled=false;
-  if(error){
-    $('ai-provider-status').textContent='The workspace is ready, but AI generation is not available yet. '+(error.message||'Please try again later.');
-  }else if(data?.message){
-    $('ai-provider-status').textContent='APEP AI responded. Open the conversation to continue.';
-  }else{
-    $('ai-provider-status').textContent='The workspace was created. AI generation is awaiting provider configuration.';
+  try{
+    $('ai-provider-status').textContent='Creating your private APEP workspace…';
+    const title=objective.length>72?objective.slice(0,69)+'…':objective;
+    const {data:conversation,error:conversationError}=await supabase.from('apep_ai_conversations').insert({user_id:userId,title}).select('id').single();
+    if(conversationError){$('ai-provider-status').textContent='We could not create the workspace. Please try again.';return;}
+    $('ai-provider-status').textContent='Sending your objective securely to APEP AI…';
+    const {data,error}=await supabase.functions.invoke('apep-ai-generate',{body:{conversation_id:conversation.id,message:objective}});
+    input.value='';
+    if(error){
+      $('ai-provider-status').textContent='The workspace is ready, but AI generation is not available yet. Please check provider availability and try again later.';
+    }else if(data?.message){
+      $('ai-provider-status').textContent='APEP AI responded. Open the conversation to continue.';
+    }else{
+      $('ai-provider-status').textContent='The workspace was created. AI generation is awaiting provider configuration.';
+    }
+    await Promise.all([loadConversations(),loadUsage()]);
+  }catch{
+    $('ai-provider-status').textContent='The request could not be completed. Your workspace may have been saved; check the conversation list before retrying.';
+  }finally{
+    button.disabled=false;
   }
-  await Promise.all([loadConversations(),loadUsage()]);
 });
 $('context-form').addEventListener('submit',async(event)=>{
   event.preventDefault();
@@ -65,7 +71,10 @@ $('context-form').addEventListener('submit',async(event)=>{
 
 $('context-list').addEventListener('click',async(event)=>{
   const button=event.target.closest('[data-delete-context]');if(!button)return;
-  button.disabled=true;await supabase.from('apep_ai_user_context').delete().eq('id',button.dataset.deleteContext);await loadContext();
+  button.disabled=true;
+  const {error}=await supabase.from('apep_ai_user_context').delete().eq('id',button.dataset.deleteContext);
+  if(error){$('ai-provider-status').textContent='Could not delete saved context. Please try again.';button.disabled=false;return;}
+  await loadContext();
 });
 
 (async()=>{const session=await requireSession();if(!session)return;await Promise.all([loadConversations(),loadContext(),loadUsage()]);})();
