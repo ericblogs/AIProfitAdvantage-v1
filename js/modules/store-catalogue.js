@@ -28,12 +28,24 @@ async function startPayPalCheckout(p){
     const {data:{session}}=await client.auth.getSession();
     if(!session){login(p.slug);return;}
     const {data,error}=await client.functions.invoke('initialize-paypal-product-payment',{body:{product_id:p.id,referral_code:getReferralCode()||null,referral_visitor_token:getReferralVisitorToken()||null}});
-    if(error||!data?.order_id||!data?.approve_url) throw new Error('paypal_checkout_initialization_failed');
+    if(error||!data?.order_id||!data?.approve_url){
+      let diagnostic=data&&typeof data==='object'?data:{};
+      try{const ctx=error?.context;if(ctx){const response=typeof ctx.clone==='function'?ctx.clone():ctx;if(typeof response.json==='function')diagnostic={...diagnostic,...await response.json()};}}catch{}
+      const code=String(diagnostic.error||diagnostic.code||error?.name||'paypal_checkout_initialization_failed').slice(0,100);
+      const details=[];
+      if(Array.isArray(diagnostic.missing_config)&&diagnostic.missing_config.length)details.push('missing configuration: '+diagnostic.missing_config.join(', '));
+      if(Array.isArray(diagnostic.invalid_config)&&diagnostic.invalid_config.length)details.push('invalid configuration: '+diagnostic.invalid_config.join(', '));
+      if(diagnostic.failure_stage)details.push('stage: '+String(diagnostic.failure_stage).slice(0,60));
+      if(Number.isFinite(Number(diagnostic.paypal_status)))details.push('PayPal HTTP status: '+Number(diagnostic.paypal_status));
+      console.error('APEP PayPal checkout diagnostic',{code,details,errorName:error?.name||null,status:error?.context?.status||null});
+      throw new Error('Checkout diagnostic: '+code+(details.length?' — '+details.join('; '):''));
+    }
     localStorage.setItem('apep_pending_paypal',JSON.stringify({order_id:data.order_id,product_id:p.id,slug:p.slug}));
     location.href=data.approve_url;
   }catch(err){
     console.error('APEP PayPal checkout error',err);
-    alert('We could not start PayPal checkout. Please try again.');
+    const message=String(err?.message||'').startsWith('Checkout diagnostic:')?err.message:'We could not start PayPal checkout. Please try again.';
+    alert(message);
   }
 }
 function paypalReturnStatus(message,type='info'){
