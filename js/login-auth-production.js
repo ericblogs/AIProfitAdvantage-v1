@@ -44,11 +44,27 @@ function showUnconfirmedMessage(email) {
 
 function getSafeDestination() {
   const redirect = new URLSearchParams(window.location.search).get('redirect');
-  // Only allow redirects to known application destinations. This preserves the
-  // existing dashboard guard while allowing provider onboarding to resume after login.
-  if (redirect && (redirect === '/dashboard' || redirect === '/dashboard/' || redirect.startsWith('/dashboard/') || redirect === '/pages/provider-onboarding.html')) {
-    return redirect;
+  if (!redirect) return '/dashboard/index.html';
+
+  // Resolve relative and absolute app paths, but never permit an off-site redirect.
+  // The storefront uses this return path so members can resume their intended journey.
+  try {
+    const destination = new URL(redirect, window.location.origin);
+    if (destination.origin !== window.location.origin) return '/dashboard/index.html';
+
+    const path = destination.pathname;
+    const allowed =
+      path === '/dashboard' ||
+      path === '/dashboard/' ||
+      path.startsWith('/dashboard/') ||
+      path === '/pages/provider-onboarding.html' ||
+      path === '/pages/store.html';
+
+    if (allowed) return `${path}${destination.search}${destination.hash}`;
+  } catch {
+    // Invalid redirect values fall back to the dashboard.
   }
+
   return '/dashboard/index.html';
 }
 
