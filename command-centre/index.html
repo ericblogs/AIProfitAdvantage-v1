@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>APEP AI Business Command Centre</title>
+<style>
+:root{--navy:#024784;--ink:#172033;--muted:#61708a;--bg:#f4f7fb}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--navy);color:white;padding:26px 18px}header div,main{max-width:900px;margin:auto}
+h1{font-size:26px;margin:8px 0}.tag{opacity:.9}main{padding:22px 14px 48px}
+.card{background:white;border-radius:14px;padding:20px;margin:0 0 16px;box-shadow:0 6px 22px #17203312}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+input,textarea{width:100%;padding:12px;border:1px solid #ccd5e2;border-radius:8px;font:inherit}
+textarea{min-height:130px}button{background:var(--navy);color:white;border:0;border-radius:8px;padding:12px 16px;font-weight:bold;margin-top:12px;cursor:pointer}
+.secondary{background:#e7edf6;color:var(--navy);margin-left:8px}.hidden{display:none}.muted{color:var(--muted);font-size:14px}
+.status{padding:10px;background:#eef4fb;border-radius:8px;margin-top:12px;white-space:pre-wrap}.error{background:#fff0f0;color:#9a1f1f}
+</style>
+</head>
+<body>
+<header><div><div>AI Profit Advantage Enterprise Platform</div><h1>APEP AI Business Command Centre</h1><div class="tag">Practical AI. Smarter Work. Business Growth.</div></div></header>
+<main>
+<section id="login" class="card"><h2>Private sign-in</h2><p class="muted">Sign in with your authorised APEP Certification QA Supabase account.</p>
+<label for="email">Email</label><input id="email" type="email" autocomplete="username">
+<label for="password">Password</label><input id="password" type="password" autocomplete="current-password">
+<button id="signin">Sign in</button><div id="loginmsg" class="status hidden" role="status"></div></section>
+<section id="workspace" class="hidden"><div class="card"><h2>What would you like to work on?</h2>
+<p class="muted">Private, read-only QA mode. This interface cannot publish content, send messages, change records or process payments.</p>
+<textarea id="request" placeholder="Describe your business objective or challenge..."></textarea><br>
+<button id="send">Analyse request</button><button id="logout" class="secondary">Sign out</button><p id="who" class="muted"></p></div>
+<div id="answer" class="card hidden" aria-live="polite"></div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+ const allowedUserId="22222222-2222-4222-8222-222222222222";
+ const projectUrl="https://bivuicydbggfpsdtcziy.supabase.co";
+ const publishableKey="sb_publishable_tt2ukEKWcNiMKhua3hkFtw_Rx0zy-rJ";
+ const client=window.supabase.createClient(projectUrl,publishableKey);
+ const el=id=>document.getElementById(id);
+ function showMessage(message,isError){const node=el("loginmsg");node.textContent=message;node.className="status"+(isError?" error":"");}
+ async function refreshSession(){
+   const result=await client.auth.getUser();
+   const user=result.data&&result.data.user;
+   if(user&&user.id===allowedUserId){el("login").classList.add("hidden");el("workspace").classList.remove("hidden");el("who").textContent="Signed in to the authorised private QA account.";return;}
+   el("workspace").classList.add("hidden");el("login").classList.remove("hidden");
+   if(user)showMessage("This account is not authorised for the private Command Centre.",true);
+ }
+ el("signin").addEventListener("click",async function(){
+   showMessage("Signing in...",false);
+   const result=await client.auth.signInWithPassword({email:el("email").value.trim(),password:el("password").value});
+   if(result.error){showMessage(result.error.message,true);return;}
+   await refreshSession();
+ });
+ el("logout").addEventListener("click",async function(){await client.auth.signOut();await refreshSession();});
+ el("send").addEventListener("click",async function(){
+   const message=el("request").value.trim();if(message.length<3)return;
+   const answer=el("answer");answer.classList.remove("hidden");answer.textContent="Working...";
+   const result=await client.functions.invoke("apep-ai-business-command-centre",{body:{message}});
+   if(result.error){answer.textContent="Request failed: "+result.error.message;return;}
+   const data=result.data||{};
+   answer.replaceChildren();
+   const heading=document.createElement("h2");heading.textContent=data.module_name||"Analysis";answer.appendChild(heading);
+   const summary=document.createElement("p");summary.textContent=data.objective_summary||"";answer.appendChild(summary);
+   if(data.clarification_question){const question=document.createElement("p");question.textContent="One question: "+data.clarification_question;answer.appendChild(question);}
+   const subheading=document.createElement("h3");subheading.textContent="Suggested workflow";answer.appendChild(subheading);
+   const list=document.createElement("ol");(Array.isArray(data.workflow)?data.workflow:[]).forEach(function(step){const item=document.createElement("li");item.textContent=step;list.appendChild(item);});answer.appendChild(list);
+   const note=document.createElement("p");note.className="muted";note.textContent=data.safety_note||"";answer.appendChild(note);
+ });
+ refreshSession().catch(function(error){showMessage("Could not check sign-in status: "+error.message,true);});
+})();
+</script>
+</body></html>
