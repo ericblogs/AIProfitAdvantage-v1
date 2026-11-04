@@ -1,0 +1,51 @@
+name: APEP AdKraft QA Preview Artifact
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "command-centre/index.html"
+      - ".github/workflows/adkraft-qa-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out QA branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify QA page contains AdKraft feature
+        run: |
+          test -f command-centre/index.html
+          grep -q "AI Video Ad Creation" command-centre/index.html
+          grep -q "https://adkraft.ai/" command-centre/index.html
+          grep -q "does not connect to AdKraft's API" command-centre/index.html
+          echo "AdKraft QA page checks passed."
+
+      - name: Package browser preview
+        run: |
+          mkdir -p preview/command-centre
+          cp command-centre/index.html preview/command-centre/index.html
+          cat > preview/README.txt <<'EOF'
+          APEP AdKraft QA preview
+
+          Open command-centre/index.html in a modern browser.
+          This is a QA-only local preview. It is not published to the APEP domain.
+          Sign-in requires the authorised QA Supabase account.
+          No AdKraft API is connected and no credits are consumed.
+          EOF
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apep-adkraft-qa-preview
+          path: preview/
+          if-no-files-found: error
+          retention-days: 7
