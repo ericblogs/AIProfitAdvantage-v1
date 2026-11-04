@@ -15,7 +15,7 @@ label{display:block;font-weight:bold;margin:12px 0 6px}
 input,textarea{width:100%;padding:12px;border:1px solid #ccd5e2;border-radius:8px;font:inherit}
 textarea{min-height:130px}button{background:var(--navy);color:white;border:0;border-radius:8px;padding:12px 16px;font-weight:bold;margin-top:12px;cursor:pointer}
 .secondary{background:#e7edf6;color:var(--navy);margin-left:8px}.hidden{display:none}.muted{color:var(--muted);font-size:14px}
-.status{padding:10px;background:#eef4fb;border-radius:8px;margin-top:12px;white-space:pre-wrap}.error{background:#fff0f0;color:#9a1f1f}
+.status{padding:10px;background:#eef4fb;border-radius:8px;margin-top:12px;white-space:pre-wrap}.error{background:#fff0f0;color:#9a1f1f}a{color:var(--navy);font-weight:bold}
 </style>
 </head>
 <body>
@@ -29,6 +29,23 @@ textarea{min-height:130px}button{background:var(--navy);color:white;border:0;bor
 <p class="muted">Private, read-only QA mode. This interface cannot publish content, send messages, change records or process payments.</p>
 <textarea id="request" placeholder="Describe your business objective or challenge..."></textarea><br>
 <button id="send">Analyse request</button><button id="logout" class="secondary">Sign out</button><p id="who" class="muted"></p></div>
+
+<div class="card" id="adkraft-tool">
+<h2>AI Video Ad Creation</h2>
+<p>Plan your video ad here, then take the prepared brief into AdKraft for video creation.</p>
+<p><a href="https://adkraft.ai/" target="_blank" rel="noopener noreferrer">Open AdKraft website</a> · <a href="https://adkraft.ai/signup" target="_blank" rel="noopener noreferrer">Create an AdKraft account</a></p>
+<p class="muted">AdKraft is an external service. This QA tool prepares a brief in your browser only. It does not connect to AdKraft's API, upload your information, create an account, or spend credits.</p>
+<label for="ad-product">Product or service</label><input id="ad-product" type="text" placeholder="What are you advertising?">
+<label for="ad-audience">Target audience and location</label><input id="ad-audience" type="text" placeholder="Who should see this ad?">
+<label for="ad-platform">Advertising platform</label><input id="ad-platform" type="text" placeholder="e.g. Instagram Reels, TikTok, Facebook, YouTube">
+<label for="ad-offer">Main offer or customer benefit</label><textarea id="ad-offer" placeholder="What problem does it solve? What should customers know?"></textarea>
+<label for="ad-style">Video style and tone</label><input id="ad-style" type="text" placeholder="e.g. product demo, UGC-style, professional, friendly">
+<label for="ad-duration">Preferred video length</label><input id="ad-duration" type="text" placeholder="e.g. 15 seconds">
+<label for="ad-cta">Call to action</label><input id="ad-cta" type="text" placeholder="e.g. Shop now, Sign up, Learn more">
+<button id="build-ad-brief" type="button">Prepare AdKraft video brief</button>
+<div id="ad-brief-result" class="status hidden" aria-live="polite"></div>
+<button id="copy-ad-brief" type="button" class="secondary hidden">Copy brief</button>
+</div>
 <div id="answer" class="card hidden" aria-live="polite"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -67,6 +84,27 @@ textarea{min-height:130px}button{background:var(--navy);color:white;border:0;bor
    const subheading=document.createElement("h3");subheading.textContent="Suggested workflow";answer.appendChild(subheading);
    const list=document.createElement("ol");(Array.isArray(data.workflow)?data.workflow:[]).forEach(function(step){const item=document.createElement("li");item.textContent=step;list.appendChild(item);});answer.appendChild(list);
    const note=document.createElement("p");note.className="muted";note.textContent=data.safety_note||"";answer.appendChild(note);
+ });
+
+ el("build-ad-brief").addEventListener("click",function(){
+   const fields=[
+     ["Product or service","ad-product"],
+     ["Target audience and location","ad-audience"],
+     ["Advertising platform","ad-platform"],
+     ["Main offer or customer benefit","ad-offer"],
+     ["Video style and tone","ad-style"],
+     ["Preferred video length","ad-duration"],
+     ["Call to action","ad-cta"]
+   ];
+   const lines=["APEP VIDEO AD BRIEF FOR ADKRAFT",""];
+   fields.forEach(function(field){const value=el(field[1]).value.trim();lines.push(field[0]+": "+(value||"To be decided"));});
+   lines.push("","Creative direction: Open with a clear hook, show the customer problem or desired outcome, present the offer, and finish with the stated call to action.");
+   lines.push("","Review all claims, prices, product details, music, images, likenesses and usage rights before publishing.");
+   const result=el("ad-brief-result");result.textContent=lines.join("\\n");result.classList.remove("hidden");el("copy-ad-brief").classList.remove("hidden");
+ });
+ el("copy-ad-brief").addEventListener("click",async function(){
+   const value=el("ad-brief-result").textContent;
+   try{await navigator.clipboard.writeText(value);el("copy-ad-brief").textContent="Copied";}catch(error){el("copy-ad-brief").textContent="Select and copy the brief above";el("ad-brief-result").focus();}
  });
  refreshSession().catch(function(error){showMessage("Could not check sign-in status: "+error.message,true);});
 })();
