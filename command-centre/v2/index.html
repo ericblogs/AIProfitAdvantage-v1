@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#024784">
+  <title>APEP Business Command Centre | QA</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./index.html" aria-label="APEP Business Command Centre home">
+      <span class="brand-mark">AI</span>
+      <span><strong>AI Profit Advantage</strong><small>Business Command Centre</small></span>
+    </a>
+    <span class="environment">PRIVATE QA ENVIRONMENT</span>
+  </header>
+
+  <main class="shell">
+    <section id="login-panel" class="login-wrap" aria-labelledby="login-title">
+      <div class="login-card">
+        <p class="eyebrow">PRIVATE WORKSPACE</p>
+        <h1 id="login-title">Sign in to APEP</h1>
+        <p class="muted">Use the authorised APEP owner account. This workspace is connected only to the APEP Certification QA database.</p>
+        <form id="login-form">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" autocomplete="username" required>
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+          <button id="sign-in" class="button primary" type="submit">Sign in securely</button>
+          <p id="login-message" class="message" role="status" aria-live="polite"></p>
+        </form>
+        <p class="fine-print">Access is controlled by Supabase authentication, the APEP owner profile and database Row Level Security. There is no public registration on this private QA workspace.</p>
+      </div>
+    </section>
+
+    <section id="access-denied" class="login-wrap hidden" aria-labelledby="denied-title">
+      <div class="login-card">
+        <p class="eyebrow">ACCESS CONTROL</p>
+        <h1 id="denied-title">This account is not authorised</h1>
+        <p id="denied-message" class="muted">Only the approved APEP owner account can open this workspace.</p>
+        <button id="denied-sign-out" class="button secondary" type="button">Sign out</button>
+      </div>
+    </section>
+
+    <section id="dashboard" class="hidden" aria-labelledby="dashboard-title">
+      <div class="welcome-row">
+        <div>
+          <p class="eyebrow">EXECUTIVE OVERVIEW</p>
+          <h1 id="dashboard-title">Good to have you back.</h1>
+          <p id="welcome-copy" class="muted">Your APEP business information, in one place.</p>
+        </div>
+        <div class="actions">
+          <span id="connection-status" class="status-pill">Connecting</span>
+          <button id="refresh" class="button secondary" type="button">Refresh</button>
+          <button id="sign-out" class="button outline" type="button">Sign out</button>
+        </div>
+      </div>
+
+      <div class="notice" role="note">
+        <strong>QA mode:</strong> This dashboard reads APEP Certification QA data only. Editing, publishing, payment processing, email sending and campaign activation are disabled.
+      </div>
+
+      <section class="metric-grid" aria-label="Business snapshot">
+        <article class="metric-card"><span class="metric-label">Products</span><strong id="metric-products">—</strong><small>In the APEP registry</small></article>
+        <article class="metric-card"><span class="metric-label">Open tasks</span><strong id="metric-tasks">—</strong><small>Not completed or cancelled</small></article>
+        <article class="metric-card"><span class="metric-label">Open alerts</span><strong id="metric-alerts">—</strong><small>Business items needing attention</small></article>
+        <article class="metric-card"><span class="metric-label">Approved knowledge</span><strong id="metric-knowledge">—</strong><small>Trusted APEP reference records</small></article>
+      </section>
+
+      <div class="content-grid">
+        <section class="panel span-2" aria-labelledby="products-heading">
+          <div class="panel-heading"><div><p class="eyebrow">PRODUCT MANAGEMENT</p><h2 id="products-heading">Products</h2></div><span id="product-count" class="count-label"></span></div>
+          <div id="products-list" class="record-list"><p class="empty">Loading products…</p></div>
+        </section>
+
+        <section class="panel" aria-labelledby="tasks-heading">
+          <div class="panel-heading"><div><p class="eyebrow">EXECUTION</p><h2 id="tasks-heading">Priority tasks</h2></div></div>
+          <div id="tasks-list" class="record-list"><p class="empty">Loading tasks…</p></div>
+        </section>
+
+        <section class="panel" aria-labelledby="alerts-heading">
+          <div class="panel-heading"><div><p class="eyebrow">BUSINESS MONITORING</p><h2 id="alerts-heading">Open alerts</h2></div></div>
+          <div id="alerts-list" class="record-list"><p class="empty">Loading alerts…</p></div>
+        </section>
+
+        <section class="panel" aria-labelledby="knowledge-heading">
+          <div class="panel-heading"><div><p class="eyebrow">APPROVED REFERENCE</p><h2 id="knowledge-heading">Knowledge base</h2></div></div>
+          <div id="knowledge-list" class="record-list"><p class="empty">Loading approved knowledge…</p></div>
+        </section>
+
+        <section class="panel span-2" aria-labelledby="reports-heading">
+          <div class="panel-heading"><div><p class="eyebrow">BUSINESS INTELLIGENCE</p><h2 id="reports-heading">Latest reports</h2></div></div>
+          <div id="reports-list" class="record-list"><p class="empty">Loading reports…</p></div>
+        </section>
+      </div>
+      <p id="dashboard-message" class="message page-message" role="status" aria-live="polite"></p>
+      <footer class="footer-note">AI Profit Advantage Enterprise Platform · Practical AI. Smarter Work. Business Growth.</footer>
+    </section>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
