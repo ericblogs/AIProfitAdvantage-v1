@@ -17,6 +17,24 @@ function setMessage(node, message, type = "error") {
   node.textContent = message || "";
   node.className = "message" + (type === "success" ? " success" : "");
 }
+function safeErrorMessage(error, fallback = "Something went wrong. Please try again.") {
+  // Keep implementation details out of the browser-facing interface.
+  console.error("APEP Command Centre QA error:", error);
+  const message = String(error?.message || "");
+  if (/invalid login credentials|invalid email or password/i.test(message)) {
+    return "The email address or password is incorrect. Please check and try again.";
+  }
+  if (/email not confirmed/i.test(message)) {
+    return "This account's email address has not been confirmed. Contact the workspace administrator.";
+  }
+  if (/network|fetch failed|failed to fetch|load failed/i.test(message)) {
+    return "We could not reach the QA service. Check your internet connection and try again.";
+  }
+  if (/JWT|token|session.*(expired|invalid)|not authenticated/i.test(message)) {
+    return "Your sign-in session is no longer valid. Please sign in again.";
+  }
+  return fallback;
+}
 function showOnly(panel) {
   [loginPanel, dashboard, deniedPanel].forEach((item) => item.classList.add("hidden"));
   panel.classList.remove("hidden");
@@ -200,7 +218,7 @@ async function checkSession() {
     await loadDashboard(data.user);
   } catch (error) {
     showOnly(loginPanel);
-    setMessage($("login-message"), error.message);
+    setMessage($("login-message"), safeErrorMessage(error, "We could not restore your session. Please sign in again."));
   }
 }
 
@@ -212,22 +230,20 @@ $("login-form").addEventListener("submit", async (event) => {
   setMessage($("login-message"), "Checking your account…", "success");
   const email = $("email").value.trim();
   const password = $("password").value;
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  button.disabled = false;
-  button.textContent = "Sign in securely";
-  if (error) {
-    setMessage($("login-message"), error.message);
-    return;
-  }
-  if (!data.user) {
-    setMessage($("login-message"), "Sign-in did not return a verified user session.");
-    return;
-  }
   try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (!data.user) {
+      setMessage($("login-message"), "We could not confirm your sign-in. Please try again.");
+      return;
+    }
     await loadDashboard(data.user);
-  } catch (loadError) {
-    setMessage($("login-message"), loadError.message);
+  } catch (error) {
     showOnly(loginPanel);
+    setMessage($("login-message"), safeErrorMessage(error, "We could not sign you in. Please try again."));
+  } finally {
+    button.disabled = false;
+    button.textContent = "Sign in securely";
   }
 });
 
@@ -246,7 +262,7 @@ $("refresh").addEventListener("click", async () => {
     if (error || !data.user) throw new Error(error?.message || "Your session has expired. Please sign in again.");
     await loadDashboard(data.user);
   } catch (error) {
-    setMessage($("dashboard-message"), error.message);
+    setMessage($("dashboard-message"), safeErrorMessage(error, "We could not refresh the dashboard. Please try again."));
   } finally {
     $("refresh").disabled = false;
   }
