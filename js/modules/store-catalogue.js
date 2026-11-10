@@ -48,6 +48,56 @@ async function startPayPalCheckout(p){
     alert(message);
   }
 }
+async function completePaystackReturn(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('paystack')!=='success')return;
+  const reference=params.get('reference')||params.get('trxref');
+  const productId=params.get('product_id');
+  if(!reference||!productId){
+    paystackReturnStatus('Paystack returned to APEP, but the transaction reference or product identifier is missing. No download access has been granted.','error');
+    return;
+  }
+  paystackReturnStatus('Paystack returned to APEP. Verifying your payment securely…');
+  try{
+    const client=await getSupabase();
+    const {data:{session}}=await client.auth.getSession();
+    if(!session){
+      paystackReturnStatus('Your payment return was received, but your APEP session has expired. Sign in with the purchasing account, then reopen this return page to complete verification.','error');
+      return;
+    }
+    const {data,error}=await client.functions.invoke('verify-paystack-product-payment',{body:{reference,product_id:productId}});
+    if(error||!data?.success){
+      const code=data?.error||error?.message||'verification_failed';
+      console.error('APEP Paystack return verification failed',{code,status:error?.context?.status||null});
+      paystackReturnStatus('APEP could not confirm this Paystack payment yet. No download access has been granted. Keep your reference for support: '+reference+' • '+code,'error');
+      return;
+    }
+    paystackReturnStatus('Payment confirmed. Your APEP product entitlement has been granted. Your download button is ready below.','success');
+    history.replaceState({},document.title,location.pathname+'#apep-learning-store');
+    const grid=document.querySelector('#apep-products-grid');
+    if(grid){
+      await hydrateEntitlements(grid);
+      const card=[...grid.querySelectorAll('.apep-product-card')].find(item=>item.dataset.productId===productId);
+      const button=card?.querySelector('.apep-download-btn');
+      if(button)button.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }catch(err){
+    console.error('APEP Paystack return error',err);
+    paystackReturnStatus('We could not confirm the Paystack payment. No download access has been granted. Keep your reference for support: '+reference,'error');
+  }
+}
+function paystackReturnStatus(message,type='info'){
+  let box=document.getElementById('apep-paystack-return-status');
+  if(!box){
+    box=document.createElement('div');
+    box.id='apep-paystack-return-status';
+    box.setAttribute('role','status');
+    box.style.cssText='position:fixed;z-index:99999;top:18px;left:50%;transform:translateX(-50%);width:min(92vw,620px);box-sizing:border-box;padding:16px 18px;border-radius:10px;background:#fff;border:1px solid #d9dee8;box-shadow:0 8px 30px rgba(0,0,0,.14);font:600 14px/1.5 Arial,sans-serif;color:#263247;';
+    document.body.appendChild(box);
+  }
+  box.textContent=message;
+  box.style.borderColor=type==='success'?'#2d8a57':type==='error'?'#b44b4b':'#d9dee8';
+}
 function paypalReturnStatus(message,type='info'){
   let box=document.getElementById('apep-paypal-return-status');
   if(!box){
@@ -114,5 +164,5 @@ function wireReadMore(grid){return grid;}
 function render(grid){if(grid.querySelector('.apep-product-card'))return;grid.replaceChildren(...PRODUCTS.map(card));wireReadMore(grid);}
 async function hydratePublishedProducts(){try{const client=await getSupabase();const {data,error}=await client.from('digital_products').select('id,slug,title,short_description,description,price,usd_price,cover_image_path,is_published').eq('is_published',true).order('created_at',{ascending:true});if(error||!Array.isArray(data)){console.warn('APEP Store published product hydration failed:',error);return;}for(const row of data){if(!row?.id||PRODUCTS.some(p=>p.id===row.id))continue;PRODUCTS.push({id:row.id,slug:row.slug,title:row.title,description:row.description,shortDescription:row.short_description,price:Number(row.price),usd:row.usd_price!=null?Number(row.usd_price):null,cover:row.cover_image_path});}}catch(error){console.warn('APEP Store published product hydration failed:',error);}}
 function needsRepair(grid){const cards=[...grid.querySelectorAll('.apep-product-card')];if(!cards.length)return true;return cards.some(card=>{const img=card.querySelector('.apep-product-cover');const desc=card.querySelector('.apep-product-desc');const title=card.querySelector('.apep-product-title');const readMore=card.querySelector('.apep-read-more');return !title||!title.textContent.trim()||!desc||!desc.textContent.trim()||!readMore||!img||!img.getAttribute('src');});}
-async function initialise(){const grid=document.querySelector('#apep-products-grid');if(!grid||!document.querySelector('#apep-learning-store'))return;addStyles();await hydratePublishedProducts();await hydrateProductDescriptions();render(grid);await hydrateEntitlements(grid);await completePayPalReturn();await hydrateEntitlements(grid);setTimeout(()=>hydrateEntitlements(grid),800);setTimeout(()=>hydrateEntitlements(grid),2000);setTimeout(async()=>{if(needsRepair(grid)){grid.replaceChildren(...PRODUCTS.map(card));wireReadMore(grid);await hydrateEntitlements(grid);}},1200);}
+async function initialise(){const grid=document.querySelector('#apep-products-grid');if(!grid||!document.querySelector('#apep-learning-store'))return;addStyles();await hydratePublishedProducts();await hydrateProductDescriptions();render(grid);await hydrateEntitlements(grid);await completePayPalReturn();await completePaystackReturn();await hydrateEntitlements(grid);setTimeout(()=>hydrateEntitlements(grid),800);setTimeout(()=>hydrateEntitlements(grid),2000);setTimeout(async()=>{if(needsRepair(grid)){grid.replaceChildren(...PRODUCTS.map(card));wireReadMore(grid);await hydrateEntitlements(grid);}},1200);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialise,{once:true});else initialise();
