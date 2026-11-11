@@ -108,23 +108,23 @@ function wirePayPalFallback(p,c){
 }
 function normaliseHeading(v){return String(v||'').replace(/^#+\s*/,'').replace(/[’‘]/g,"'").replace(/&/g,'and').replace(/[^a-z0-9]+/gi,' ').trim().toLowerCase()}function displayLongDescription(product){let clean=String(product.description||product.shortDescription||'').trim();const titleKey=normaliseHeading(product.title);for(let i=0;i<3;i++){const lines=clean.split(/\r?\n/);if(!lines.length)break;const first=lines[0].trim();if(normaliseHeading(first)===titleKey){clean=lines.slice(1).join('\n').replace(/^\s*\n+/,'').trim();}else break;}return clean}function formatDescription(text){
   const safe=esc(text).replace(/[←⟵⇐⇦]/g,'→');
-  const lines=safe.split(/\\r?\\n/);
+  const lines=safe.split(/\r?\n/);
   const headingLine=line=>{
     const value=line.trim();
     if(!value)return false;
-    if(/^#{1,3}\\s+/.test(value))return true;
-    if(/^<strong>.*<\\/strong>$/.test(value))return true;
-    if(/^\\d{1,2}[.)]?\\s*[—–-]\\s*[^.!?]{2,100}$/.test(value))return true;
+    if(/^#{1,3}\s+/.test(value))return true;
+    if(/^<strong>.*<\/strong>$/.test(value))return true;
+    if(/^\d{1,2}[.)]?\s*[—–-]\s*[^.!?]{2,100}$/.test(value))return true;
     if(/^[A-Z0-9][A-Z0-9 &’'(),:|/–—-]{2,90}$/.test(value) && /[A-Z]/.test(value))return true;
     const plain=value.replace(/<[^>]+>/g,'').trim();
-    const words=plain.split(/\\s+/);
+    const words=plain.split(/\s+/);
     if(words.length>=2&&words.length<=10&&plain.length<=78&&!/[.!?;]$/.test(plain)&&!/^[-•*]/.test(plain)&&/^[A-Z0-9“‘]/.test(plain))return true;
     return false;
   };
   return lines.map(line=>{
     const value=line.trim();
     if(!value)return '';
-    if(/^#{1,3}\\s+/.test(value))return '<strong>'+value.replace(/^#{1,3}\\s+/,'')+'</strong>';
+    if(/^#{1,3}\s+/.test(value))return '<strong>'+value.replace(/^#{1,3}\s+/,'')+'</strong>';
     if(headingLine(value))return '<strong>'+value+'</strong>';
     return value;
   }).join('<br>');
