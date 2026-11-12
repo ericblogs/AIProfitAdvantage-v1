@@ -96,6 +96,16 @@ def request_json(url, payload=None, headers=None, method=None):
             print(f"API read timed out; retrying in {delay}s (attempt {attempt + 2}/4).")
             time.sleep(delay)
 
+def canonicalize_internal_links(markdown):
+    """Make site-root links resolve correctly when drafts are reviewed on GitHub."""
+    base = "https://www.aiprofitadvantage.online"
+    return re.sub(
+        r'(?<=[\\(])(/pages/(?:blog|knowledge-library|articles/[a-z0-9-]+)\\.html)',
+        lambda match: base + match.group(1),
+        markdown,
+    )
+
+
 def main():
     prompt = f"""
 You are the senior editorial writer for AI Profit Advantage Enterprise Platform (APEP),
@@ -175,7 +185,7 @@ Editorial requirements:
 
     title = str(article["title"]).strip()
     slug = str(article["slug"]).strip().lower()
-    body = str(article["article_markdown"]).strip()
+    body = canonicalize_internal_links(str(article["article_markdown"]).strip())
     excerpt = str(article["excerpt"]).strip()
     words = re.findall(r"\b[\w'-]+\b", body)
     if not title or not excerpt or len(slug) > 90 or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug):
@@ -200,7 +210,7 @@ Editorial requirements:
         return
 
     notes = article.get("editor_verification_notes") or []
-    links = article.get("suggested_internal_links") or []
+    links = [canonicalize_internal_links(str(link).strip()) for link in (article.get("suggested_internal_links") or [])]
     issue_body = f"""## Editorial status
 **Draft — requires human review. Not published.**
 
