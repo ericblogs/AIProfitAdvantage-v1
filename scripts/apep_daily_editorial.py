@@ -76,7 +76,7 @@ def request_json(url, payload=None, headers=None, method=None):
     retryable_statuses = {429, 500, 502, 503, 504}
     for attempt in range(4):
         try:
-            with urllib.request.urlopen(req, timeout=90) as response:
+            with urllib.request.urlopen(req, timeout=180) as response:
                 return json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             if exc.code not in retryable_statuses or attempt == 3:
@@ -88,6 +88,12 @@ def request_json(url, payload=None, headers=None, method=None):
                 delay = 5 * (2 ** attempt)
             print(f"Temporary API response HTTP {exc.code}; retrying in {delay}s "
                   f"(attempt {attempt + 2}/4).")
+            time.sleep(delay)
+        except TimeoutError:
+            if attempt == 3:
+                raise
+            delay = 5 * (2 ** attempt)
+            print(f"API read timed out; retrying in {delay}s (attempt {attempt + 2}/4).")
             time.sleep(delay)
 
 def main():
