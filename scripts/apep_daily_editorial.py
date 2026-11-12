@@ -21,7 +21,7 @@ TODAY = (
     datetime.fromisoformat(raw_date.replace("Z", "+00:00")).date().isoformat()
     if raw_date else datetime.now(timezone.utc).date().isoformat()
 )
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
 
 CATEGORIES = [
     ("AI Fundamentals", "Explain a useful AI concept for beginners and show when it matters in real work."),
