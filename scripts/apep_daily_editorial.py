@@ -139,23 +139,34 @@ Editorial requirements:
 - Category should be exactly: {category}
 - Return only the requested JSON object.
 """
-    gemini_url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        + urllib.parse.quote(MODEL, safe="")
-        + ":generateContent?key=" + urllib.parse.quote(GEMINI_API_KEY, safe="")
-    )
-    result = request_json(
-        gemini_url,
-        {
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": {
-                "temperature": 0.65,
-                "responseMimeType": "application/json",
-                "responseSchema": SCHEMA,
-            },
+    generation_payload = {
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.65,
+            "responseMimeType": "application/json",
+            "responseSchema": SCHEMA,
         },
-        {"Content-Type": "application/json"},
-    )
+    }
+
+    def generate_with_model(model_name):
+        gemini_url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            + urllib.parse.quote(model_name, safe="")
+            + ":generateContent?key=" + urllib.parse.quote(GEMINI_API_KEY, safe="")
+        )
+        return request_json(
+            gemini_url, generation_payload, {"Content-Type": "application/json"}
+        )
+
+    try:
+        result = generate_with_model(MODEL)
+    except urllib.error.HTTPError as exc:
+        fallback_model = os.environ.get("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash-lite")
+        if exc.code != 503 or fallback_model == MODEL:
+            raise
+        print(f"Primary Gemini model {MODEL} returned HTTP 503 after retries; "
+              f"trying supported fallback model {fallback_model}.")
+        result = generate_with_model(fallback_model)
     try:
         raw = result["candidates"][0]["content"]["parts"][0]["text"]
         article = json.loads(raw)
