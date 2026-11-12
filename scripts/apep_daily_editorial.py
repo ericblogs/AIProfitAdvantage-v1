@@ -100,11 +100,10 @@ def canonicalize_internal_links(markdown):
     """Make site-root links resolve correctly when drafts are reviewed on GitHub."""
     base = "https://www.aiprofitadvantage.online"
     return re.sub(
-        r'(?<=[\\(])(/pages/(?:blog|knowledge-library|articles/[a-z0-9-]+)\\.html)',
+        r'(?<=\()(/pages/(?:blog|knowledge-library|articles/[a-z0-9-]+)\.html)',
         lambda match: base + match.group(1),
         markdown,
     )
-
 
 def main():
     prompt = f"""
