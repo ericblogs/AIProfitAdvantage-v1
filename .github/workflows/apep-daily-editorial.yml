@@ -1,0 +1,42 @@
+name: APEP Daily Editorial Draft
+
+on:
+  schedule:
+    # 07:00 West Africa Time (UTC+1)
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: apep-daily-editorial
+  cancel-in-progress: false
+
+jobs:
+  generate-editorial-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate and queue editorial draft
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.5-flash
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          EDITORIAL_DATE: ${{ github.run_started_at }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::error::Missing repository secret GEMINI_API_KEY. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          python scripts/apep_daily_editorial.py
