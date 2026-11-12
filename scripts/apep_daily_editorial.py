@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -72,8 +73,22 @@ def request_json(url, payload=None, headers=None, method=None):
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers or {},
                                  method=method or ("POST" if data else "GET"))
-    with urllib.request.urlopen(req, timeout=90) as response:
-        return json.loads(response.read().decode("utf-8"))
+    retryable_statuses = {429, 500, 502, 503, 504}
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=90) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            if exc.code not in retryable_statuses or attempt == 3:
+                raise
+            retry_after = exc.headers.get("Retry-After")
+            try:
+                delay = min(max(int(retry_after), 1), 30) if retry_after else 5 * (2 ** attempt)
+            except ValueError:
+                delay = 5 * (2 ** attempt)
+            print(f"Temporary API response HTTP {exc.code}; retrying in {delay}s "
+                  f"(attempt {attempt + 2}/4).")
+            time.sleep(delay)
 
 def main():
     prompt = f"""
