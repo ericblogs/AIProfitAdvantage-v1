@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 REPO = os.environ["GITHUB_REPOSITORY"]
 GH_TOKEN = os.environ["GH_TOKEN"]
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-TODAY = os.environ.get("EDITORIAL_DATE") or datetime.now(timezone.utc).date().isoformat()
+raw_date = os.environ.get("EDITORIAL_DATE")\nTODAY = (datetime.fromisoformat(raw_date.replace("Z", "+00:00")).date().isoformat()\n         if raw_date else datetime.now(timezone.utc).date().isoformat())
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 CATEGORIES = [
