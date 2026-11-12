@@ -30,7 +30,7 @@ jobs:
       - name: Generate and queue editorial draft
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash
+          GEMINI_MODEL: gemini-3.8-flash
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           EDITORIAL_DATE: ${{ github.run_started_at }}
